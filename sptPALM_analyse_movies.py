@@ -11,12 +11,12 @@ from tkinter import simpledialog, filedialog
 import os
 import sys
 
-from DefineInputParameters import define_input_parameters
+from define_input_parameters import define_input_parameters
 
 
-from Convert_csv import convert_csv
-from ApplyCellSegmentation import apply_cell_segmentation
-# from TrackingAnalysis import tracking_analysis
+from convert_csv import convert_csv
+from apply_cell_segmentation import apply_cell_segmentation
+from tracking_aAnalysis import tracking_analysis
 # from DiffusionAnalysis import diffusion_analysis
 # from Plot_Hist_DiffusionTracklength import plot_hist_diffusion_tracklength
 # from SingleCellTrackingAnalysis import single_cell_tracking_analysis
@@ -24,29 +24,27 @@ from ApplyCellSegmentation import apply_cell_segmentation
 # from NormIncrements_Analysis import norm_increments_analysis
 
 
-def sptPALM_analyse_Movies():
+def sptPALM_analyse_movies():
     DATA = None
     # 1.1 Define input parameters
     print('Run DefineInputParameters()')
     inputParameter = define_input_parameters()
     
     # Allow savename to be changed (default: 'sptDataMovies.mat')
-    
+    # NOT NEEDED, REMEMBER FOR LATER
     # root = tk.Tk()
     # root.withdraw()  # Hide the root window    
     # prompt = "Enter new name for saving sptDataMovies.mat or press OK/Enter"
     # inputParameter['dataFileNameMat'] = simpledialog.askstring("Rename sptDataMovies.mat?", prompt, initialvalue='sptDataMovies.mat')
-    
-    input_default = 'sptDataMovies.matPy'
-    user_input = input("  Enter string or press enter (default is: '"+input_default+"'): ")
-    if not user_input:
-        user_input = input_default 
-    inputParameter['dataFileNameMat'] = user_input
+   
+ #temporarily disabled   
+    inputParameter['dataFileNameMat'] = 'sptDataMovies.matPy'
+    # input_default = 'sptDataMovies.matPy'
+    # user_input = input("  Enter string or press enter (default is: '"+input_default+"'): ")
+    # if not user_input:
+    #     user_input = input_default 
+    # inputParameter['dataFileNameMat'] = user_input
       
-    # # Convert to string if it's None
-    # if inputParameter['dataFileNameMat'] is None:
-    #     inputParameter['dataFileNameMat'] = 'sptDataMovies.matPy'
-    
     
     # Fall-back to GUI if no list of ThunderSTORM.csv files is specified
     # *_thunder_.csv files is specified in DefineInputParameters.m
@@ -61,7 +59,6 @@ def sptPALM_analyse_Movies():
             inputParameter['dataPathName'] = os.path.dirname(files[0])
             os.chdir(inputParameter['dataPathName'])
             
-
     # Check whether an equal number of files for localisations and segmentations was selected
     # in the SPECIAL CASE that several *_thunder.csv files, but only one brightfield image
     # were selected, ask wether to continue. If yes is chosen, this brightfiield image
@@ -112,8 +109,8 @@ def sptPALM_analyse_Movies():
         if inputParameter['useSegmentations']:
             Para1 = apply_cell_segmentation(Para1)
 
-#         # 2.4 Perform tracking
-#         Para1 = tracking_analysis(Para1)
+        # 2.4 Perform tracking
+        Para1 = tracking_analysis(Para1)
 
 #         # 2.5 Calculate and plot diffusion coefficients
 #         Para1 = diffusion_analysis(Para1)

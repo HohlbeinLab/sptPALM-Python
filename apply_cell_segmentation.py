@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from skimage.io import imread
 
 def apply_cell_segmentation(para1):
+    cmap_applied = 'gist_ncar' ##was: 'nipy_spectral', tab20c, 
     # Define filenames to load existing data
     para1['filename_procBrightfield_segm'] = para1['filename_procBrightfield'][:-4] + '_segm.tif'
     para1['filename_procBrightfield_segm_Table'] = para1['filename_procBrightfield_segm'][:-4] + '_Table.csv'
@@ -60,19 +61,21 @@ def apply_cell_segmentation(para1):
 
     # Plot images initially segmented elsewhere
     fig, ax = plt.subplots(2, 3, figsize=(14, 8))
-    circle_spot_size = 4
+    circle_spot_size = 2
 
     # Show processed brightfield image
     ax[0, 0].imshow(procBrightfield_image, cmap='gray')
     ax[0, 0].set_title('Processed brightfield image (MacroCellSegmentation.ijm)')
     ax[0, 0].set_xlabel('Pixels')
     ax[0, 0].set_ylabel('Pixels')
+    ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
     # Show segmented brightfield image
-    ax[0, 1].imshow(procBrightfield_segm_image, cmap='nipy_spectral')
+    ax[0, 1].imshow(procBrightfield_segm_image, cmap = cmap_applied)
     ax[0, 1].set_title(f'Segmentations of {len(procBrightfield_segm_Table)} cells')
     ax[0, 1].set_xlabel('Pixels')
     ax[0, 1].set_ylabel('Pixels')
+    ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
     # Show histogram
     ax[0, 2].hist(para1['OutputTable']['brightness'], bins=np.arange(0, 10000, 500), edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
@@ -81,12 +84,13 @@ def apply_cell_segmentation(para1):
     ax[0, 2].set_ylabel('Number of localisations')
 
     # Show segmented brightfield image with all localisations
-    ax[1, 0].imshow(procBrightfield_segm_image, cmap='nipy_spectral')
+    ax[1, 0].imshow(procBrightfield_segm_image, cmap = cmap_applied)
     #!!!!!!for python x and y changes in the following: 1,0 => 0,1
     ax[1, 0].scatter(loc_pixel_array[:, 0], loc_pixel_array[:, 1], circle_spot_size, 'black', label='Localisations')
     ax[1, 0].set_title(f'Segmented image containing {len(loc_pixel_array)} localisations')
     ax[1, 0].set_xlabel('Pixels')
     ax[1, 0].set_ylabel('Pixels')
+    ax[1, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
     print(f'Total number of localisations: {len(loc_pixel_array)}')
     print(f'Number of cells before filtering: {len(procBrightfield_segm_Table)}')
@@ -101,6 +105,7 @@ def apply_cell_segmentation(para1):
     print(f'Number of cells after filtering: {len(temp_cell_array)}')
 
     # # Check for each localisation whether it is part of a valid cell or not
+    # OLD code: slow and redundant
     # for j in range(len(temp_cell_array)):
     #     if j % 50 == 0:
     #         print(f'Cell {j + 1} of {len(temp_cell_array)}')
@@ -127,23 +132,25 @@ def apply_cell_segmentation(para1):
         loc_pixel_array[inside_mask, 2] = cell_id
         loc_pixel_array[inside_mask, 3] = temp_cell_array[temp_cell_array[:, 0] == cell_id, 1]
 
-
-
     # Plot additional visualizations
-    ax[1, 1].imshow(procBrightfield_segm_image, cmap='nipy_spectral')
+    ax[1, 1].imshow(procBrightfield_segm_image, cmap = cmap_applied) 
     #!!!!! for python x and y changes in the following: 1,0 => 0,1
     ax[1, 1].scatter(loc_pixel_array[loc_pixel_array[:, 2] == -1, 0], loc_pixel_array[loc_pixel_array[:, 2] == -1, 1], circle_spot_size, 'black', label='Outside')
     ax[1, 1].scatter(loc_pixel_array[loc_pixel_array[:, 2] > 0, 0], loc_pixel_array[loc_pixel_array[:, 2] > 0, 1], circle_spot_size, 'magenta', label='Within cells')
     ax[1, 1].set_title(f'{np.sum(loc_pixel_array[:, 2] > 0)} localisations within {len(temp_cell_array)} cells')
     ax[1, 1].set_xlabel('Pixels')
     ax[1, 1].set_ylabel('Pixels')
+    ax[1, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+
+    plt.tight_layout()  # Adjust layout to prevent overlap
+    plt.show()
 
     # Save figure as PNG
     if not para1.get('dataPathOutp'):
         plt.savefig(f"{para1['dataPathName']}{para1['filename_thunderstormCSV'][:-4]}-analysis-Fig01_segm.png")
     else:
         tmp_name = para1['filename_thunderstormCSV'].split("\\")[-1][:-4]
-        plt.savefig(f"{para1['dataPathOutp']}{tmp_name}-analysis-Fig01_segm.png")
+        plt.savefig(f"{para1['dataPathOutp']}{tmp_name}-analysis-Fig01_segm.png", dpi=300)
 
     print(f'Number of localisations within cells: {np.sum(loc_pixel_array[:, 2] > 0)}')
     print(f'Number of localisations outside cells: {np.sum(loc_pixel_array[:, 2] == -1)}')
