@@ -10,18 +10,18 @@ from define_input_parameters import define_input_parameters
 from sptPALM_analyse_movies import sptPALM_analyse_movies
 
 data = {}
-parameters = {}
+para = {}
 combined_data = {}
 
 def merge_data_folders_files():
     print('-2-1-')
-    # MergeDataFoldersFiles implementation here
+    # merge_data_folders_files implementation here
     return []
 def combine_thunderstorm_csv_files():
     print('-2-4-')
     # Combine_ThunderSTORM_csv_files implementation here
     return []
-def sptPALM_combine_data():
+def sptPALM_combine_data(combined_data=None):
     print('-4-')
     # Your implementation here
     return []
@@ -50,7 +50,7 @@ while True:
     6: sptPALM_anaDDA
     7: sptPALM_MCDDA
     8: sptPALM_runAll (Options 3-6)\n"""
-    #check prompt
+    # Check prompt
     try:
         prompt_input = int(input(PROMPT))
     except ValueError:
@@ -61,12 +61,12 @@ while True:
         case 0:
             print('Exit!')
             break
-        case 1: #careful, this was a dirty hack in Matlab and might not work here!
+        case 1:  # Careful, this was a dirty hack in Matlab and might not work here!
             print(' Edit parameters for data analysis!')
             print(' Look for DefineInputParameters.py and edit it.')
             print(' Then save the file and continue.')
-            input_parameter = define_input_parameters()
-        case 2: # Combine_ThunderSTORM_csv_files
+            input_parameter = define_input_para()
+        case 2:  # Combine_ThunderSTORM_csv_files
             while True:
                 print('--')
                 SUB_PROMPT = """    Choose and press Enter
@@ -75,7 +75,7 @@ while True:
         2: NOT WORKING YET Run ImageJ/Fiji macro 'Cell Segmentation'
         3: NOT WORKING YET Run ImageJ/Fiji macro 'ThunderStorm'
         4: Combine ThunderSTORM *.csv files\n: """
-                #check prompt
+                # Check prompt
                 try:
                     sub_prompt_input = int(input(SUB_PROMPT))
                 except ValueError:
@@ -92,20 +92,20 @@ while True:
                     case 2:
                         print('NOT IMPLEMENTED: Running ImageJ/Fiji macro'
                               'Cell Segmentation')
-                        # running Cellseg implementation here
+                        # Running Cellseg implementation here
                     case 3:
                         print('NOT IMPLEMENTED: Running ThunderSTORM macro')
-                        # running Thunderstorm implementation here
+                        # Running Thunderstorm implementation here
                     case 4:
                         print('Run Combine_ThunderSTORM_csv_files')
                         combine_thunderstorm_csv_files()
                     case _:
                         print("Invalid option, please choose a valid number.")
                         continue
-        case 3: #sptPALM_analyse_Movies
-            data, parameters = sptPALM_analyse_movies()
+        case 3:  # sptPALM_analyse_Movies
+            data, para = sptPALM_analyse_movies()
             print('DATA now available in the workspace')
-        case 4: #sptPALM_combineData
+        case 4:  # sptPALM_combineData
             print('Run sptPALM_combineData()')
             if data:
                 combined_data = sptPALM_combine_data(data)
@@ -115,7 +115,7 @@ while True:
                       'or similar)')
                 CombinedDATA = sptPALM_combine_data()
             print('CombinedDATA now available in the workspace')
-        case 5: #sptPALM_PlotCombinedData
+        case 5:  # sptPALM_PlotCombinedData
             print('NRun sptPALM_PlotCombinedData(CombinedDATA)')
             if combined_data:
                 combined_data = sptPALM_plot_combined_data(combined_data)
@@ -124,7 +124,7 @@ while True:
                 print('Continue with GUI to select combined_data '
                       '("sptDataCombinedMovies.mat" or similar)')
                 combined_data = sptPALM_plot_combined_data()
-        case 6: #anaDDA
+        case 6:  # anaDDA
             print('run sptPALM_anaDDA(CombinedDATA, 1) on condition 1')
             if combined_data:
                 combined_data = sptPALM_anaDDA(1, combined_data)
@@ -133,7 +133,7 @@ while True:
                 print('Continue with GUI to select combined_data '
                       '("sptDataCombinedMovies.mat" or similar)')
                 combined_data = sptPALM_anaDDA(1)
-        case 7: #MCDDA
+        case 7:  # MCDDA
             if combined_data:
                 combined_data = sptPALM_MCDDA(1, combined_data)
             else:
@@ -141,11 +141,12 @@ while True:
                 print('Continue with GUI to select combined_data '
                       '("sptDataCombinedMovies.mat" or similar)')
                 combined_data = sptPALM_MCDDA(1)
-        case 8: # un everything until anaDDA
-            data, parameters = sptPALM_analyse_movies()
+        case 8: # Run everything until anaDDA
+            data, para = sptPALM_analyse_movies()
             combined_data = sptPALM_combine_data(data)
             combined_data = sptPALM_plot_combined_data(combined_data)
             combined_data = sptPALM_anaDDA(1, combined_data)
         case _:
             print("Invalid option, please choose a valid number.")
             continue
+        

@@ -8,7 +8,7 @@ Created on Wed Aug 28 20:58:09 2024
 
 # Transforming thunderSTORM.csv files to _analysis.csv files for further downstream processing
 # First, load localisation data from ThunderSTORM ('*_thunder.csv') and
-# convert it to '*_thunder-analysis.csv' table and add Para1.movieNumber to the file
+# convert it to '*_thunder-analysis.csv' table and add para.movieNumber to the file
 # Note that localisations from ThunderSTORM use unit of nanometer (not pixels)! 
 # author: Johannes Hohlbein, 14.08.2022
 
@@ -16,21 +16,19 @@ Created on Wed Aug 28 20:58:09 2024
 import pandas as pd
 import numpy as np
 
-def convert_csv(para1):
+def convert_csv(para):
     # Import *.csv data (for example obtained from running ThunderSTORM)
-    load_file = para1['dataPathName'] + para1['filename_thunderstormCSV']
+    load_file = para['data_pathname'] + para['filename_thunderstorm_csv']
     print(f' loadFile [csv] = {load_file}')
     
     csv_input_file = pd.read_csv(load_file)
 
     # Prepare output file
-    para1['filename_analysis_csv'] = para1['filename_thunderstormCSV'][:-4] + '_analysis.csv'
-    save_file = para1['dataPathName'] + para1['filename_analysis_csv']
-    print(f' saveFile [csv] = {save_file}')
+    para['filename_analysis_csv'] = para['filename_thunderstorm_csv'][:-4] + '_analysis.csv'
+    save_file = para['data_pathname'] + para['filename_analysis_csv']
+    print(f' save_file [csv] = {save_file}')
 
     # Define the output columns
-    # columns: loc id, movie_id, frame_id, cell_id, x [nm], y [nm], z [nm], brightness, bg, i0, sx, sy, empty (NaN)
-
     csv_header = ['loc_id', 'movie_id', 'frame_id', 'cell_id', 'track_id', 
                   'x [nm]', 'y [nm]', 'z [nm]', 'brightness', 'background', 
                   'i0', 'sx', 'sy', 'cell_area_id']
@@ -55,52 +53,52 @@ def convert_csv(para1):
 
     # Fill in the output DataFrame based on the mappings
     
-    # fill 'loc_id' column
+    # Fill 'loc_id' column
     if columns_map['id_column'] is not None:
         csv_output_file['loc_id'] = csv_input_file.iloc[:, columns_map['id_column']]
         
-    # fill 'movie_id' column (preset to 1)
-    csv_output_file['movie_id'] = para1['movieNumber']
+    # Fill 'movie_id' column (preset to 1)
+    csv_output_file['movie_id'] = para['movie_number']
     
-    # fill 'frames_id' column
+    # Fill 'frames_id' column
     if columns_map['frame_column'] is not None:
         csv_output_file['frame_id'] = csv_input_file.iloc[:, columns_map['frame_column']]
     
-    # fill 'cells_id' column (preset to -1)
+    # Fill 'cells_id' column (preset to -1)
     csv_output_file['cell_id'] = -1
     
-    # fill 'track_id' column (preset to -1)
+    # Fill 'track_id' column (preset to -1)
     csv_output_file['track_id'] = -1
 
-    # fill x positions
+    # Fill x positions
     if columns_map['x_column'] is not None:
         csv_output_file['x [nm]'] = csv_input_file.iloc[:, columns_map['x_column']]
   
-    # fill y positions
+    # Fill y positions
     if columns_map['y_column'] is not None:
         csv_output_file['y [nm]'] = csv_input_file.iloc[:, columns_map['y_column']]
     
-    # fill z positions
+    # Fill z positions
     if columns_map['z_column'] is not None:
         csv_output_file['z [nm]'] = csv_input_file.iloc[:, columns_map['z_column']]
     
-    # fill intensities
+    # Fill intensities
     if columns_map['intensity_column'] is not None:
         csv_output_file['brightness'] = csv_input_file.iloc[:, columns_map['intensity_column']]
     
-    # fill background intensities (?)
+    # Fill background intensities (?)
     if columns_map['offset_column'] is not None:
         csv_output_file['background'] = csv_input_file.iloc[:, columns_map['offset_column']]
 
-    # fill background intensities (?)    
+    # Fill background intensities (?)    
     if columns_map['bkgstd_column'] is not None:
         csv_output_file['i0'] = csv_input_file.iloc[:, columns_map['bkgstd_column']]
     
-    # fill localisation error sigma x
+    # Fill localisation error sigma x
     if columns_map['sx_column'] is not None:
         csv_output_file['sx'] = csv_input_file.iloc[:, columns_map['sx_column']]
   
-    # fill localisation error sigma y
+    # Fill localisation error sigma y
     if columns_map['sy_column'] is not None:
         csv_output_file['sy'] = csv_input_file.iloc[:, columns_map['sy_column']]
     
@@ -108,7 +106,7 @@ def convert_csv(para1):
 
     # Export the '*_analysis.csv' file
     csv_output_file.to_csv(save_file, index=False, quoting=0)
-    para1['OutputTable'] = csv_output_file
+    para['output_table'] = csv_output_file
     print('\nConversion of *thunder.csv to *_analysis.csv done!\n')
 
-    return para1
+    return para
