@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from skimage.io import imread
 
 def apply_cell_segmentation(para):
+    
     CMAP_APPLIED = 'gist_ncar' ##was: 'nipy_spectral', tab20c, 
     # Define filenames to load existing data
     para['filename_proc_brightfield_segm'] = para['filename_proc_brightfield'][:-4] + '_segm.tif'
@@ -26,7 +27,6 @@ def apply_cell_segmentation(para):
     load_proc_brightfield_segm = para['data_pathname'] + para['filename_proc_brightfield_segm']
     print(f' load_proc_brightfield_segm: {load_proc_brightfield_segm}')
     proc_brightfield_segm_image = imread(load_proc_brightfield_segm)
-    #!!!!!!for python x and y changes in the following
     segm_image_y_pos_max_pixel, segm_image_x_pos_max_pixel = proc_brightfield_segm_image.shape
 
     # Load table with information on the segmentations '*_procBrightfield_segm_Table.csv'
@@ -88,7 +88,6 @@ def apply_cell_segmentation(para):
 
     # Show segmented brightfield image with all localisations
     ax[1, 0].imshow(proc_brightfield_segm_image, cmap = CMAP_APPLIED)
-    #!!!!!!for python x and y changes in the following: 1,0 => 0,1
     ax[1, 0].scatter(loc_pixel_array[:, 0], loc_pixel_array[:, 1], circle_spot_size,
                      'black', label='Localisations')
     ax[1, 0].set_title(f'Segmented image containing {len(loc_pixel_array)} localisations')
@@ -108,24 +107,13 @@ def apply_cell_segmentation(para):
 
     print(f'Number of cells after filtering: {len(temp_cell_array)}')
 
-    # # Check for each localisation whether it is part of a valid cell or not
-    # OLD code: slow and redundant
-    # for j in range(len(temp_cell_array)):
-    #     if j % 50 == 0:
-    #         print(f'Cell {j + 1} of {len(temp_cell_array)}')
-    #     temp_im = (procBrightfield_segm_image == temp_cell_array[j, 0]).T
-    #     for i in range(csv_array.shape[0]):
-    #         if temp_im[loc_pixel_array[i, 0].astype(int) - 1, loc_pixel_array[i, 1].astype(int) - 1]:
-    #             loc_pixel_array[i, 2] = temp_cell_array[j, 0]
-    #             loc_pixel_array[i, 3] = temp_cell_array[j, 1]
-
-   # Create a dictionary for the masks
+    # Check for each localisation whether it is part of a valid cell or not
+    # Create a dictionary for the masks
     cell_masks = {}
     for j in range(len(temp_cell_array)):
         if j % 50 == 0:
             print(f' Cell {j + 1} of {len(temp_cell_array)}')
         cell_id = temp_cell_array[j, 0]
-
         cell_masks[cell_id] = (proc_brightfield_segm_image == cell_id).T
 
     # Check each localization against all valid cells
@@ -139,7 +127,6 @@ def apply_cell_segmentation(para):
 
     # Plot additional visualizations
     ax[1, 1].imshow(proc_brightfield_segm_image, cmap = CMAP_APPLIED) 
-    #!!!!! for python x and y changes in the following: 1,0 => 0,1
     ax[1, 1].scatter(loc_pixel_array[loc_pixel_array[:, 2] == -1, 0], 
                      loc_pixel_array[loc_pixel_array[:, 2] == -1, 1],
                      circle_spot_size, 'black', label='Outside valid cells')
@@ -156,10 +143,10 @@ def apply_cell_segmentation(para):
 
     # Save figure as PNG
     if not para.get('data_path_Outp'):
-        plt.savefig(f"{para['data_pathname']}{para['filename_thunderstorm_csv'][:-4]}-analysis-Fig01_segm.png")
+        plt.savefig(f"{para['data_pathname']}{para['filename_thunderstorm_csv'][:-4]}-analysis-Fig01_segm.png", dpi=para['dpi'])
     else:
         tmp_name = para['filename_thunderstorm_csv'].split("\\")[-1][:-4]
-        plt.savefig(f"{para['data_path_outp']}{tmp_name}-analysis-Fig01_segm.png", dpi=300)
+        plt.savefig(f"{para['data_path_outp']}{tmp_name}-analysis-Fig01_segm.png", dpi=para['dpi'])
 
     print(f'Number of localisations within cells: {np.sum(loc_pixel_array[:, 2] > 0)}')
     print(f'Number of localisations outside cells: {np.sum(loc_pixel_array[:, 2] == -1)}')

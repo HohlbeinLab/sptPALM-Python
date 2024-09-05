@@ -6,8 +6,8 @@ Created on Wed Aug 28 21:54:13 2024
 @author: hohlbein
 """
 
+# Function defining all the input parameters and data to be analyzed
 def define_input_parameters():
-    # Function defining all the input parameters and data to be analyzed
 
     input_parameter = {
         'data_pathname': '',
@@ -16,46 +16,47 @@ def define_input_parameters():
         'condition_names': [],
         'condition_files': [],
         'copynumber_intervals': [],
-        'pixel_size': 0.119,  #pixelsize of the camera (this is also set thunderstorm.ijm), default: ~0.117
+        'pixel_size': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
 
         # Segmentation of cells allows linking localisations to individual cells
-        'cellarea_pixels_min': 50,  #filter cells for area (area is given in number of pixels), default: ~[10 300]
-        'cellarea_pixels_max': 600, #%filter cells for area (area is given in number of pixels), default: ~[10 300]
-        'use_segmentations': True, #%still need to account for Playground.useSegmentations = false, default: true
+        'cellarea_pixels_min': 50,  # Filter cells for minum area (area is given in number of pixels), default: 50
+        'cellarea_pixels_max': 500, # Filter cells for area (area is given in number of pixels), default: 500
+        'use_segmentations': False, # Account for segmentations = False, default: True
 
         # Tracking parameters
-        'track_steplength_max': 800, #set tracking window (nm), default: 800nm
-        'track_memory': 0, #set tracking memory in frames, default: 1
+        'track_steplength_max': 0.8, # Tracking window (um), default: 0.8um
+        'track_memory': 0, # Tracking memory in frames, default: 1
 
         # Diffusion analysis
-        'frametime': 0.01, #frametime in seconds, default: 0.01
-        'sigma_noise': 0.03, # %localization error (um), default: 0.03
-        'diff_hist_steps_min': 3, #minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
-        'diff_hist_steps_max': 100, # %maximum number of steps for a track to be analyzed, deafult: 100
+        'frametime': 0.01, # Frametime in seconds, default: 0.01
+        'sigma_noise': 0.03, # Localization error (um), default: 0.03
+        'diff_hist_steps_min': 3, # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
+        'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, deafult: 100
 
         # Cell by cell analysis
-        'number_tracks_per_cell_min': 1, #minimum number of tracks that cell must contain, default: 1
-        'number_tracks_per_cell_max': 10000, # %maximum number of tracks, default 10000
+        'number_tracks_per_cell_min': 1, # Minimum number of tracks for each cell, default: 1
+        'number_tracks_per_cell_max': 10000, # Maximum number of tracks for each cell, default: 10000
 
         # (OPTIONAL) settings for visualisation of tracks SCTA: Single-cell tracking analysis
-        'scta_vis_cells': False, #%visualize individual cells true/false, default: false
-        'scat_plot_cell_window': 15, #radius in pixels for plotting individual cells and their tracks
-        'scta_vis_interactive': False, #%interactively cycle through cells true/false, default: false
-        'scta_vis_rangemax': 0.4, # %color-coding in the range of [0:(vis_rangemax*inputParameter.plotDiffHist_max)], default: 0.4
+        'scta_vis_cells': False, # Visualize individual cells True/False, default: False
+        'scta_plot_cell_window': 15, # Radius in pixels for plotting individual cells and their tracks
+        'scta_vis_interactive': False, # Interactively cycle through cells True/False, default: False
+        'scta_vis_rangemax': 0.4, # Color-coding in the range of [0:(vis_rangemax*inputParameter.plotDiffHist_max)], default: 0.4
 
         # Histograms for diffusion analysis
-        'conversion_factor': 1E-6, #localisations are in nm. Diff coef => um^2/s, default: 1-E6
-        'plot_diff_hist_min': 4E-3, #plot and histogram from um^2/s to um^2/s, default: 4E-3
-        'plot_diff_hist_max': 10, #plot and histogram from um^2/s to um^2/s, default: 10
+        'conversion_factor': 1E-6, # Localisations are in nm. Diff coef => um^2/s, default: 1-E6
+        'plot_diff_hist_min': 4E-3, # Plot and histogram from um^2/s to um^2/s, default: 4E-3
+        'plot_diff_hist_max': 10, # Plot and histogram from um^2/s to um^2/s, default: 10
         
         # Parameters for plotting figures
-        'fontsize': 10, #%default: 10
-        'linewidth': 1, #default: 1
-        'plot_norm_histograms': 'probability',#Carefull: Matlab: choose either 'count' (default) | 'probability' | 'countdensity' | 'pdf' | 'cumcount' | 'cdf'
-        'mod_define_input_parameters': False, #%run DefineInputParameters.m in sptPALM_combineData.m true/false, default: false
-        'plot_frame_number': True, #%whether to plot the frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
-        'para': {}  #structure that will later save all parameters and settings
-
+        'fontsize': 10, # Default: 10
+        'linewidth': 1, # Default: 1
+        'plot_norm_histograms': 'probability', # Carefull: Matlab: choose either 'count' (default) | 'probability' | 'countdensity' | 'pdf' | 'cumcount' | 'cdf'
+        'mod_define_input_parameters': False, #  Run DefineInputParameters.m in sptPALM_combineData.m True/False, default: False
+        'plot_frame_number': True, # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
+        'dpi': 300, # DPI setting for plotting figures, default: 300
+        
+        'para': {}  # Structure that will later save all parameters and settings
     }
 
     # Directory containing your data
@@ -76,7 +77,9 @@ def define_input_parameters():
     #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
     input_parameter['condition_names'].append('start')
     input_parameter['condition_files'].append([1])  # refers to the order of files defined above
-    # Copy the following lines if necessary
+    
+    # DO NOT REMOVE THE FOLLOWING LINES!
+    # Copy or uncomment the following lines if necessary
     # input_parameter['Condition_name'].append('standard')
     # input_parameter['Condition_files'].append([1,2])  # refers to the order of files defined above
 

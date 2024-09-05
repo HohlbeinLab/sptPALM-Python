@@ -9,12 +9,12 @@ Created on Wed Aug 28 20:58:09 2024
 #import tkinter as tk
 from tkinter import simpledialog, filedialog
 import os
-#import sys
-
+import sys
+import pandas as pd
 from define_input_parameters import define_input_parameters
 
 
-from convert_csv import convert_csv
+from load_csv import load_csv
 from apply_cell_segmentation import apply_cell_segmentation
 from tracking_analysis import tracking_analysis
 # from DiffusionAnalysis import diffusion_analysis
@@ -27,7 +27,7 @@ from tracking_analysis import tracking_analysis
 def sptPALM_analyse_movies():
     DATA = None
     # 1.1 Define input parameters
-    print('Run define_input_parameters()')
+    print('\nrun define_input_parameters.py\n')
     inputParameter = define_input_parameters()
     
     # Allow savename to be changed (default: 'sptDataMovies.mat')
@@ -82,8 +82,11 @@ def sptPALM_analyse_movies():
         os.makedirs(inputParameter['data_path_output'])
 
     # Display analysis parameters
-    print('  Print inputParameters')
-    print(inputParameter)
+    print('Print inputParameters')
+    # Iterate through the dictionary and print each key-value pair on a new line
+    for key, value in inputParameter.items():
+        print(f" input_parameter.{key}: {value}")
+
 
     # 2. sptPALM data analysis (looping over each movie)
     DATA = {'MOVIES': []}
@@ -103,9 +106,11 @@ def sptPALM_analyse_movies():
         os.chdir(para['data_pathname'])
 
         # 2.2 Loading and preparing localisation data
-        para = convert_csv(para)
+        print('\nrun load_csv.py\n')
+        para = load_csv(para)
 
         # 2.3 Apply cell segmentation
+        print('\nrun appllied_cell_segmentation.py\n')
         if inputParameter['use_segmentations']:
             para = apply_cell_segmentation(para)
 
@@ -140,14 +145,5 @@ def sptPALM_analyse_movies():
 
     return DATA, inputParameter
 
-# # Example usage
-# if __name__ == "__main__":
-#     DATA, para = sptPALM_analyseMovies()
-        
-            
-            
-            
-            
-    return inputParameter, DATA
 
 

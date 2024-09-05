@@ -65,7 +65,7 @@ while True:
             print(' Edit parameters for data analysis!')
             print(' Look for DefineInputParameters.py and edit it.')
             print(' Then save the file and continue.')
-            input_parameter = define_input_para()
+            input_parameter = define_input_parameters()
         case 2:  # Combine_ThunderSTORM_csv_files
             while True:
                 print('--')

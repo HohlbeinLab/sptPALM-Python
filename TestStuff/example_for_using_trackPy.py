@@ -54,7 +54,7 @@ linked = tp.link_df(df, search_range=SEARCH_RANGE, memory=0)
 # might not be necessary
 linked = linked.drop_duplicates(subset=['particle', 'frame'])
 
-# 6. Filter Out Short Trajectories
+# 6. Filter out Short Trajectories
 filtered = tp.filter_stubs(linked, threshold=10)
 
 fig, ax = plt.subplots(2, 2, figsize=(14, 10))
