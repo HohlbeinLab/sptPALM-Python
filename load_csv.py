@@ -23,9 +23,19 @@ def load_csv(para):
     csv_input_file = pd.read_csv(load_file)
 
     # Prepare output file
-    para['filename_analysis_csv'] = para['filename_thunderstorm_csv'][:-4] + '_analysis.csv'
-    save_file = para['data_pathname'] + para['filename_analysis_csv']
+    para['filename_analysisPy_csv'] = para['filename_thunderstorm_csv'][:-4] + '_analysisPy.csv'
+    save_file = para['data_pathname'] + para['filename_analysisPy_csv']
     print(f' save_file [csv] = {save_file}')
+
+    # Change x,y,z from thunderSTORM from nm to um
+    try:
+        csv_input_file['x [nm]'] = csv_input_file['x [nm]'] /1000
+        csv_input_file['y [nm]'] = csv_input_file['y [nm]'] /1000
+        csv_input_file['z [nm]'] = csv_input_file['z [nm]'] /1000
+    except: 
+        print("\n ATTENTION, 'Something went wrong in going from nm to um !")
+        input("Press Enter to continue...")
+
 
     # Create a list of column names matching our internal naming 
     # to external naming such as, e.g., provided by ThunderSTORM
@@ -34,8 +44,8 @@ def load_csv(para):
                        ('frame', 'frame'),
                        ('cell_id', ''), 
                        ('track_id', ''),
-                       ('x [nm]', 'x [nm]'),
-                       ('y [nm]', 'y [nm]'), 
+                       ('x [um]', 'x [nm]'),
+                       ('y [um]', 'y [nm]'), 
                        ('z [nm]', 'z [nm]'),
                        ('brightness', 'intensity [photon]'), 
                        ('background', 'bkgstd [photon]'), 
@@ -75,6 +85,6 @@ def load_csv(para):
     # Export the '*_analysis.csv' file
     csv_output_file.to_csv(save_file, index=False, quoting=0)
     para['output_table'] = csv_output_file
-    print('\nConversion of *thunder.csv to *_analysis.csv done!\n')
+    print('\nConversion of *thunder.csv to *_analysisPy.csv done!\n')
 
     return para

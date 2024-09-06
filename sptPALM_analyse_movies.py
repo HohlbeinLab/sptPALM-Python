@@ -37,7 +37,7 @@ def sptPALM_analyse_movies():
     # prompt = "Enter new name for saving sptDataMovies.mat or press OK/Enter"
     # inputParameter['dataFileNameMat'] = simpledialog.askstring("Rename sptDataMovies.mat?", prompt, initialvalue='sptDataMovies.mat')
    
- #temporarily disabled   
+ #TEMPORARILY DISABLED
     inputParameter['data_filename_mat'] = 'sptDataMovies.matPy'
     # input_default = 'sptDataMovies.matPy'
     # user_input = input("  Enter string or press enter (default is: '"+input_default+"'): ")

@@ -35,24 +35,24 @@ def apply_cell_segmentation(para):
     proc_brightfield_segm_table = pd.read_csv(load_proc_brightfield_segm_table).to_numpy()
 
     # Load table '*_analysis.csv'
-    load_file = para['data_pathname'] + para['filename_analysis_csv']
-    save_file = para['data_pathname'] + para['filename_analysis_csv']
+    load_file = para['data_pathname'] + para['filename_analysisPy_csv']
+    save_file = para['data_pathname'] + para['filename_analysisPy_csv']
 
     # Import '*_analysis.csv'
     csv_array = pd.read_csv(load_file)
-    x_column = csv_array.columns.get_loc('x [nm]')
-    y_column = csv_array.columns.get_loc('y [nm]')
+    x_column = csv_array.columns.get_loc('x [um]')
+    y_column = csv_array.columns.get_loc('y [um]')
 
     # Check for x- and y-positions and transform them into pixels
     loc_pixel_array = np.zeros((len(csv_array), 4))  # Initialize with zeros
     if x_column is not None and y_column is not None:
         loc_pixel_array[:, :2] = csv_array.iloc[:, [x_column, y_column]].to_numpy()
         loc_pixel_array[:, 0] = np.clip(np.round(loc_pixel_array[:, 0] / (
-            para['pixel_size'] * 1000)).astype(int), 1, segm_image_x_pos_max_pixel)
+            para['pixel_size'])).astype(int), 1, segm_image_x_pos_max_pixel)
         loc_pixel_array[:, 1] = np.clip(np.round(loc_pixel_array[:, 1] / (
-            para['pixel_size'] * 1000)).astype(int), 1, segm_image_y_pos_max_pixel)
+            para['pixel_size'])).astype(int), 1, segm_image_y_pos_max_pixel)
     else:
-        print('\n Warning, column "x [nm]" and/or "y [nm]" not found!\n')
+        print('\n Warning, column "x [um]" and/or "y [um]" not found!\n')
 
     loc_pixel_array[:, 2] = -1  # Will contain cell_id
     loc_pixel_array[:, 3] = -1  # Will contain cell_area_id
@@ -158,7 +158,7 @@ def apply_cell_segmentation(para):
 
     para['output_table'] = csv_array
     print('Segmentation analysis done!')
-    print('cell_ids have been assigned in *_analysis.csv!')
+    print('cell_ids have been assigned in *_analysisPy.csv!')
 
     return para
 

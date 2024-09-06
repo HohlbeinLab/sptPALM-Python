@@ -21,7 +21,7 @@ def define_input_parameters():
         # Segmentation of cells allows linking localisations to individual cells
         'cellarea_pixels_min': 50,  # Filter cells for minum area (area is given in number of pixels), default: 50
         'cellarea_pixels_max': 500, # Filter cells for area (area is given in number of pixels), default: 500
-        'use_segmentations': False, # Account for segmentations = False, default: True
+        'use_segmentations': True, # Account for segmentations = False, default: True
 
         # Tracking parameters
         'track_steplength_max': 0.8, # Tracking window (um), default: 0.8um
@@ -31,7 +31,7 @@ def define_input_parameters():
         'frametime': 0.01, # Frametime in seconds, default: 0.01
         'sigma_noise': 0.03, # Localization error (um), default: 0.03
         'diff_hist_steps_min': 3, # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
-        'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, deafult: 100
+        'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, default: 100
 
         # Cell by cell analysis
         'number_tracks_per_cell_min': 1, # Minimum number of tracks for each cell, default: 1
@@ -65,7 +65,7 @@ def define_input_parameters():
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['filename_thunderstorm_csv'] = [
         #'9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-        'SHORT_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
