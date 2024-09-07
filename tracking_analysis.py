@@ -13,42 +13,55 @@ import trackpy as tp
 import matplotlib.pyplot as plt
 import warnings as warn
 import time
+import os
 
 def plot_trackPy_data(linked, para):
     # Filter out Short Trajectories
     filtered = tp.filter_stubs(linked, threshold=para['diff_hist_steps_min'])
-
     fig, ax = plt.subplots(2, 2, figsize=(14, 10))
     ax[0, 0].set_title('Particle Trajectories')
-    # ax[0, 0].set_ylabel('y (\mum)')
-    # ax[0, 0].set_xlabel('x (\mum)')
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    tp.plot_traj(filtered, mpp=para['pixel_size'],ax = ax[0,0], pos_columns= ['x [um]', 'y [um]'])
-
+    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,0], pos_columns=['x [um]', 'y [um]'])
+    ax[0, 0].set_ylabel('y (um)')
+    ax[0, 0].set_xlabel('x (um)')
 
     # Calculate and correct drift!
     d = tp.compute_drift(filtered, pos_columns= ['x [um]', 'y [um]'])
     d.plot(ax = ax[1, 0])
-    ax[1, 0].set_ylabel('y,y (\mum)')
+    ax[1, 0].set_ylabel('x,y (um)')
     ax[1, 0].set_xlabel('frames')
     ax[1, 0].set_title('Drift')
 
-    filtered_drift_corrected = tp.subtract_drift(filtered.copy(), d)
-    tp.plot_traj(filtered_drift_corrected, ax = ax[0,1], pos_columns= ['x [um]', 'y [um]'])
-    ax[0, 1].set_title('Particle Trajectories: drift corrected')
+    # filtered_drift_corrected = tp.subtract_drift(filtered.copy(), d)
+    # tp.plot_traj(filtered_drift_corrected, ax = ax[0,1], pos_columns= ['x [um]', 'y [um]'])
+    # ax[0, 1].set_title('Particle Trajectories: drift corrected')
+    # ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+    ax[0, 1].set_title('Particle Trajectories')
     ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,1], pos_columns=['x [um]', 'y [um]'])
+    ax[0, 1].set_title('Particle Trajectories')
+    ax[0, 1].set_ylabel('y (um)')
+    ax[0, 1].set_xlabel('x (um)')  
+    ax[0, 1].set_ylim(0, 0.5)
+    ax[0, 1].set_xlim(0, 0.5)
+
 
     # Compute Mean Squared Displacement (MSD)
     msd = tp.emsd(filtered, mpp=1, fps=1/para['frametime'], max_lagtime = 7, pos_columns= ['x [um]', 'y [um]'])
 
     # Plots and fits Mean Squared Displacement (MSD)
     ax[1, 1].set_title('Mean Squared Displacement: with fit, no drift correction')
-    ax[1, 1].set_ylabel(r'$\langle \Delta r^2 \rangle$ [p\mu m$^2$]')
+    ax[1, 1].set_ylabel(r'$\langle \Delta r^2 \rangle$ [mu m$^2$]')
     ax[1, 1].set_xlabel('lag time $t$')
     fit = tp.utils.fit_powerlaw(msd, ax = ax[1,1])  # performs linear best fit in log space, plots]
     print(fit)
 
     plt.tight_layout()  # Adjust layout to prevent overlap
+    
+    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
+    plt.savefig(temp_path + para['fn_locs_csv'][:-4] + '_Fig02_track.png', dpi = para['dpi'])
+    
+    
     plt.show()
     return ()
 
@@ -56,20 +69,16 @@ def tracking_analysis(para):
     # Load the CSV file
     if not para['use_segmentations']:
         print('\n Tracking without cell segmentations...\n')
-        load_file = f"{para['data_pathname']}{para['filename_analysisPy_csv']}"
     elif para['use_segmentations']:
         print('\n Tracking with cell segmentations...\n')
-        load_file = f"{para['data_pathname']}{para['filename_analysisPy_csv']}"
     else:
         raise ValueError(f"\n Problem! para['use_segmentations'] = {para['use_segmentations']}, should be True or False!\n")
 
     # Load data into a DataFrame
-    print(f" loadFile [tracking]: {load_file}")
-    csv_data = pd.read_csv(load_file)
+    print(f" loadFile [tracking]: {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
+    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
+    csv_data = pd.read_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'])
 
-    # Prepare filename for saving data
-    save_file = f"{para['data_pathname']}{para['filename_analysisPy_csv']}"
-    print(f" saveFile [tracking]: {save_file}")
 
     # Check for existing 'track_id' and warn if necessary
     if ('track_id' in csv_data.columns) and (csv_data['track_id'] != -1).any():
@@ -132,13 +141,15 @@ def tracking_analysis(para):
                        
             # Update 'track' column in the csv_data
             csv_data_sort.loc[tracks_temp.index.tolist(), 'track_id'] = tracks_temp['particle']
-            # Accumulate track structure
-            tracks = pd.concat([tracks, tracks_temp], ignore_index=True)
+            
+            # Accumulate track structure, check that tracks_temp isn't empty
+            if len(tracks_temp)>0:
+                tracks = pd.concat([tracks, tracks_temp], ignore_index=True)
 
         # Update CSV file with track IDs
-        csv_data.to_csv(save_file, index=False)
+        csv_data.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
         print('\n Tracking analysis done!\n')
-        print('track_ids have been set in *_analysis.csv!\n')
+        print(f" track_ids have been set in {para['fn_locs_csv'][:-4] + para['fn_csv_handle']} \n")
 
     else:
         # No segmentation scenario
@@ -147,16 +158,13 @@ def tracking_analysis(para):
                                         memory=para['track_memory'],
                                         search_range=para['track_steplength_max'],
                                         pos_columns= ['x [um]', 'y [um]'])
-        plot_trackPy_data(csv_data['tracks'] , para)
-
     # How long did the tracking take?
     end = time.time()
     print(f"time for tracking:  {end-start}")
     
-    # # Export track_id to '*_analysis.csv'
-    # csv_data.to_csv(save_file, index=False)
-    # print('\n Tracking analysis done!\n')
-    # print('track_ids have been set in *_analysis.csv!\n')
+    # Plot all tracks
+    print(' Plot all tracks')
+    plot_trackPy_data(tracks, para)
 
     para['tracks_all'] = tracks
     print('Tracks have been stored in the para structure!\n')

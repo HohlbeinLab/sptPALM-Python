@@ -10,12 +10,18 @@ Created on Wed Aug 28 21:54:13 2024
 def define_input_parameters():
 
     input_parameter = {
-        'data_pathname': '',
-        'filename_thunderstorm_csv': [],
-        'filename_proc_brightfield': [],
-        'condition_names': [],
-        'condition_files': [],
-        'copynumber_intervals': [],
+        'pn_data': '', # Allocating pathname to the data (selection via GUI or pre-defined, see below) 
+        'fn_locs_csv': '',  # Allocating filename to the localisation data (selection via GUI or pre-defined, see below) 
+        'fn_proc_brightfield': '', # Allocating filename to the brighfield data (selection via GUI or pre-defined, see below) 
+        'default_output_folder': 'output_python/', #Allocation for a new folder to which analysed data is saved        
+        'fn_csv_handle': '_py_save_csv.csv', # Will be used to name the csv file of the analysed data
+        'fn_dict_handle': '_py_save_dict.json', #Will be used to name the jason file of the analysed data
+        'fn_combined_data': 'sptDataMovies.json', #filename of combined output
+        
+        'condition_names': [], # Allocation, further defined below
+        'condition_files': [], # Allocation, further defined below
+        'copynumber_intervals': [], # Allocation, further definied below
+
         'pixel_size': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
 
         # Segmentation of cells allows linking localisations to individual cells
@@ -24,7 +30,7 @@ def define_input_parameters():
         'use_segmentations': True, # Account for segmentations = False, default: True
 
         # Tracking parameters
-        'track_steplength_max': 0.8, # Tracking window (um), default: 0.8um
+        'track_steplength_max': 0.8, # Tracking window (um), default: 0.8 um
         'track_memory': 0, # Tracking memory in frames, default: 1
 
         # Diffusion analysis
@@ -63,13 +69,13 @@ def define_input_parameters():
     input_parameter['data_pathname'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
 
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
-    input_parameter['filename_thunderstorm_csv'] = [
-        #'9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-        'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+    input_parameter['fn_locs_csv'] = [
+        '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        # 'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
-    input_parameter['filename_proc_brightfield'] = [
+    input_parameter['fn_proc_brightfield'] = [
         '9NTFixTL_2_1_MMStack_Pos0.ome_procBrightfield.tif'
     ]
 
@@ -80,8 +86,8 @@ def define_input_parameters():
     
     # DO NOT REMOVE THE FOLLOWING LINES!
     # Copy or uncomment the following lines if necessary
-    # input_parameter['Condition_name'].append('standard')
-    # input_parameter['Condition_files'].append([1,2])  # refers to the order of files defined above
+    # input_parameter['condition_names'].append('standard')
+    # input_parameter['condition_files'].append([1,2])  # refers to the order of files defined above
 
     # Histogramming of diffusion coefficients per copynumber
     INTERVAL = 200
