@@ -10,22 +10,20 @@ Created on Wed Aug 28 20:58:09 2024
 from tkinter import simpledialog, filedialog
 import os
 # import sys
-# import pandas as pd
 from define_input_parameters import define_input_parameters
 
 
 from load_csv import load_csv
 from apply_cell_segmentation import apply_cell_segmentation
 from tracking_analysis import tracking_analysis
-# from diffusion_analysis import diffusion_analysis
-# from Plot_Hist_DiffusionTracklength import plot_hist_diffusion_tracklength
+from diffusion_analysis import diffusion_analysis
+from plot_hist_diffusion_track_length import plot_hist_diffusion_track_length
 # from SingleCellTrackingAnalysis import single_cell_tracking_analysis
 # from Plot_SingleCellTrackingAnalysis import plot_single_cell_tracking_analysis
 # from NormIncrements_Analysis import norm_increments_analysis
 
 
 def sptPALM_analyse_movies():
-    DATA = None
     # 1.1 Define input parameters
     print('\nrun define_input_parameters.py\n')
     input_parameter = define_input_parameters()
@@ -87,8 +85,7 @@ def sptPALM_analyse_movies():
         print(f" input_parameter.{key}: {value}")
 
     # 2. sptPALM data analysis (looping over each movie)
-    DATA = {'MOVIES': []}
-
+    DATA = {}
     for ii in range(len(input_parameter['fn_locs_csv'])):
         input_parameter['movie_number'] = ii #start with 0 not 1
 
@@ -116,8 +113,8 @@ def sptPALM_analyse_movies():
         para = tracking_analysis(para)
 
         # 2.5 Calculate and plot diffusion coefficients
-        # para = diffusion_analysis(para)
-#         para = plot_hist_diffusion_tracklength(para)
+        para = diffusion_analysis(para)
+        para = plot_hist_diffusion_track_length(para)
 
 #         # 2.6 Single Cell Tracking Analysis
 #         if inputParameter['useSegmentations']:
@@ -134,14 +131,15 @@ def sptPALM_analyse_movies():
 #         shutil.copyfile(para['filename_thunderstormCSV'], save_path)
 
         # Cell array containing all para structs
-        DATA['MOVIES'].append((para, para['fn_locs_csv']))
+        # DATA['MOVIES'].append((para, para['fn_locs_csv']))
+
+        DATA[ii] = para
 
     # 3. Save entire DATA structure
-    # save_path = os.path.join(input_parameter['data_output_folder'], input_parameter['fn_combined_data'])
     with open(temp_path + para['fn_combined_data'], 'w') as f:
         f.write(str(DATA))
 
-    return DATA, input_parameter
+    return DATA, input_parameter, para
 
 
 

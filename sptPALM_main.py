@@ -38,6 +38,7 @@ def sptPALM_MCDDA(condition, combined_data=None):
     # Your implementation here
     return combined_data
 
+
 while True:
     print('-')
     PROMPT = """Choose and press Enter
@@ -103,7 +104,7 @@ while True:
                         print("Invalid option, please choose a valid number.")
                         continue
         case 3:  # sptPALM_analyse_Movies
-            data, para = sptPALM_analyse_movies()
+            data, input_parameter, para = sptPALM_analyse_movies()
             print('DATA now available in the workspace')
         case 4:  # sptPALM_combineData
             print('Run sptPALM_combineData()')
@@ -149,4 +150,4 @@ while True:
         case _:
             print("Invalid option, please choose a valid number.")
             continue
-        
+print("Done")

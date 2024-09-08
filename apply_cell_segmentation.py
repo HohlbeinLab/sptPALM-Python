@@ -152,7 +152,7 @@ def apply_cell_segmentation(para):
     csv_data['cell_area_id'] = loc_pixel_array[:, 3]
     csv_data.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
 
-    para['output_table'] = csv_data
+    para['csv_data'] = csv_data
     print('Segmentation analysis done!')
     print(f"cell_ids have been assigned in {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
 

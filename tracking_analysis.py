@@ -79,7 +79,6 @@ def tracking_analysis(para):
     temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
     csv_data = pd.read_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'])
 
-
     # Check for existing 'track_id' and warn if necessary
     if ('track_id' in csv_data.columns) and (csv_data['track_id'] != -1).any():
         warn('Previously assigned tracks in your analysis file will be overwritten!')
@@ -96,22 +95,21 @@ def tracking_analysis(para):
         cell_ids, ia, ic = np.unique(csv_data_sort['cell_id'], return_index=True, return_inverse=True)
 
         # Prepare cellTrackCount
-        counts = np.bincount(ic)
-        cell_particle_count = np.column_stack((cell_ids, counts, np.cumsum(counts)))
+        number_locs_cells = np.bincount(ic)
+        cells_locs_count = np.column_stack((cell_ids, number_locs_cells, np.cumsum(number_locs_cells)))
 
-        # Remove unsegmented localizations for tracking
-        cell_particle_count = cell_particle_count[1:] if cell_particle_count[0, 0] == -1 else cell_particle_count 
+        # Removes first row if -1 is returned
+        cells_locs_count = cells_locs_count[1:] if cells_locs_count[0, 0] == -1 else cells_locs_count 
 
-        # Initialise DataFrame (will contain *.csv and more) 
+        # Initialise DataFrame 
         tracks = pd.DataFrame()
-        # output['tracks'] = {} #pd.DataFrame()
        
         # Perform tracking for each segmented cell
-        for num_cell in range(len(cell_particle_count)):
-            if num_cell % 10 == 0 or num_cell == len(cell_particle_count) - 1:
-                print(f" Tracking for valid cell {num_cell+1} of {len(cell_particle_count)+1}...")
+        for num_cell in range(len(cells_locs_count)):
+            if num_cell % 50 == 0 or num_cell == len(cells_locs_count) - 1:
+                print(f" Tracking for cell {num_cell+1} of {len(cells_locs_count)+1}...")
             #makes sure that track_id continues increasing for every new (bacterial) cell
-            track_id_shift = 0 if num_cell == 0 else max(tracks['particle'])
+            track_id_shift = 0 if num_cell == 0 else max(tracks['track_id'])
             
             # Select all data of a particular (bacterial cell)
             part_csv_data_sort = csv_data_sort[csv_data_sort['cell_id'] == num_cell+1]
@@ -128,19 +126,21 @@ def tracking_analysis(para):
                                     search_range=para['track_steplength_max'],
                                     memory=para['track_memory'],
                                     pos_columns= ['x [um]', 'y [um]'],)
+                #trackPy returns "particle' let's rename for track_id
+                linked.rename(columns={'particle': 'track_id'}, inplace=True)
             else:
                 track_id_shift += 1
                 linked = xy_frame_temp 
-                linked['particle'] = -1
+                linked['track_id'] = -1
 
             # Again, make sure that particle counting increases for each bacterial cell
-            linked['particle'] += track_id_shift
+            linked['track_id'] += track_id_shift
             
             # Sort for frames
             tracks_temp = linked.sort_values(by = ['frame'])
                        
             # Update 'track' column in the csv_data
-            csv_data_sort.loc[tracks_temp.index.tolist(), 'track_id'] = tracks_temp['particle']
+            csv_data_sort.loc[tracks_temp.index.tolist(), 'track_id'] = tracks_temp['track_id']
             
             # Accumulate track structure, check that tracks_temp isn't empty
             if len(tracks_temp)>0:
@@ -163,10 +163,10 @@ def tracking_analysis(para):
     print(f"time for tracking:  {end-start}")
     
     # Plot all tracks
-    print(' Plot all tracks')
-    plot_trackPy_data(tracks, para)
+    # print(' Plot all tracks')
+    # plot_trackPy_data(tracks, para)
 
-    para['tracks_all'] = tracks
+    para['tracks'] = tracks
     print('Tracks have been stored in the para structure!\n')
 
     return para

@@ -10,17 +10,19 @@ Created on Wed Aug 28 21:54:13 2024
 def define_input_parameters():
 
     input_parameter = {
-        'pn_data': '', # Allocating pathname to the data (selection via GUI or pre-defined, see below) 
-        'fn_locs_csv': '',  # Allocating filename to the localisation data (selection via GUI or pre-defined, see below) 
-        'fn_proc_brightfield': '', # Allocating filename to the brighfield data (selection via GUI or pre-defined, see below) 
-        'default_output_folder': 'output_python/', #Allocation for a new folder to which analysed data is saved        
+        'pn_data': '', # Initialise pathname to the data (selection via GUI or pre-defined, see below) 
+        'fn_locs_csv': '',  # Initialise filename to the localisation data (selection via GUI or pre-defined, see below) 
+        'fn_proc_brightfield': '', # Initialise filename to the brighfield data (selection via GUI or pre-defined, see below
+        'default_output_folder': 'output_python/', #Initialise for a new folder to which analysed data is saved        
         'fn_csv_handle': '_py_save_csv.csv', # Will be used to name the csv file of the analysed data
-        'fn_dict_handle': '_py_save_dict.json', #Will be used to name the jason file of the analysed data
-        'fn_combined_data': 'sptDataMovies.json', #filename of combined output
+        'fn_dict_handle': '_py_save_dict.json', # Will be used to name the jason file of the analysed data
+        'fn_diffs_handle': '_diff_coeffs.csv', # Will be used to name the file of diffusion coefficients
+        'fn_combined_data': 'sptDataMovies.json', # Filename of combined output
+
         
-        'condition_names': [], # Allocation, further defined below
-        'condition_files': [], # Allocation, further defined below
-        'copynumber_intervals': [], # Allocation, further definied below
+        'condition_names': [], # Initialise, further defined below
+        'condition_files': [], # Initialise, further defined below
+        'copynumber_intervals': [], # Initialise, further definied below
 
         'pixel_size': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
 
@@ -62,7 +64,7 @@ def define_input_parameters():
         'plot_frame_number': True, # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
         'dpi': 300, # DPI setting for plotting figures, default: 300
         
-        'para': {}  # Structure that will later save all parameters and settings
+        # 'para': {}  # Structure that will later save all parameters and settings
     }
 
     # Directory containing your data
@@ -70,8 +72,8 @@ def define_input_parameters():
 
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs_csv'] = [
-        '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-        # 'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        # '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
