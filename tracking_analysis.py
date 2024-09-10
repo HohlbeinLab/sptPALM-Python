@@ -6,7 +6,6 @@ Created on Wed Aug 28 20:58:09 2024
 @author: hohlbein
 """
 
-
 import pandas as pd
 import numpy as np
 import trackpy as tp
@@ -66,16 +65,17 @@ def plot_trackPy_data(linked, para):
     return ()
 
 def tracking_analysis(para):
-    # Load the CSV file
+    print('\nRun tracking_analysis.py')
+    # Load the *.csv file
     if not para['use_segmentations']:
-        print('\n Tracking without cell segmentations...\n')
+        print('  Tracking without cell segmentations...')
     elif para['use_segmentations']:
-        print('\n Tracking with cell segmentations...\n')
+        print('  Tracking with cell segmentations...')
     else:
         raise ValueError(f"\n Problem! para['use_segmentations'] = {para['use_segmentations']}, should be True or False!\n")
 
     # Load data into a DataFrame
-    print(f" loadFile [tracking]: {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
+    print(f"  loadFile [tracking]: {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
     temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
     csv_data = pd.read_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'])
 
@@ -85,14 +85,10 @@ def tracking_analysis(para):
 
     # Tracking (cell by cell)
     tp.quiet() #make tracking silent
-
     start = time.time()
     if para['use_segmentations']:
-        # Sort data by cell_id
-        csv_data_sort = csv_data.sort_values(by = ['cell_id', 'frame'])
- 
         # Find unique cell_ids
-        cell_ids, ia, ic = np.unique(csv_data_sort['cell_id'], return_index=True, return_inverse=True)
+        cell_ids, ia, ic = np.unique(csv_data['cell_id'], return_index=True, return_inverse=True)
 
         # Prepare cellTrackCount
         number_locs_cells = np.bincount(ic)
@@ -105,18 +101,19 @@ def tracking_analysis(para):
         tracks = pd.DataFrame()
        
         # Perform tracking for each segmented cell
-        for num_cell in range(len(cells_locs_count)):
-            if num_cell % 50 == 0 or num_cell == len(cells_locs_count) - 1:
-                print(f" Tracking for cell {num_cell+1} of {len(cells_locs_count)+1}...")
+        print("  Tracking...")
+        for jj in range(len(cells_locs_count)):
+            if jj % 50 == 0 and jj > 0: 
+                print(f"   ...cell {jj} of {len(cells_locs_count)}")
             #makes sure that track_id continues increasing for every new (bacterial) cell
-            track_id_shift = 0 if num_cell == 0 else max(tracks['track_id'])
+            track_id_shift = 0 if jj == 0 else max(tracks['track_id']+1)
             
-            # Select all data of a particular (bacterial cell)
-            part_csv_data_sort = csv_data_sort[csv_data_sort['cell_id'] == num_cell+1]
+            # Select all data of a particular (bacterial cell), note: cell_id starts with 1, not 0
+            part_csv_data_sort = csv_data[csv_data['cell_id'] == cells_locs_count[jj,0]]
 
-            # Extract required data for tracking: x [um]', 'y [um]', 'frame'
-            xy_frame_temp = part_csv_data_sort[['x [um]', 'y [um]', 'frame']] 
-            
+            # Extract required data for tracking:  x [um]', 'y [um]', 'frame', loc_id
+            xy_frame_temp = part_csv_data_sort[['x [um]', 'y [um]', 'frame', 'loc_id']] 
+
             # Perform tracking
             if len(xy_frame_temp) > 0:
                 # Link Positions to Form Trajectories
@@ -136,37 +133,48 @@ def tracking_analysis(para):
             # Again, make sure that particle counting increases for each bacterial cell
             linked['track_id'] += track_id_shift
             
-            # Sort for frames
-            tracks_temp = linked.sort_values(by = ['frame'])
+            # Sort for frames (might not be needed)
+            tracks_temp = linked.sort_values(by = ['loc_id'])
                        
             # Update 'track' column in the csv_data
-            csv_data_sort.loc[tracks_temp.index.tolist(), 'track_id'] = tracks_temp['track_id']
-            
+            csv_data.loc[tracks_temp.index.tolist(), 'track_id'] = tracks_temp['track_id']
+
             # Accumulate track structure, check that tracks_temp isn't empty
             if len(tracks_temp)>0:
                 tracks = pd.concat([tracks, tracks_temp], ignore_index=True)
-
-        # Update CSV file with track IDs
-        csv_data.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
-        print('\n Tracking analysis done!\n')
-        print(f" track_ids have been set in {para['fn_locs_csv'][:-4] + para['fn_csv_handle']} \n")
-
+        print(f"   ...cell {jj} of {len(cells_locs_count)}.")
     else:
         # No segmentation scenario
-        xy_frame_temp = csv_data[['x [um]', 'y [um]', 'frame']] #if num_cell > 0 else 0
-        csv_data['tracks'] = tp.link_df(xy_frame_temp,
+        xy_frame_temp = csv_data[['x [um]', 'y [um]', 'frame', 'loc_id']] #if num_cell > 0 else 0
+        linked = tp.link_df(xy_frame_temp,
                                         memory=para['track_memory'],
                                         search_range=para['track_steplength_max'],
                                         pos_columns= ['x [um]', 'y [um]'])
+        #trackPy returns "particle' let's rename for track_id
+        linked.rename(columns={'particle': 'track_id'}, inplace=True)
+        
+        # Sort for frames (might not be neded)
+        tracks = linked.sort_values(by = ['loc_id'])
+
+        # Update 'track' column in the csv_data
+        csv_data.loc[tracks.index.tolist(), 'track_id'] = tracks['track_id']
+ 
     # How long did the tracking take?
     end = time.time()
-    print(f"time for tracking:  {end-start}")
+    rounded_time = round(end-start, 2)
+    print(f"  Time for tracking: {rounded_time} seconds")
+    
+    # breakpoint()
     
     # Plot all tracks
     # print(' Plot all tracks')
     # plot_trackPy_data(tracks, para)
 
+    # Update CSV file with track_ids
+    csv_data.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
+    print(f"  track_ids have updated in {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
+
     para['tracks'] = tracks
-    print('Tracks have been stored in the para structure!\n')
+    print('  Tracks have been stored in the para dictionary!')
 
     return para

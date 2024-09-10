@@ -13,29 +13,25 @@ import os
 from skimage.io import imread
 
 def apply_cell_segmentation(para):
-    
+    print('\nRun apply_cell_segmentation.py')
     CMAP_APPLIED = 'gist_ncar' ##was: 'nipy_spectral', tab20c, 
     # Define filenames to load existing data (requires correct settings in ImageJ/Fiji macro 'Cell Segmentation')
     para['fn_proc_brightfield_segm'] = para['fn_proc_brightfield'][:-4] + '_segm.tif'
     para['fn_proc_brightfield_segm_table'] = para['fn_proc_brightfield_segm'][:-4] + '_table.csv'
 
     # Load processed brightfield image with cells, filename: '*_procBrightfield.tif'
-    print(f" load_proc_brightfield: {para['fn_proc_brightfield']}")
+    print(f"  load_proc_brightfield: {para['fn_proc_brightfield']}")
     proc_brightfield_image = imread(para['data_pathname'] + para['fn_proc_brightfield'])
 
     # Load segmented image with cells, filename '*_procBrightfield_segm.tif'
-    print(f" load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
+    print(f"  load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
     proc_brightfield_segm_image = imread(para['data_pathname'] + para['fn_proc_brightfield_segm'])
     segm_image_y_pos_max_pixel, segm_image_x_pos_max_pixel = proc_brightfield_segm_image.shape
 
     # Load table with information on the segmentations, filename '*_procBrightfield_segm_table.csv'
-    print(f" load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}\n")
+    print(f"  load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
     proc_brightfield_segm_table = pd.read_csv(para['data_pathname'] + para['fn_proc_brightfield_segm_table']).to_numpy()
 
-    # # Load table '*_analysis.csv'
-    # load_file = para['data_pathname'] + para['fn_save_csv']
-    # save_file = load_file
-    
     # Import '*_analysis.csv'
     temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
     csv_data = pd.read_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'])
@@ -58,7 +54,7 @@ def apply_cell_segmentation(para):
 
     # Warn if cell_ids are already assigned
     if (csv_data['cell_id'] != -1).sum() > 1:
-        print('Warning: Previously assigned localisations in your analysis file have been overwritten!')
+        print('\n  Warning: Previously assigned localisations in your analysis file have been overwritten!')
 
     # Plot images initially segmented elsewhere
     fig, ax = plt.subplots(2, 3, figsize=(14, 8))
@@ -94,8 +90,8 @@ def apply_cell_segmentation(para):
     ax[1, 0].set_ylabel('Pixels')
     ax[1, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
-    print(f'Total number of localisations: {len(loc_pixel_array)}')
-    print(f'Number of cells before filtering: {len(proc_brightfield_segm_table)}')
+    print(f'  Total number of localisations: {len(loc_pixel_array)}')
+    print(f'  Number of cells before filtering: {len(proc_brightfield_segm_table)}')
 
     # Filter cell segments for size
     temp_cell_array = []
@@ -104,17 +100,20 @@ def apply_cell_segmentation(para):
             temp_cell_array.append([proc_brightfield_segm_table[i, 0], proc_brightfield_segm_table[i, 1]])
     temp_cell_array = np.array(temp_cell_array)
 
-    print(f'Number of cells after filtering: {len(temp_cell_array)}')
+    print(f'  Number of cells after filtering: {len(temp_cell_array)}')
 
     # Check for each localisation whether it is part of a valid cell or not
     # Create a dictionary for the masks
     cell_masks = {}
+    print("  Cell... ")
     for j in range(len(temp_cell_array)):
-        if j % 50 == 0:
-            print(f' Cell {j + 1} of {len(temp_cell_array)}')
+        if j % 50 == 0 and j > 0:
+            print(f'   ...cell {j} of {len(temp_cell_array)}')
+        
         cell_id = temp_cell_array[j, 0]
         cell_masks[cell_id] = (proc_brightfield_segm_image == cell_id).T
-
+    print(f'   ...cell {j+1} of {len(temp_cell_array)}.')
+    
     # Check each localization against all valid cells
     loc_y = loc_pixel_array[:, 0].astype(int) - 1
     loc_x = loc_pixel_array[:, 1].astype(int) - 1
@@ -144,8 +143,8 @@ def apply_cell_segmentation(para):
     
     plt.show()
 
-    print(f'Number of localisations within cells: {np.sum(loc_pixel_array[:, 2] > 0)}')
-    print(f'Number of localisations outside cells: {np.sum(loc_pixel_array[:, 2] == -1)}')
+    print(f'  Number of localisations within cells: {np.sum(loc_pixel_array[:, 2] > 0)}')
+    print(f'  Number of localisations outside cells: {np.sum(loc_pixel_array[:, 2] == -1)}')
 
     # Update cell_ids in '*.csv' and export
     csv_data['cell_id'] = loc_pixel_array[:, 2]
@@ -153,8 +152,7 @@ def apply_cell_segmentation(para):
     csv_data.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
 
     para['csv_data'] = csv_data
-    print('Segmentation analysis done!')
-    print(f"cell_ids have been assigned in {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
-
+    print(f"  Cell_ids have been updated in {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
+    print('  Segmentation analysis done!')
     return para
 

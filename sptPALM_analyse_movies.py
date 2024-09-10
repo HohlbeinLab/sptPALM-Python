@@ -24,8 +24,8 @@ from plot_hist_diffusion_track_length import plot_hist_diffusion_track_length
 
 
 def sptPALM_analyse_movies():
+    print('\nRun sptPALM_analyse_movies.py')
     # 1.1 Define input parameters
-    print('\nrun define_input_parameters.py\n')
     input_parameter = define_input_parameters()
     
     # Allow savename to be changed (default: 'sptDataMovies.mat')
@@ -74,15 +74,14 @@ def sptPALM_analyse_movies():
 
     # Create OUTPUT folder if it doesn't yet exist
     temp_path = os.path.join(input_parameter['data_pathname'], input_parameter['default_output_folder'])
-    print('temp_path')
     if not os.path.exists(temp_path):
         os.makedirs(temp_path)
 
     # Display analysis parameters
-    print('Print input_parameter')
+    print('  Show input_parameter')
     # Iterate through the dictionary and print each key-value pair on a new line
     for key, value in input_parameter.items():
-        print(f" input_parameter.{key}: {value}")
+        print(f"    .{key}: {value}")
 
     # 2. sptPALM data analysis (looping over each movie)
     DATA = {}
@@ -101,11 +100,9 @@ def sptPALM_analyse_movies():
         os.chdir(para['data_pathname'])
 
         # 2.2 Loading and preparing localisation data
-        print('\nRun load_csv.py\n')
         para = load_csv(para)
 
         # 2.3 Apply cell segmentation
-        print('\nRun appllied_cell_segmentation.py\n')
         if input_parameter['use_segmentations']:
             para = apply_cell_segmentation(para)
 

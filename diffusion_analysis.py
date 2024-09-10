@@ -16,6 +16,7 @@ import os
 
 
 def diffusion_analysis(para):
+    print('\nRun diffusion_analysis.py')
     # Extract track data
     tracks_temp = para['tracks']
     
@@ -28,14 +29,17 @@ def diffusion_analysis(para):
     filter_vec = (track_length > para['diff_hist_steps_min']) & (track_length < para['diff_hist_steps_max'])
     track_count = track_count_temp[filter_vec, :]
 
+    # breakpoint()
+
     # Create empty vector for MSDs
     msd = np.zeros(len(track_count))
    
     output = pd.DataFrame()
     # For each track (which can have many localizations/positions)
+    print("  MSD analysis...")
     for ii in range(len(track_count)):
-        if ii % 500 == 0 or ii == len(track_count) - 1:
-            print(f" MSD analysis track {ii} out of {len(track_count)} valid tracks")
+        if ii % 500 == 0 and ii > 0:
+            print(f"   ...track {ii} out of {len(track_count)} valid tracks")
         # breakpoint()    
         temp_array = tracks_temp[tracks_temp['track_id'] == track_count[ii,0]]
     
@@ -53,11 +57,12 @@ def diffusion_analysis(para):
                             (temp_array.iloc[jj+1]['y [um]'] - temp_array.iloc[jj]['y [um]']) ** 2)
 
         # Divide by total number of steps
-        # Careful, was +1 in Matlab, not sure here, +2???
-        msd[ii] /= (jj + 1)  # Mean square displacement
+        msd[ii] /= para['diff_hist_steps_min']  # Mean square displacement
+
+    print(f"   ...track {ii} out of {len(track_count)} valid tracks.")
 
     # Calculate D from MSD and correct for localization noise
-    dmle = msd / (4 * para['frametime']) - (para['sigma_noise'] ** 2) / para['frametime']
+    dmle = msd/(4 * para['frametime']) - (para['sigma_noise'] ** 2)/para['frametime']
 
     # Save data
     output = pd.DataFrame({
@@ -71,9 +76,9 @@ def diffusion_analysis(para):
         # Save data into a new *.csv file
         temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
         output.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_diffs_handle'], index=False, quoting=3)  # quoting=3 corresponds to 'QUOTE_NONE'
-        print('\nDiffusion analysis done and diffusion coefficients saved!\n')
+        print('  Diffusion analysis done and diffusion coefficients saved!')
     else:
-        print('\nEmpty list of diffusion coefficients!\n')
+        print('  Careful, empty list of diffusion coefficients returned!')
 
     para['diff_coeffs_list'] = output
     

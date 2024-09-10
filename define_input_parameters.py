@@ -8,7 +8,7 @@ Created on Wed Aug 28 21:54:13 2024
 
 # Function defining all the input parameters and data to be analyzed
 def define_input_parameters():
-
+    print('\nRun define_input_parameters.py')
     input_parameter = {
         'pn_data': '', # Initialise pathname to the data (selection via GUI or pre-defined, see below) 
         'fn_locs_csv': '',  # Initialise filename to the localisation data (selection via GUI or pre-defined, see below) 
@@ -28,11 +28,11 @@ def define_input_parameters():
 
         # Segmentation of cells allows linking localisations to individual cells
         'cellarea_pixels_min': 50,  # Filter cells for minum area (area is given in number of pixels), default: 50
-        'cellarea_pixels_max': 500, # Filter cells for area (area is given in number of pixels), default: 500
+        'cellarea_pixels_max': 300, # Filter cells for area (area is given in number of pixels), default: 500
         'use_segmentations': True, # Account for segmentations = False, default: True
 
         # Tracking parameters
-        'track_steplength_max': 0.8, # Tracking window (um), default: 0.8 um
+        'track_steplength_max': 0.5, # Tracking window (um), default: 0.8 um
         'track_memory': 0, # Tracking memory in frames, default: 1
 
         # Diffusion analysis
@@ -62,7 +62,7 @@ def define_input_parameters():
         'plot_norm_histograms': 'probability', # Carefull: Matlab: choose either 'count' (default) | 'probability' | 'countdensity' | 'pdf' | 'cumcount' | 'cdf'
         'mod_define_input_parameters': False, #  Run DefineInputParameters.m in sptPALM_combineData.m True/False, default: False
         'plot_frame_number': True, # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
-        'dpi': 300, # DPI setting for plotting figures, default: 300
+        'dpi': 150, # DPI setting for plotting figures, default: 300
         
         # 'para': {}  # Structure that will later save all parameters and settings
     }
@@ -73,7 +73,7 @@ def define_input_parameters():
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs_csv'] = [
         # '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-        'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        'veryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
