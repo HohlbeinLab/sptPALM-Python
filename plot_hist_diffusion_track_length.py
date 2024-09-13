@@ -18,10 +18,10 @@ import os
 def plot_hist_diffusion_track_length(para):
     print('\nRun plot_hist_diffusion_track_length.py')
     # Convert MATLAB table to a numpy array and multiply by ConversionFactor
-    diff_coeffs_temp = para['diff_coeffs_list']['diff_coeffs_filtered'].to_numpy()
+    diff_coeffs_temp = para['diff_coeffs_filtered_list']['diff_coeffs_filtered'].to_numpy()
 
     # Create figure for histograms
-    fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6.5))
+    fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6.5)) #
     fig1.suptitle('Histogram: Diffusion coefficients and track lengths')
 
     # Plot histogram of diffusion coefficients (density= False,)
@@ -36,7 +36,6 @@ def plot_hist_diffusion_track_length(para):
     ax1.tick_params(axis='both', which='major', labelsize=para['fontsize'])
 
     # Find unique track IDs and create histogram for track lengths
-    # breakpoint()
     track_ids, ia, ic = np.unique(para['tracks']['track_id'], return_index=True, return_inverse=True)
     ax2.hist(np.bincount(ic), bins=np.arange(0.5, 51.5, 1), density=(para['plot_norm_histograms'] == 'probability'),
              edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
@@ -49,8 +48,8 @@ def plot_hist_diffusion_track_length(para):
     ax2.tick_params(axis='both', which='major', labelsize=para['fontsize'])
 
     # Save figure as PNG
-    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
-    plt.savefig(temp_path + para['fn_locs_csv'][:-4] + '_Fig02_diff.png', dpi = para['dpi'])
+    temp_path = os.path.join(para['data_pathname'], para['default_output_dir'])
+    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig02_diff.png', dpi = para['dpi'])
 
     plt.show()
     return para

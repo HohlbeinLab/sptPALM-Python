@@ -20,8 +20,8 @@ def load_csv(para):
     print('\nRun load_csv.py')
     # Import *.csv data (for example obtained from running ThunderSTORM)
     print(f"  pathname: {para['data_pathname']}")  
-    print(f"  load_filename(s) [csv]: {para['fn_locs_csv']}")    
-    csv_input_file = pd.read_csv(para['data_pathname'] + para['fn_locs_csv'])
+    print(f"  load_filename(s) [csv]: {para['fn_locs']}")    
+    csv_input_file = pd.read_csv(para['data_pathname'] + para['fn_locs'])
 
     # Change x,y,z from thunderSTORM from nm to um
     try:
@@ -43,7 +43,7 @@ def load_csv(para):
                        ('track_id', ''),
                        ('x [um]', 'x [nm]'),
                        ('y [um]', 'y [nm]'), 
-                       ('z [nm]', 'z [nm]'),
+                       ('z [um]', 'z [nm]'),
                        ('brightness', 'intensity [photon]'), 
                        ('background', 'bkgstd [photon]'), 
                        ('i0', 'offset [photon]'),
@@ -81,9 +81,9 @@ def load_csv(para):
         print(f"   ...csv-data column: {row['internal_naming']} <= {row['external_naming']}")
         
     # Export the '*_analysis.csv' file
-    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
-    csv_data.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
-    para['output_table'] = csv_data
-    print(f"  Conversion of *thunder.csv to {para['fn_locs_csv'][:-4] + para['fn_csv_handle']} done!\n")
+    temp_path = os.path.join(para['data_pathname'], para['default_output_dir'])
+    csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
+    para['csv_data'] = csv_data
+    print(f"  Conversion of *thunder.csv to {para['fn_locs'][:-4] + para['fn_csv_handle']} done!\n")
 
     return para

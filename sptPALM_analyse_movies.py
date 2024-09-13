@@ -18,7 +18,7 @@ from apply_cell_segmentation import apply_cell_segmentation
 from tracking_analysis import tracking_analysis
 from diffusion_analysis import diffusion_analysis
 from plot_hist_diffusion_track_length import plot_hist_diffusion_track_length
-# from SingleCellTrackingAnalysis import single_cell_tracking_analysis
+from single_cell_tracking_analysis import single_cell_tracking_analysis
 # from Plot_SingleCellTrackingAnalysis import plot_single_cell_tracking_analysis
 # from NormIncrements_Analysis import norm_increments_analysis
 
@@ -45,7 +45,7 @@ def sptPALM_analyse_movies():
     
     # Fall-back to GUI if no list of ThunderSTORM.csv files 
     # '*_thunder_.csv' are specified in DefineInputParameters.m
-    if not input_parameter['fn_locs_csv']:
+    if not input_parameter['fn_locs']:
         files = filedialog.askopenfilenames(
             title="Select *.csv from ThunderSTORM or other SMLM programs",
             filetypes=[("CSV files", "*_thunder.csv")])
@@ -60,7 +60,7 @@ def sptPALM_analyse_movies():
     # were selected, ask wether to continue. If yes is chosen, this brightfiield image
     # is used for all loaded *_thunder.csv files.
     if input_parameter.get('use_segmentations'):
-        if len(input_parameter['fn_locs_csv']) != len(input_parameter['fn_proc_brightfield']):
+        if len(input_parameter['fn_locs']) != len(input_parameter['fn_proc_brightfield']):
             if len(input_parameter['fn_proc_brightfield']) == 1 and len(input_parameter['fn_locs_csv']) > 1:
                 print('Only one brightfield image but >1 CSV files were chosen!')
                 proceed = simpledialog.askinteger("Continue?", "Enter 1 to continue or 0 to cancel:", initialvalue=1)
@@ -73,7 +73,7 @@ def sptPALM_analyse_movies():
                 raise Exception('Select an equal number of files for localisations and segmentations!')
 
     # Create OUTPUT folder if it doesn't yet exist
-    temp_path = os.path.join(input_parameter['data_pathname'], input_parameter['default_output_folder'])
+    temp_path = os.path.join(input_parameter['data_pathname'], input_parameter['default_output_dir'])
     if not os.path.exists(temp_path):
         os.makedirs(temp_path)
 
@@ -85,13 +85,13 @@ def sptPALM_analyse_movies():
 
     # 2. sptPALM data analysis (looping over each movie)
     DATA = {}
-    for ii in range(len(input_parameter['fn_locs_csv'])):
+    for ii in range(len(input_parameter['fn_locs'])):
         input_parameter['movie_number'] = ii #start with 0 not 1
 
         # 2.1 Initialisation of structure para (local analysis over one movie)
         #The structure para will contain all parameters and updated references to filenames and pathnames.
         para = input_parameter.copy() #Initialise data structure
-        para['fn_locs_csv'] = input_parameter['fn_locs_csv'][ii]
+        para['fn_locs'] = input_parameter['fn_locs'][ii]
         if input_parameter['fn_proc_brightfield']:
             para['fn_proc_brightfield'] = input_parameter['fn_proc_brightfield'][ii]
         else:
@@ -113,9 +113,9 @@ def sptPALM_analyse_movies():
         para = diffusion_analysis(para)
         para = plot_hist_diffusion_track_length(para)
 
-#         # 2.6 Single Cell Tracking Analysis
-#         if inputParameter['useSegmentations']:
-#             para = single_cell_tracking_analysis(para)
+        # 2.6 Single Cell Tracking Analysis
+        # if input_parameter['use_segmentations']:
+        #     para = single_cell_tracking_analysis(para)
 #             para = plot_single_cell_tracking_analysis(para)
 
 #         # 2.7 Optional Analysis of normalized increment distribution
@@ -132,7 +132,7 @@ def sptPALM_analyse_movies():
 
         DATA[ii] = para
 
-    # 3. Save entire DATA structure
+    # 3. Save entire DATA dictionary
     with open(temp_path + para['fn_combined_data'], 'w') as f:
         f.write(str(DATA))
 

@@ -33,8 +33,8 @@ def apply_cell_segmentation(para):
     proc_brightfield_segm_table = pd.read_csv(para['data_pathname'] + para['fn_proc_brightfield_segm_table']).to_numpy()
 
     # Import '*_analysis.csv'
-    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
-    csv_data = pd.read_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'])
+    temp_path = os.path.join(para['data_pathname'], para['default_output_dir'])
+    csv_data = pd.read_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'])
     x_column = csv_data.columns.get_loc('x [um]')
     y_column = csv_data.columns.get_loc('y [um]')
 
@@ -57,7 +57,7 @@ def apply_cell_segmentation(para):
         print('\n  Warning: Previously assigned localisations in your analysis file have been overwritten!')
 
     # Plot images initially segmented elsewhere
-    fig, ax = plt.subplots(2, 3, figsize=(14, 8))
+    fig, ax = plt.subplots(2, 3, figsize=(14, 8)) # 
     circle_spot_size = 2
 
     # Show processed brightfield image
@@ -75,7 +75,7 @@ def apply_cell_segmentation(para):
     ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
     # Show histogram
-    ax[0, 2].hist(para['output_table']['brightness'], bins=np.arange(0, 10000, 500),
+    ax[0, 2].hist(para['csv_data']['brightness'], bins=np.arange(0, 10000, 500),
                   edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
     ax[0, 2].set_title('Histogram: Intensity of all localisations')
     ax[0, 2].set_xlabel('Number of counts')
@@ -108,7 +108,7 @@ def apply_cell_segmentation(para):
     print("  Cell... ")
     for j in range(len(temp_cell_array)):
         if j % 50 == 0 and j > 0:
-            print(f'   ...cell {j} of {len(temp_cell_array)}')
+            print(f'   ...cell {j} of {len(temp_cell_array)},')
         
         cell_id = temp_cell_array[j, 0]
         cell_masks[cell_id] = (proc_brightfield_segm_image == cell_id).T
@@ -139,7 +139,7 @@ def apply_cell_segmentation(para):
     plt.tight_layout()  # Adjust layout to prevent overlap
 
     # Save figure as PNG
-    plt.savefig(temp_path + para['fn_locs_csv'][:-4] + '_Fig01_segm.png', dpi = para['dpi'])
+    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig01_segm.png', dpi = para['dpi'])
     
     plt.show()
 
@@ -149,10 +149,10 @@ def apply_cell_segmentation(para):
     # Update cell_ids in '*.csv' and export
     csv_data['cell_id'] = loc_pixel_array[:, 2]
     csv_data['cell_area_id'] = loc_pixel_array[:, 3]
-    csv_data.to_csv(temp_path + para['fn_locs_csv'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
+    csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
 
     para['csv_data'] = csv_data
-    print(f"  Cell_ids have been updated in {para['fn_locs_csv'][:-4] + para['fn_csv_handle']}")
+    print(f"  Cell_ids have been updated in {para['fn_locs'][:-4] + para['fn_csv_handle']}")
     print('  Segmentation analysis done!')
     return para
 

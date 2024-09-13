@@ -10,10 +10,10 @@ Created on Wed Aug 28 21:54:13 2024
 def define_input_parameters():
     print('\nRun define_input_parameters.py')
     input_parameter = {
-        'pn_data': '', # Initialise pathname to the data (selection via GUI or pre-defined, see below) 
-        'fn_locs_csv': '',  # Initialise filename to the localisation data (selection via GUI or pre-defined, see below) 
+        'data_dir': '', # Directory where the data is found (selection via GUI or pre-defined, see below) 
+        'default_output_dir': 'output_python/', # Initialise new directory to which analysed data is saved        
+        'fn_locs': '',  # Initialise filename to the localisation data (selection via GUI or pre-defined, see below) 
         'fn_proc_brightfield': '', # Initialise filename to the brighfield data (selection via GUI or pre-defined, see below
-        'default_output_folder': 'output_python/', #Initialise for a new folder to which analysed data is saved        
         'fn_csv_handle': '_py_save_csv.csv', # Will be used to name the csv file of the analysed data
         'fn_dict_handle': '_py_save_dict.json', # Will be used to name the jason file of the analysed data
         'fn_diffs_handle': '_diff_coeffs.csv', # Will be used to name the file of diffusion coefficients
@@ -52,7 +52,6 @@ def define_input_parameters():
         'scta_vis_rangemax': 0.4, # Color-coding in the range of [0:(vis_rangemax*inputParameter.plotDiffHist_max)], default: 0.4
 
         # Histograms for diffusion analysis
-        'conversion_factor': 1E-6, # Localisations are in nm. Diff coef => um^2/s, default: 1-E6
         'plot_diff_hist_min': 4E-3, # Plot and histogram from um^2/s to um^2/s, default: 4E-3
         'plot_diff_hist_max': 10, # Plot and histogram from um^2/s to um^2/s, default: 10
         
@@ -71,7 +70,7 @@ def define_input_parameters():
     input_parameter['data_pathname'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
 
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
-    input_parameter['fn_locs_csv'] = [
+    input_parameter['fn_locs'] = [
         # '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
         'veryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
     ]
