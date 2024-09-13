@@ -67,7 +67,7 @@ def define_input_parameters():
     }
 
     # Directory containing your data
-    input_parameter['data_pathname'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
+    input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
 
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [

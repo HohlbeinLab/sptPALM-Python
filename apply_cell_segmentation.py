@@ -21,19 +21,19 @@ def apply_cell_segmentation(para):
 
     # Load processed brightfield image with cells, filename: '*_procBrightfield.tif'
     print(f"  load_proc_brightfield: {para['fn_proc_brightfield']}")
-    proc_brightfield_image = imread(para['data_pathname'] + para['fn_proc_brightfield'])
+    proc_brightfield_image = imread(para['data_dir'] + para['fn_proc_brightfield'])
 
     # Load segmented image with cells, filename '*_procBrightfield_segm.tif'
     print(f"  load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
-    proc_brightfield_segm_image = imread(para['data_pathname'] + para['fn_proc_brightfield_segm'])
+    proc_brightfield_segm_image = imread(para['data_dir'] + para['fn_proc_brightfield_segm'])
     segm_image_y_pos_max_pixel, segm_image_x_pos_max_pixel = proc_brightfield_segm_image.shape
 
     # Load table with information on the segmentations, filename '*_procBrightfield_segm_table.csv'
     print(f"  load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
-    proc_brightfield_segm_table = pd.read_csv(para['data_pathname'] + para['fn_proc_brightfield_segm_table']).to_numpy()
+    proc_brightfield_segm_table = pd.read_csv(para['data_dir'] + para['fn_proc_brightfield_segm_table']).to_numpy()
 
     # Import '*_analysis.csv'
-    temp_path = os.path.join(para['data_pathname'], para['default_output_dir'])
+    temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     csv_data = pd.read_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'])
     x_column = csv_data.columns.get_loc('x [um]')
     y_column = csv_data.columns.get_loc('y [um]')

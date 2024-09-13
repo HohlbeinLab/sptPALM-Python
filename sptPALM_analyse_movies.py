@@ -73,7 +73,7 @@ def sptPALM_analyse_movies():
                 raise Exception('Select an equal number of files for localisations and segmentations!')
 
     # Create OUTPUT folder if it doesn't yet exist
-    temp_path = os.path.join(input_parameter['data_pathname'], input_parameter['default_output_dir'])
+    temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
     if not os.path.exists(temp_path):
         os.makedirs(temp_path)
 
@@ -84,7 +84,7 @@ def sptPALM_analyse_movies():
         print(f"    .{key}: {value}")
 
     # 2. sptPALM data analysis (looping over each movie)
-    DATA = {}
+    data = {}
     for ii in range(len(input_parameter['fn_locs'])):
         input_parameter['movie_number'] = ii #start with 0 not 1
 
@@ -97,7 +97,7 @@ def sptPALM_analyse_movies():
         else:
             para['fn_proc_brightfield'] = None
 
-        os.chdir(para['data_pathname'])
+        os.chdir(para['data_dir'])
 
         # 2.2 Loading and preparing localisation data
         para = load_csv(para)
@@ -130,13 +130,13 @@ def sptPALM_analyse_movies():
         # Cell array containing all para structs
         # DATA['MOVIES'].append((para, para['fn_locs_csv']))
 
-        DATA[ii] = para
+        data[ii] = para
 
     # 3. Save entire DATA dictionary
     with open(temp_path + para['fn_combined_data'], 'w') as f:
-        f.write(str(DATA))
+        f.write(str(data))
 
-    return DATA, input_parameter, para
+    return data, input_parameter, para
 
 
 

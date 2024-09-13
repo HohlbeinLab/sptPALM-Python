@@ -48,7 +48,7 @@ def plot_hist_diffusion_track_length(para):
     ax2.tick_params(axis='both', which='major', labelsize=para['fontsize'])
 
     # Save figure as PNG
-    temp_path = os.path.join(para['data_pathname'], para['default_output_dir'])
+    temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig02_diff.png', dpi = para['dpi'])
 
     plt.show()

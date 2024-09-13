@@ -68,7 +68,7 @@ def diffusion_analysis(para):
 
     if not diffs_df.empty:  # Check if diffs_df is not empty
         # Save data into a new *.csv file
-        temp_path = os.path.join(para['data_pathname'], para['default_output_dir'])
+        temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
         diffs_df.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_diffs_handle'], index=False, quoting=3)  # quoting=3 corresponds to 'QUOTE_NONE'
         print('  Diffusion analysis done and diffusion coefficients saved!')
     else:

@@ -76,7 +76,7 @@ def tracking_analysis(para):
 
     # Load csv data into a DataFrame
     print(f"  loadFile [tracking]: {para['fn_locs'][:-4] + para['fn_csv_handle']}")
-    temp_path = os.path.join(para['data_pathname'], para['default_output_dir'])
+    temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     csv_data = pd.read_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'])
 
     # Check for existing 'track_id' and warn if necessary
@@ -92,7 +92,7 @@ def tracking_analysis(para):
 
         # Prepare cellTrackCount
         cell_locs = np.bincount(ic)
-        cell_ids_locs = np.column_stack((cell_locs, cell_locs, np.cumsum(cell_locs)))
+        cell_ids_locs = np.column_stack((cell_ids, cell_locs, np.cumsum(cell_locs)))
 
         # Removes first row if -1 is returned
         cell_ids_locs = cell_ids_locs[1:] if cell_ids_locs[0, 0] == -1 else cell_ids_locs 
