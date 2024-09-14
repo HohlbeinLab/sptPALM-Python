@@ -14,55 +14,6 @@ import warnings as warn
 import time
 import os
 
-def plot_trackPy_data(linked, para):
-    # Filter out Short Trajectories
-    filtered = tp.filter_stubs(linked, threshold=para['diff_hist_steps_min'])
-    fig, ax = plt.subplots(2, 2, figsize=(14, 10))
-    ax[0, 0].set_title('Particle Trajectories')
-    ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,0], pos_columns=['x [um]', 'y [um]'])
-    ax[0, 0].set_ylabel('y (um)')
-    ax[0, 0].set_xlabel('x (um)')
-
-    # Calculate and correct drift!
-    d = tp.compute_drift(filtered, pos_columns= ['x [um]', 'y [um]'])
-    d.plot(ax = ax[1, 0])
-    ax[1, 0].set_ylabel('x,y (um)')
-    ax[1, 0].set_xlabel('frames')
-    ax[1, 0].set_title('Drift')
-
-    # filtered_drift_corrected = tp.subtract_drift(filtered.copy(), d)
-    # tp.plot_traj(filtered_drift_corrected, ax = ax[0,1], pos_columns= ['x [um]', 'y [um]'])
-    # ax[0, 1].set_title('Particle Trajectories: drift corrected')
-    # ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    ax[0, 1].set_title('Particle Trajectories')
-    ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,1], pos_columns=['x [um]', 'y [um]'])
-    ax[0, 1].set_title('Particle Trajectories')
-    ax[0, 1].set_ylabel('y (um)')
-    ax[0, 1].set_xlabel('x (um)')  
-    ax[0, 1].set_ylim(0, 0.5)
-    ax[0, 1].set_xlim(0, 0.5)
-
-
-    # Compute Mean Squared Displacement (MSD)
-    msd = tp.emsd(filtered, mpp=1, fps=1/para['frametime'], max_lagtime = 7, pos_columns= ['x [um]', 'y [um]'])
-
-    # Plots and fits Mean Squared Displacement (MSD)
-    ax[1, 1].set_title('Mean Squared Displacement: with fit, no drift correction')
-    ax[1, 1].set_ylabel(r'$\langle \Delta r^2 \rangle$ [mu m$^2$]')
-    ax[1, 1].set_xlabel('lag time $t$')
-    fit = tp.utils.fit_powerlaw(msd, ax = ax[1,1])  # performs linear best fit in log space, plots]
-    print(fit)
-
-    plt.tight_layout()  # Adjust layout to prevent overlap
-    
-    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
-    plt.savefig(temp_path + para['fn_locs_csv'][:-4] + '_Fig02_track.png', dpi = para['dpi'])
-    
-    
-    plt.show()
-    return ()
 
 def tracking_analysis(para):
     print('\nRun tracking_analysis.py')
@@ -97,7 +48,7 @@ def tracking_analysis(para):
         # Removes first row if -1 is returned
         cell_ids_locs = cell_ids_locs[1:] if cell_ids_locs[0, 0] == -1 else cell_ids_locs 
 
-        # Initialise DataFrame 
+        # Initialise tracks DataFrame 
         tracks = pd.DataFrame([[0, 0, 0, 0]],columns = ['x [um]', 'y [um]', 'frame', 'track_id'])#()
        
         # Perform tracking for each segmented cell
@@ -176,3 +127,53 @@ def tracking_analysis(para):
     print('  Tracks have been stored in the para dictionary!')
 
     return para
+
+def plot_trackPy_data(linked, para):
+    # Filter out Short Trajectories
+    filtered = tp.filter_stubs(linked, threshold=para['diff_hist_steps_min'])
+    fig, ax = plt.subplots(2, 2, figsize=(14, 10))
+    ax[0, 0].set_title('Particle Trajectories')
+    ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,0], pos_columns=['x [um]', 'y [um]'])
+    ax[0, 0].set_ylabel('y (um)')
+    ax[0, 0].set_xlabel('x (um)')
+
+    # Calculate and correct drift!
+    d = tp.compute_drift(filtered, pos_columns= ['x [um]', 'y [um]'])
+    d.plot(ax = ax[1, 0])
+    ax[1, 0].set_ylabel('x,y (um)')
+    ax[1, 0].set_xlabel('frames')
+    ax[1, 0].set_title('Drift')
+
+    # filtered_drift_corrected = tp.subtract_drift(filtered.copy(), d)
+    # tp.plot_traj(filtered_drift_corrected, ax = ax[0,1], pos_columns= ['x [um]', 'y [um]'])
+    # ax[0, 1].set_title('Particle Trajectories: drift corrected')
+    # ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+    ax[0, 1].set_title('Particle Trajectories')
+    ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,1], pos_columns=['x [um]', 'y [um]'])
+    ax[0, 1].set_title('Particle Trajectories')
+    ax[0, 1].set_ylabel('y (um)')
+    ax[0, 1].set_xlabel('x (um)')  
+    ax[0, 1].set_ylim(0, 0.5)
+    ax[0, 1].set_xlim(0, 0.5)
+
+
+    # Compute Mean Squared Displacement (MSD)
+    msd = tp.emsd(filtered, mpp=1, fps=1/para['frametime'], max_lagtime = 7, pos_columns= ['x [um]', 'y [um]'])
+
+    # Plots and fits Mean Squared Displacement (MSD)
+    ax[1, 1].set_title('Mean Squared Displacement: with fit, no drift correction')
+    ax[1, 1].set_ylabel(r'$\langle \Delta r^2 \rangle$ [mu m$^2$]')
+    ax[1, 1].set_xlabel('lag time $t$')
+    fit = tp.utils.fit_powerlaw(msd, ax = ax[1,1])  # performs linear best fit in log space, plots]
+    print(fit)
+
+    plt.tight_layout()  # Adjust layout to prevent overlap
+    
+    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
+    plt.savefig(temp_path + para['fn_locs_csv'][:-4] + '_Fig02_track.png', dpi = para['dpi'])
+    
+    
+    plt.show()
+    return ()

@@ -49,7 +49,7 @@ def load_csv(para):
                        ('i0', 'offset [photon]'),
                        ('sx', 'sigma1 [nm]'),
                        ('sy', 'sigma2 [nm]'),
-                       ('cell_area_id', '')]
+                       ('cell_area', '')]
     
     # Create data frame and the names into separate columns
     df = pd.DataFrame(int_ext_headers, columns=['internal_naming', 'external_naming'])
@@ -70,7 +70,7 @@ def load_csv(para):
             csv_data['cell_id'] = -1
         elif row['internal_naming'] == 'track_id':  # Fill 'track_id' column (preset to -1)
             csv_data['track_id'] = -1
-        elif row['internal_naming'] == 'cell_area_id':
+        elif row['internal_naming'] == 'cell_area':
             csv_data['cell_area_id'] = 0
         else: # read data from provided *.csv file
             try:

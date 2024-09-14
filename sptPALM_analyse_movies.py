@@ -114,8 +114,8 @@ def sptPALM_analyse_movies():
         para = plot_hist_diffusion_track_length(para)
 
         # 2.6 Single Cell Tracking Analysis
-        # if input_parameter['use_segmentations']:
-        #     para = single_cell_tracking_analysis(para)
+        if input_parameter['use_segmentations']:
+            para = single_cell_tracking_analysis(para)
 #             para = plot_single_cell_tracking_analysis(para)
 
 #         # 2.7 Optional Analysis of normalized increment distribution

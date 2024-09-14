@@ -13,27 +13,48 @@ import numpy as np
 def single_cell_tracking_analysis(para):
     print('\nRun single_cell_tracking_analysis()')
 
+    csv_data = para['csv_data']
+
     # Check wether tracks_ids have been assigned
     if (para['csv_data']['track_id'] == -1).sum() != len(para['csv_data']['track_id'] ):
         print('Warning: ...tracks do not seem to be not assigneds, please run tracking!')
 
-    breakpoint()
+
 
     # # Create a temporary copy of the data matrix
+    #probably not needed
     data_matrix_temp = para['csv_data'].copy()
 
     # # Check '*_analysis.csv' for the presence of specific columns (sanity check)
-    # track_id_column = para['csvHeader'].index('"track_id"')
+    # track_id_column = para['csvHeader'].index('track_id')
     
     # Remove all localizations with cell_id == -1 (outside valid cells)
-    data_matrix_temp = para['csv_data'][para['csv_data']['"cell_id"'] != -1]
+    #probably not needed
+    data_matrix_temp = para['csv_data'][para['csv_data']['cell_id'] != -1]
+    
     
     # Sort the table by "cell_id"
     data_matrix_temp = data_matrix_temp.sort_values(by='cell_id')
 
+
+
     # Find unique cell_ids
-    cell_ids = data_matrix_temp['cell_id'].unique()
-    cell_area_ids = data_matrix_temp.loc[data_matrix_temp['cell_id'].isin(cell_ids), '"cell_area_id'].values
+    # cell_ids = data_matrix_temp['cell_id'].unique()
+    # cell_area_ids = data_matrix_temp.loc[data_matrix_temp['cell_id'].isin(cell_ids), '"cell_area_id'].values
+
+    # cell_ids = para['csv_data']['cell_id'].unique()
+    
+    cell_ids, ia, ic = np.unique(csv_data['cell_id'], return_index=True, return_inverse=True)
+    # Removes first row if -1 is returned
+    cell_ids = cell_ids[1:] if cell_ids[0] == -1 else cell_ids 
+
+
+    
+    cell_areas_id = csv_data.loc[csv_data['cell_id'].isin(cell_ids), 'cell_area_id'].values
+
+ 
+    
+    breakpoint()
 
     # Prepare a table with remaining cell_ids, number of localizations per cell, and cumulative sum
     cell_counts = data_matrix_temp['"cell_id"'].value_counts().sort_index()
@@ -50,6 +71,9 @@ def single_cell_tracking_analysis(para):
     # Initialize additional columns in the DiffCoeffsList dataframe
     para['diffs_coeffs_list']['cell_id'] = -1
     para['diffs_coeffs_list']['copynumber'] = -1
+
+    breakpoint()
+
 
     cell_data_array = []
     tracks_temp = []

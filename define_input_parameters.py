@@ -62,7 +62,7 @@ def define_input_parameters():
         'mod_define_input_parameters': False, #  Run DefineInputParameters.m in sptPALM_combineData.m True/False, default: False
         'plot_frame_number': True, # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
         'dpi': 150, # DPI setting for plotting figures, default: 300
-        
+        'cmap_applied': 'gist_ncar', ##was: 'nipy_spectral', tab20c, 
         # 'para': {}  # Structure that will later save all parameters and settings
     }
 
