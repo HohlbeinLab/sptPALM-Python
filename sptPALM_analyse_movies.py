@@ -6,13 +6,15 @@ Created on Wed Aug 28 20:58:09 2024
 @author: hohlbein
 """
 
-#import tkinter as tk
+# import tkinter as tk
+# import sys
 from tkinter import simpledialog, filedialog
 import os
-# import sys
+import json
+import pandas as pd
+import pickle
+
 from define_input_parameters import define_input_parameters
-
-
 from load_csv import load_csv
 from apply_cell_segmentation import apply_cell_segmentation
 from tracking_analysis import tracking_analysis
@@ -88,8 +90,8 @@ def sptPALM_analyse_movies():
     for ii in range(len(input_parameter['fn_locs'])):
         input_parameter['movie_number'] = ii #start with 0 not 1
 
-        # 2.1 Initialisation of structure para (local analysis over one movie)
-        #The structure para will contain all parameters and updated references to filenames and pathnames.
+        # 2.1 Initialisation of dictionary para (local analysis over one movie)
+        # Para will contain all parameters and updated references to filenames and pathnames.
         para = input_parameter.copy() #Initialise data structure
         para['fn_locs'] = input_parameter['fn_locs'][ii]
         if input_parameter['fn_proc_brightfield']:
@@ -128,14 +130,16 @@ def sptPALM_analyse_movies():
 #         shutil.copyfile(para['filename_thunderstormCSV'], save_path)
 
         # Cell array containing all para structs
-        # DATA['MOVIES'].append((para, para['fn_locs_csv']))
-
         data[ii] = para
 
     # 3. Save entire DATA dictionary
-    with open(temp_path + para['fn_combined_data'], 'w') as f:
-        f.write(str(data))
-
+    with open(temp_path + para['fn_combined_data'], 'wb') as f:
+        pickle.dump(data, f)
+    print('Data saved as pickle file')
+    
+    # with open(temp_path + para['fn_combined_data'] + '.pkl', 'rb') as f:
+    #     data_loaded = pickle.load(f)
+        
     return data, input_parameter, para
 
 

@@ -15,7 +15,7 @@ def define_input_parameters():
         'fn_locs': '',  # Initialise filename to the localisation data (selection via GUI or pre-defined, see below) 
         'fn_proc_brightfield': '', # Initialise filename to the brighfield data (selection via GUI or pre-defined, see below
         'fn_csv_handle': '_py_save_csv.csv', # Will be used to name the csv file of the analysed data
-        'fn_dict_handle': '_py_save_dict.json', # Will be used to name the jason file of the analysed data
+        'fn_dict_handle': '_py_save_dict.pkl', # Will be used to name the pickle file of the analysed data
         'fn_diffs_handle': '_diff_coeffs.csv', # Will be used to name the file of diffusion coefficients
         'fn_combined_data': 'sptDataMovies.json', # Filename of combined output
 

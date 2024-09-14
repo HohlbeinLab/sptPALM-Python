@@ -17,6 +17,7 @@ import os
 
 def tracking_analysis(para):
     print('\nRun tracking_analysis.py')
+    
     # Load the *.csv file
     if not para['use_segmentations']:
         print('  Tracking without cell segmentations...')
@@ -40,29 +41,23 @@ def tracking_analysis(para):
     if para['use_segmentations']:
         # Find unique cell_ids
         cell_ids, ia, ic = np.unique(csv_data['cell_id'], return_index=True, return_inverse=True)
-
-        # Prepare cellTrackCount
-        cell_locs = np.bincount(ic)
-        cell_ids_locs = np.column_stack((cell_ids, cell_locs, np.cumsum(cell_locs)))
-
-        # Removes first row if -1 is returned
-        cell_ids_locs = cell_ids_locs[1:] if cell_ids_locs[0, 0] == -1 else cell_ids_locs 
+        cell_ids = cell_ids[1:] if cell_ids[0] == -1 else cell_ids 
 
         # Initialise tracks DataFrame 
         tracks = pd.DataFrame([[0, 0, 0, 0]],columns = ['x [um]', 'y [um]', 'frame', 'track_id'])#()
        
         # Perform tracking for each segmented cell
         print("  Tracking...")
-        for jj in range(len(cell_ids_locs)):
+        for jj in range(len(cell_ids)):
             if jj % 50 == 0 and jj > 0: 
-                print(f"   ...cell {jj} of {len(cell_ids_locs)},")
+                print(f"   ...cell {jj} of {len(cell_ids)},")
             #makes sure that track_id continues increasing for every new (bacterial) cell
             track_id_shift = 0 if jj == 0 else max(tracks['track_id']+1)
             
             # Select all data of a particular (bacterial cell), note: cell_id starts with 1, not 0
-            part_csv_data_sort = csv_data[csv_data['cell_id'] == cell_ids_locs[jj,0]]
+            part_csv_data_sort = csv_data[csv_data['cell_id'] == cell_ids[jj]]
 
-            # Extract required data for tracking:  x [um]', 'y [um]', 'frame', loc_id
+            # Extract required data for tracking:
             xy_frame_temp = part_csv_data_sort[['x [um]', 'y [um]', 'frame', 'loc_id']] 
 
             # Perform tracking
@@ -93,7 +88,7 @@ def tracking_analysis(para):
             # Accumulate track structure, check that tracks_temp isn't empty
             if len(tracks_temp)>0:
                 tracks = pd.concat([tracks, tracks_temp], ignore_index=True)
-        print(f"   ...cell {jj} of {len(cell_ids_locs)}.")
+        print(f"   ...cell {jj} of {len(cell_ids)}.")
     else:
         # No segmentation scenario
         xy_frame_temp = csv_data[['x [um]', 'y [um]', 'frame', 'loc_id']] #if num_cell > 0 else 0
@@ -158,7 +153,6 @@ def plot_trackPy_data(linked, para):
     ax[0, 1].set_ylim(0, 0.5)
     ax[0, 1].set_xlim(0, 0.5)
 
-
     # Compute Mean Squared Displacement (MSD)
     msd = tp.emsd(filtered, mpp=1, fps=1/para['frametime'], max_lagtime = 7, pos_columns= ['x [um]', 'y [um]'])
 
@@ -173,7 +167,6 @@ def plot_trackPy_data(linked, para):
     
     temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
     plt.savefig(temp_path + para['fn_locs_csv'][:-4] + '_Fig02_track.png', dpi = para['dpi'])
-    
     
     plt.show()
     return ()

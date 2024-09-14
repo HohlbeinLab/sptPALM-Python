@@ -71,7 +71,6 @@ def apply_cell_segmentation(para):
                 'segm_cell_area': [bf_dict['proc_brightfield_segm_table'].loc[i, 'volume']]
                 })
             bf_dict['temp_cell_table'] = pd.concat([bf_dict['temp_cell_table'], new_row], ignore_index=True)
-   # bf_dict['temp_cell_table'] = np.array(bf_dict['temp_cell_table'])
 
     print(f" Number of cells after filtering: {len(bf_dict['temp_cell_table'])}")
 
@@ -85,10 +84,9 @@ def apply_cell_segmentation(para):
         if j % 50 == 0 and j > 0:
             print(f"   ...cell {j} of {len(bf_dict['temp_cell_table'])},")  
         cell_id = bf_dict['temp_cell_table'].loc[j,'segm_cell_id']
-        cell_masks[j] = (bf_dict['proc_brightfield_segm_image'] == cell_id).T
+        cell_masks[j] = (bf_dict['proc_brightfield_segm_image'] == cell_id).T # .T transpose matrix
     print(f"   ...cell {j+1} of {len(bf_dict['temp_cell_table'])}.")
-    
-    
+      
     # Check each localization against all valid cells
     loc_y = bf_dict['loc_pixel_table'].loc[:, 'x'].astype(int) - 1
     loc_x = bf_dict['loc_pixel_table'].loc[:, 'y'].astype(int) - 1
