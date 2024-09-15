@@ -55,10 +55,10 @@ def tracking_analysis(para):
             track_id_shift = 0 if jj == 0 else max(tracks['track_id']+1)
             
             # Select all data of a particular (bacterial cell), note: cell_id starts with 1, not 0
-            part_csv_data_sort = csv_data[csv_data['cell_id'] == cell_ids[jj]]
+            part_csv_data = csv_data[csv_data['cell_id'] == cell_ids[jj]]
 
             # Extract required data for tracking:
-            xy_frame_temp = part_csv_data_sort[['x [um]', 'y [um]', 'frame', 'loc_id']] 
+            xy_frame_temp = part_csv_data[['x [um]', 'y [um]', 'frame', 'loc_id']] 
 
             # Perform tracking
             if len(xy_frame_temp) > 0:

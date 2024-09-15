@@ -10,8 +10,6 @@ Created on Wed Aug 28 20:58:09 2024
 # import sys
 from tkinter import simpledialog, filedialog
 import os
-import json
-import pandas as pd
 import pickle
 
 from define_input_parameters import define_input_parameters
