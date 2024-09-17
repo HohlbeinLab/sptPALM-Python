@@ -41,17 +41,19 @@ def tracking_analysis(para):
     if para['use_segmentations']:
         # Find unique cell_ids
         cell_ids, ia, ic = np.unique(csv_data['cell_id'], return_index=True, return_inverse=True)
+        
+        # Find and remove any instances of cell_ids = -1
         cell_ids = cell_ids[1:] if cell_ids[0] == -1 else cell_ids 
 
         # Initialise tracks DataFrame 
-        tracks = pd.DataFrame([[0, 0, 0, 0]],columns = ['x [um]', 'y [um]', 'frame', 'track_id'])#()
+        tracks = pd.DataFrame(columns = ['x [um]', 'y [um]', 'frame', 'track_id'])
        
         # Perform tracking for each segmented cell
         print("  Tracking...")
         for jj in range(len(cell_ids)):
             if jj % 50 == 0 and jj > 0: 
                 print(f"   ...cell {jj} of {len(cell_ids)},")
-            #makes sure that track_id continues increasing for every new (bacterial) cell
+            # Make sure that track_id continues increasing for every new (bacterial) cell
             track_id_shift = 0 if jj == 0 else max(tracks['track_id']+1)
             
             # Select all data of a particular (bacterial cell), note: cell_id starts with 1, not 0
