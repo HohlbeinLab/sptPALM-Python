@@ -14,7 +14,7 @@ import os
 
 def diffusion_analysis(para):
     print('\nRun diffusion_analysis.py')
-    
+
     # Find unique elements in the track_id column
     track_ids, ic = np.unique(para['tracks']['track_id'], return_inverse=True)
     track_length = np.bincount(ic)
@@ -51,7 +51,7 @@ def diffusion_analysis(para):
         # Divide by total number of steps
         msd[ii] /= para['diff_hist_steps_min']  # Mean square displacement
 
-    print(f"   ...track {ii} out of {len(track_ids_length_filtered)} valid tracks.")
+    print(f"   ...track {ii+1} out of {len(track_ids_length_filtered)} valid tracks.")
 
     # Calculate diffusion coefficient from MSD and correct for localization noise
     diffquot = msd/(4 * para['frametime']) - (para['sigma_noise'] ** 2)/para['frametime']
@@ -72,6 +72,7 @@ def diffusion_analysis(para):
         print('  Careful, empty list of diffusion coefficients returned!')
 
     para['diff_coeffs_filtered_list'] = diffs_df
+    
     
     return para
 

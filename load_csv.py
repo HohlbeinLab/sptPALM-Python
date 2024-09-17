@@ -19,8 +19,8 @@ import os
 def load_csv(para):
     print('\nRun load_csv.py')
     # Import *.csv data (for example obtained from running ThunderSTORM)
-    print(f"  pathname: {para['data_dir']}")  
-    print(f"  load_filename(s) [csv]: {para['fn_locs']}")    
+    print(f"  Pathname: {para['data_dir']}")  
+    print(f"  Load_filename(s) [csv]: {para['fn_locs']}")    
     csv_input_file = pd.read_csv(para['data_dir'] + para['fn_locs'])
 
     # Change x,y,z from thunderSTORM from nm to um
@@ -71,7 +71,7 @@ def load_csv(para):
         elif row['internal_naming'] == 'track_id':  # Fill 'track_id' column (preset to -1)
             csv_data['track_id'] = -1
         elif row['internal_naming'] == 'cell_area':
-            csv_data['cell_area_id'] = 0
+            csv_data['cell_area_id'] = -1
         else: # read data from provided *.csv file
             try:
                 csv_data[row['internal_naming']] = csv_input_file[row['external_naming']]
@@ -79,7 +79,11 @@ def load_csv(para):
                 print(f"\n ATTENTION, '{row['external_naming']}' not found in {para['fn_locs_csv']} !")
                 input("Press Enter to continue...")
         print(f"   ...csv-data column: {row['internal_naming']} <= {row['external_naming']}")
-        
+    
+    #For Python, convention is that everything should start at 0 (not 1), therefore
+    csv_data['loc_id'] -= 1 if csv_data['loc_id'].min() == 1 else 0
+    csv_data['frame'] -= 1 if csv_data['loc_id'].min() == 1 else 0
+    
     # Export the '*_analysis.csv' file
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)

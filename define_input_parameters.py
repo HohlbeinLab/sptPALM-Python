@@ -42,7 +42,7 @@ def define_input_parameters():
         'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, default: 100
 
         # Cell by cell analysis
-        'number_tracks_per_cell_min': 1, # Minimum number of tracks for each cell, default: 1
+        'number_tracks_per_cell_min': 2, # Minimum number of tracks for each cell, default: 1
         'number_tracks_per_cell_max': 10000, # Maximum number of tracks for each cell, default: 10000
 
         # (OPTIONAL) settings for visualisation of tracks SCTA: Single-cell tracking analysis

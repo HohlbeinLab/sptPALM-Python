@@ -13,30 +13,33 @@ import os
 from skimage.io import imread
 
 def apply_cell_segmentation(para):
-    print('\nRun apply_cell_segmentation.py')
+    print('Run apply_cell_segmentation.py')
+    
     # Define filenames to load existing data (requires correct settings in ImageJ/Fiji macro 'Cell Segmentation')
     para['fn_proc_brightfield_segm'] = para['fn_proc_brightfield'][:-4] + '_segm.tif'
     para['fn_proc_brightfield_segm_table'] = para['fn_proc_brightfield_segm'][:-4] + '_table.csv'
 
     # Load processed brightfield image with cells, filename: '*_procBrightfield.tif'
-    print(f"  load_proc_brightfield: {para['fn_proc_brightfield']}")
+    print(f"  Load_proc_brightfield: {para['fn_proc_brightfield']}")
     bf_dict = {} #pd.DataFrame()
     bf_dict['proc_brightfield_image'] = imread(para['data_dir'] + para['fn_proc_brightfield'])
-    # proc_brightfield_image = imread(para['data_dir'] + para['fn_proc_brightfield'])
 
     # Load segmented image with cells, filename '*_procBrightfield_segm.tif'
-    print(f"  load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
+    print(f"  Load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
     # proc_brightfield_segm_image = imread(para['data_dir'] + para['fn_proc_brightfield_segm'])
     bf_dict['proc_brightfield_segm_image'] = imread(para['data_dir'] + para['fn_proc_brightfield_segm'])
     
     # Load table with information on the segmentations, filename '*_procBrightfield_segm_table.csv'
-    print(f"  load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
+    print(f"  Load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
     bf_dict['proc_brightfield_segm_table'] = pd.read_csv(para['data_dir'] + para['fn_proc_brightfield_segm_table'])
-
+    
+    # To go with Python convention start labels from 0 (image segmentation , labels start from 1!!!)
+    bf_dict['proc_brightfield_segm_image'] -= 1 if bf_dict['proc_brightfield_segm_image'].min() == 1 else 0
+    bf_dict['proc_brightfield_segm_table'] -= 1 if bf_dict['proc_brightfield_segm_table'].loc[:, 'Label'].min() == 1 else 0
+    
     # Import '*_analysis.csv'
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     csv_data = pd.read_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'])
-
 
     # Check for x- and y-positions and transform them into pixels
     column_names = ['x', 'y', 'cell_id', 'cell_area']  # Replace with your actual column names
@@ -67,12 +70,12 @@ def apply_cell_segmentation(para):
     for i in range(bf_dict['proc_brightfield_segm_table'].shape[0]):
         if para['cellarea_pixels_min'] <= bf_dict['proc_brightfield_segm_table'].loc[i, 'volume'] <= para['cellarea_pixels_max']:
             new_row = pd.DataFrame({
-                'segm_cell_id': [bf_dict['proc_brightfield_segm_table'].loc[i, 'Label']],
+                'segm_cell_id': [bf_dict['proc_brightfield_segm_table'].loc[i,'Label']],
                 'segm_cell_area': [bf_dict['proc_brightfield_segm_table'].loc[i, 'volume']]
                 })
             bf_dict['temp_cell_table'] = pd.concat([bf_dict['temp_cell_table'], new_row], ignore_index=True)
 
-    print(f" Number of cells after filtering: {len(bf_dict['temp_cell_table'])}")
+    print(f"  Number of cells after filtering: {len(bf_dict['temp_cell_table'])}")
 
     # Check for each localisation whether it is part of a valid cell or not
     # Create a dictionary for the masks
@@ -88,15 +91,15 @@ def apply_cell_segmentation(para):
     print(f"   ...cell {j+1} of {len(bf_dict['temp_cell_table'])}.")
       
     # Check each localization against all valid cells
-    loc_y = bf_dict['loc_pixel_table'].loc[:, 'x'].astype(int) - 1
-    loc_x = bf_dict['loc_pixel_table'].loc[:, 'y'].astype(int) - 1
+    loc_y = bf_dict['loc_pixel_table'].loc[:, 'x'].astype(int)-1
+    loc_x = bf_dict['loc_pixel_table'].loc[:, 'y'].astype(int)-1
 
-    for i, cell_mask in cell_masks.items(): #Why does it start from i = 1?
+    for i, cell_mask in cell_masks.items(): 
         inside_mask = cell_mask[loc_y, loc_x]
         bf_dict['loc_pixel_table'].loc[inside_mask, 'cell_id'] = bf_dict['temp_cell_table'].loc[i,'segm_cell_id']
         bf_dict['loc_pixel_table'].loc[inside_mask, 'cell_area'] = bf_dict['temp_cell_table'].loc[i,'segm_cell_area']
 
-    print(f"  Number of localisations within cells: {np.sum(bf_dict['loc_pixel_table'].loc[:, 'cell_id'] > 0)}")
+    print(f"  Number of localisations within cells: {np.sum(bf_dict['loc_pixel_table'].loc[:, 'cell_id'] >= 0)}")
     print(f"  Number of localisations outside cells: {np.sum(bf_dict['loc_pixel_table'].loc[:, 'cell_id'] == -1)}")
 
     # Plot data
@@ -110,9 +113,12 @@ def apply_cell_segmentation(para):
     para['csv_data'] = csv_data
     print(f"  Cell_ids have been updated in {para['fn_locs'][:-4] + para['fn_csv_handle']}")
     print('  Segmentation analysis done!')
+    
+    # breakpoint()
     return para
 
 def plot_locs_cells(bf_dict, para):
+    
     # Plot images initially segmented elsewhere
     fig, ax = plt.subplots(2, 3, figsize=(14, 8)) # 
     circle_spot_size = 2
@@ -152,8 +158,8 @@ def plot_locs_cells(bf_dict, para):
     ax[1, 1].scatter(bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] == -1, 'x'], 
                      bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] == -1, 'y'],
                      circle_spot_size, 'black', label='Outside valid cells')
-    ax[1, 1].scatter(bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] > 0, 'x'],
-                     bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] > 0, 'y'],
+    ax[1, 1].scatter(bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] >= 0, 'x'],
+                     bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] >= 0, 'y'],
                      circle_spot_size, 'magenta', label='Within valid cells')
     ax[1, 1].set_title(f"{np.sum(bf_dict['loc_pixel_table'].loc[:, 'cell_id'] > 0)} localisations within {len(bf_dict['temp_cell_table'])} cells")
     ax[1, 1].set_xlabel('Pixels')

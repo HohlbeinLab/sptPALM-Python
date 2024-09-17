@@ -83,12 +83,13 @@ def tracking_analysis(para):
             tracks_temp = linked.sort_values(by = ['loc_id'])
             
             # Update 'track' column in the csv_data
+
             csv_data.loc[tracks_temp.index.tolist(), 'track_id'] = tracks_temp['track_id']
 
             # Accumulate track structure, check that tracks_temp isn't empty
             if len(tracks_temp)>0:
                 tracks = pd.concat([tracks, tracks_temp], ignore_index=True)
-        print(f"   ...cell {jj} of {len(cell_ids)}.")
+        print(f"   ...cell {jj+1} of {len(cell_ids)}.")
     else:
         # No segmentation scenario
         xy_frame_temp = csv_data[['x [um]', 'y [um]', 'frame', 'loc_id']] #if num_cell > 0 else 0
@@ -105,6 +106,7 @@ def tracking_analysis(para):
         # Update 'track' column in the csv_data
         csv_data.loc[tracks.index.tolist(), 'track_id'] = tracks['track_id']
  
+
     # How long did the tracking take?
     end = time.time()
     rounded_time = round(end-start, 2)
@@ -120,7 +122,10 @@ def tracking_analysis(para):
 
     para['tracks'] = tracks
     print('  Tracks have been stored in the para dictionary!')
-
+    
+    # Update para structure
+    para['csv_data'] = csv_data
+    
     return para
 
 def plot_trackPy_data(linked, para):
