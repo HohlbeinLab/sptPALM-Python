@@ -40,8 +40,6 @@ def single_cell_tracking_analysis(para):
         'average_diff_coeff_per_cell': np.NaN,
     })
     
-    diff_coeffs_temp = para['diff_coeffs_filtered_list']['diff_coeffs_filtered'].values
-
     # Initialize additional columns in the DiffCoeffsList dataframe
     para['diff_coeffs_filtered_list']['cell_id'] = -1
     para['diff_coeffs_filtered_list']['copynumber'] = -1
@@ -98,7 +96,8 @@ def single_cell_tracking_analysis(para):
 
     difdata_filtered = []
     res_avgD_cell = []
-
+    diff_coeffs_temp = para['diff_coeffs_filtered_list']['diff_coeffs_filtered'].values
+    
     # Calculate average diffusion coefficients per cell
     for ii in range(len(cell_df)):
         if cell_df.at[ii, 'keep_cells']:
@@ -111,15 +110,19 @@ def single_cell_tracking_analysis(para):
 
     cell_df['average_diff_coeff_per_cell'] = res_avgD_cell
 
-    # Add copy numbers of respective diffusion coefficients
+    # Add copy numbers and cell_ids of respective diffusion coefficients
     copynumber = []
+    cell_temp = []
     for ii in range(len(cell_df)):
         # Get the number of tracks for the current row
-        num_tracks = cell_df.iloc[ii]['#tracks (unfiltered for #tracks per cell)']
+        num_tracks = int(cell_df.iloc[ii]['#tracks (unfiltered for #tracks per cell)'])
+        num_cell_ids = int(cell_df.iloc[ii]['cell_id'])
         # Create a list of ones of size num_tracks and multiply by num_tracks, then extend copynumber list
-        copynumber.extend([num_tracks]* num_tracks)
-    
+        copynumber.extend(num_tracks*[num_tracks])
+        cell_temp.extend(num_tracks*[num_cell_ids])
+
     para['diff_coeffs_filtered_list']['copynumber'] = np.array(copynumber) # Number of tracks per cell
+    para['diff_coeffs_filtered_list']['cell_id'] = np.array(cell_temp) # Number of tracks per cell
 
     # Update Para1 structure
     para['scta_table'] = cell_df
@@ -128,6 +131,7 @@ def single_cell_tracking_analysis(para):
         para['tracks_filtered'] = para['tracks_filtered'].iloc[:, [-1, -1, -1, -1]]
 
     print(f"We sorted out {cell_df['#tracks (unfiltered for #tracks per cell)'].sum() - cell_df['#tracks (filtered for #tracks per cell)'].sum()} tracks that were in cells with too few or too many tracks per cell")
+
 
     return para
 

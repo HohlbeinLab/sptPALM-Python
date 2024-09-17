@@ -19,7 +19,7 @@ from tracking_analysis import tracking_analysis
 from diffusion_analysis import diffusion_analysis
 from plot_hist_diffusion_track_length import plot_hist_diffusion_track_length
 from single_cell_tracking_analysis import single_cell_tracking_analysis
-# from Plot_SingleCellTrackingAnalysis import plot_single_cell_tracking_analysis
+from plot_single_cell_tracking_analysis import plot_single_cell_tracking_analysis
 # from NormIncrements_Analysis import norm_increments_analysis
 
 
@@ -116,7 +116,7 @@ def sptPALM_analyse_movies():
         # 2.6 Single Cell Tracking Analysis
         if input_parameter['use_segmentations']:
             para = single_cell_tracking_analysis(para)
-#             para = plot_single_cell_tracking_analysis(para)
+            para = plot_single_cell_tracking_analysis(para)
 
 #         # 2.7 Optional Analysis of normalized increment distribution
 #         if para.get('NormIncAnalysis', False):

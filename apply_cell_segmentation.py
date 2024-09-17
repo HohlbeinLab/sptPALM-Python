@@ -21,7 +21,7 @@ def apply_cell_segmentation(para):
 
     # Load processed brightfield image with cells, filename: '*_procBrightfield.tif'
     print(f"  Load_proc_brightfield: {para['fn_proc_brightfield']}")
-    bf_dict = {} #pd.DataFrame()
+    bf_dict = {} 
     bf_dict['proc_brightfield_image'] = imread(para['data_dir'] + para['fn_proc_brightfield'])
 
     # Load segmented image with cells, filename '*_procBrightfield_segm.tif'
