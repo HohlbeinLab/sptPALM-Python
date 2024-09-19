@@ -14,7 +14,6 @@ import warnings as warn
 import time
 import os
 
-
 def tracking_analysis(para):
     print('\nRun tracking_analysis.py')
     
@@ -82,10 +81,10 @@ def tracking_analysis(para):
             linked['track_id'] += track_id_shift
             
             # Sort for frames (might not be needed)
+            tracks_temp = tracks.iloc[0:0].copy()
             tracks_temp = linked.sort_values(by = ['loc_id'])
             
             # Update 'track' column in the csv_data
-
             csv_data.loc[tracks_temp.index.tolist(), 'track_id'] = tracks_temp['track_id']
 
             # Accumulate track structure, check that tracks_temp isn't empty
@@ -99,6 +98,7 @@ def tracking_analysis(para):
                                         memory=para['track_memory'],
                                         search_range=para['track_steplength_max'],
                                         pos_columns= ['x [um]', 'y [um]'])
+       
         #trackPy returns "particle' let's rename for track_id
         linked.rename(columns={'particle': 'track_id'}, inplace=True)
         

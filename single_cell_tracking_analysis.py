@@ -47,6 +47,7 @@ def single_cell_tracking_analysis(para):
     # Predefine some DataFrames
     para['scta_tracks_csv'] =  para['csv_data'].iloc[0:0].copy()
     para['tracks_filtered'] =  para['tracks'].iloc[0:0].copy()
+
     
     # Loop through each valid cell
     for jj in range(len(cell_ids)):
@@ -100,7 +101,6 @@ def single_cell_tracking_analysis(para):
     cell_df['keep_cells'] = (cell_df['#tracks (filtered for #tracks per cell)'] >= para['number_tracks_per_cell_min']) & \
                                               (cell_df['cum. #tracks (filtered for #tracks per cell)'] <= para['number_tracks_per_cell_max']
                                                )
-
     difdata_filtered = []
     res_avgD_cell = []
     diff_coeffs_temp = para['diff_coeffs_filtered_list']['diff_coeffs_filtered'].values
@@ -134,10 +134,11 @@ def single_cell_tracking_analysis(para):
     # Update Para1 structure
     para['scta_table'] = cell_df
 
-    if not para['tracks_filtered'].empty:
+    # Avoid potential issue of returning an empty list (not sure whether it works)
+    if para['tracks_filtered'].empty:
         para['tracks_filtered'] = para['tracks_filtered'].iloc[:, [-1, -1, -1, -1]]
 
-    print(f"We sorted out {cell_df['#tracks (unfiltered for #tracks per cell)'].sum() - cell_df['#tracks (filtered for #tracks per cell)'].sum()} tracks that were in cells with too few or too many tracks per cell")
+    print(f"  We sorted out {cell_df['#tracks (unfiltered for #tracks per cell)'].sum() - cell_df['#tracks (filtered for #tracks per cell)'].sum()} tracks that were in cells with too few or too many tracks per cell")
 
 
     return para

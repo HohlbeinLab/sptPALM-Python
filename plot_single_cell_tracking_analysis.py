@@ -9,8 +9,9 @@ Created on Wed Aug 28 20:58:09 2024
 
 import matplotlib.pyplot as plt
 import os
-# import numpy as np
+import numpy as np
 from skimage.io import imread
+import pandas as pd
 
 # Assuming Para1 is a dictionary-like object
 def plot_single_cell_tracking_analysis(para):
@@ -20,7 +21,16 @@ def plot_single_cell_tracking_analysis(para):
     # Figure A: display tracks in cells (with color-coded diffusion coefficients)
     para = plot_tracks_in_cells(para)
 
-
+    # Check for x- and y-positions and transform them into pixels
+    column_names = ['x', 'y', 'cell_id', 'cell_area']  # Replace with your actual column names
+    para['bf_dict']['loc_pixel_table_filt'] = pd.DataFrame(np.zeros((len(para['tracks_filtered']), len(column_names))), columns=column_names)
+    para['bf_dict']['loc_pixel_table_filt'].loc[:, ['x','y']] = para['tracks_filtered'][['x [um]', 'y [um]']].to_numpy()
+  
+    para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] = np.clip(np.round(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] / (
+        para['pixel_size'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[1])
+    para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'] = np.clip(np.round(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'] / (
+        para['pixel_size'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[0])
+    
     para = plot_tracks_histograms(para)
     
     return para    
@@ -103,50 +113,56 @@ def plot_tracks_histograms(para):
     ax[0, 0].set_ylabel('Pixels')
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
-    # # Show processed brightfield image
-    # ax[0, 0].imshow(bf_dict['proc_brightfield_image'], cmap='gray')
-    # ax[0, 0].set_title('Processed brightfield image (from MacroCellSegmentation.ijm)')
-    # ax[0, 0].set_xlabel('Pixels')
-    # ax[0, 0].set_ylabel('Pixels')
-    # ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+    # Show segmented brightfield image with all localisations
+    ax[0, 1].imshow(para['bf_dict']['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
+    ax[0, 1].scatter(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'], para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'], circle_spot_size,
+                      'black', label='Localisations')
+    ax[0, 1].set_title(f"Segmented image containing {len(para['bf_dict']['loc_pixel_table_filt'])} localisations")
+    ax[0, 1].set_xlabel('Pixels')
+    ax[0, 1].set_ylabel('Pixels')
+    ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
-    # # Show segmented brightfield image
-    # ax[0, 1].imshow(bf_dict['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
-    # ax[0, 1].set_title(f"Segmentations of {len(bf_dict['proc_brightfield_segm_table'])} cells")
-    # ax[0, 1].set_xlabel('Pixels')
-    # ax[0, 1].set_ylabel('Pixels')
-    # ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
+    # Blank out axes
+    ax[0, 2].axis('off')
+    
+    # Show histogram: Number of tracks per cell
+    ax[1, 0].hist(para['scta_table']['#tracks (filtered for #tracks per cell)'], bins=np.arange(0, 10, 1),
+                  edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
+    ax[1, 0].set_title('Histogram: Number of tracks per cell')
+    ax[1, 0].set_xlabel('Number of tracks per valid cell')
+    ax[1, 0].set_ylabel('#')
 
-    # # Show histogram
-    # ax[0, 2].hist(para['csv_data']['brightness'], bins=np.arange(0, 10000, 500),
-    #               edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
-    # ax[0, 2].set_title('Histogram: Intensity of all localisations')
-    # ax[0, 2].set_xlabel('Number of counts')
-    # ax[0, 2].set_ylabel('Number of localisations')
+    # Scatter plot 
+    x = para['scta_table']['cell_locs']
+    y = para['scta_table']['#tracks (filtered for #tracks per cell)']
+    colors = para['scta_table']['average_diff_coeff_per_cell']  # Color based on diffusion coefficient
+    sc = ax[1, 1].scatter(x, y, c=colors, s=20, cmap='viridis', edgecolor='k')  # 'cmap' sets the color map
+    ax[1, 1].set_title('Histogram: Number of localisations per valid cell')
+    ax[1, 1].set_xlabel('Number of localisations per valid cell')
+    ax[1, 1].set_ylabel('Number of tracks per cell')
+    ax[1, 1].set_xlim(0, max(x)+max(x)/20)
+    ax[1, 1].set_ylim(0, max(y)+max(y)/20)
+    
+    cbar = fig.colorbar(sc, ax = ax[1, 1])
+    cbar.set_label('Average Diffusion coefficient (μm²/sec)', fontsize=para['fontsize'])
+    cbar.ax.tick_params(labelsize=para['fontsize'])
 
 
+    # Show histogram: areas per cell
+    ax[1, 2].hist(para['scta_table']['cell_area']*(para['pixel_size']*para['pixel_size']), bins=np.arange(0, 5, 0.5),
+                  edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
+    ax[1, 2].set_title('Histogram: area per cell')
+    ax[1, 2].set_xlabel('Area (um^2) per cell')
+    ax[1, 2].set_ylabel('#')
 
-    # # Plot additional visualizations
-    # ax[1, 1].imshow(bf_dict['proc_brightfield_segm_image'], cmap = para['cmap_applied']) 
-    # ax[1, 1].scatter(bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] == -1, 'x'], 
-    #                  bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] == -1, 'y'],
-    #                  circle_spot_size, 'black', label='Outside valid cells')
-    # ax[1, 1].scatter(bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] >= 0, 'x'],
-    #                  bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] >= 0, 'y'],
-    #                  circle_spot_size, 'magenta', label='Within valid cells')
-    # ax[1, 1].set_title(f"{np.sum(bf_dict['loc_pixel_table'].loc[:, 'cell_id'] > 0)} localisations within {len(bf_dict['temp_cell_table'])} cells")
-    # ax[1, 1].set_xlabel('Pixels')
-    # ax[1, 1].set_ylabel('Pixels')
-    # ax[1, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
- 
-    plt.tight_layout()  # Adjust layout to prevent overlap
+     # Adjust layout to prevent overlap
+    plt.tight_layout()  
  
     # Save figure as PNG
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig04_cells.png', dpi = para['dpi'])
     
     plt.show()
-
 
     return para
 

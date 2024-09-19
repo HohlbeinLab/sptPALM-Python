@@ -105,7 +105,7 @@ while True:
                         continue
         case 3:  # sptPALM_analyse_Movies
             data, input_parameter, para = sptPALM_analyse_movies()
-            print('DATA now available in the workspace')
+            print('DATA now available in the workspace\n')
         case 4:  # sptPALM_combineData
             print('Run sptPALM_combineData()')
             if data:
