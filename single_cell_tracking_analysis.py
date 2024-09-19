@@ -45,7 +45,7 @@ def single_cell_tracking_analysis(para):
     para['diff_coeffs_filtered_list']['copynumber'] = -1
 
     # Predefine some DataFrames
-    para['scta_tracks'] =  para['csv_data'].iloc[0:0].copy()
+    para['scta_tracks_csv'] =  para['csv_data'].iloc[0:0].copy()
     para['tracks_filtered'] =  para['tracks'].iloc[0:0].copy()
     
     # Loop through each valid cell
@@ -72,15 +72,22 @@ def single_cell_tracking_analysis(para):
                 cell_df.loc[jj,'#tracks (filtered for #tracks per cell)'] = len(track_df)
                 
                 # Probably not needed later?!
-                para['scta_tracks'] = pd.concat(
-                    [para['scta_tracks'], part_csv_data[part_csv_data['track_id'].isin(track_df['track_id'])]],
+                para['scta_tracks_csv'] = pd.concat(
+                    [para['scta_tracks_csv'],
+                    part_csv_data[part_csv_data['track_id'].isin(track_df['track_id'])]],
                     ignore_index=True
                     )
+                
+                # List of columns to select from part_csv_data for concatenation
+                columns_to_concatenate = ['track_id', 'frame', 'x [um]', 'y [um]', 'loc_id']  # Example columns
+
+                # Concatenate only the selected columns
                 para['tracks_filtered'] = pd.concat(
-                    [para['tracks_filtered'], 
-                     part_csv_data.loc[part_csv_data['track_id'].isin(track_df['track_id']), ['x [um]', 'y [um]', 'frame', 'track_id']]], 
-                    ignore_index=True
-                    )          
+                   [para['tracks_filtered'],
+                    part_csv_data.loc[part_csv_data['track_id'].isin(track_df['track_id']), columns_to_concatenate]],
+                   ignore_index=True
+                   )   
+     
             else:
                 cell_df.loc[jj,'#tracks (filtered for #tracks per cell)'] = 0
                 

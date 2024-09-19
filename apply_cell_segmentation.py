@@ -111,6 +111,7 @@ def apply_cell_segmentation(para):
     csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
 
     para['csv_data'] = csv_data
+    para['bf_dict'] = bf_dict
     print(f"  Cell_ids have been updated in {para['fn_locs'][:-4] + para['fn_csv_handle']}")
     print('  Segmentation analysis done!')
     
@@ -122,6 +123,9 @@ def plot_locs_cells(bf_dict, para):
     # Plot images initially segmented elsewhere
     fig, ax = plt.subplots(2, 3, figsize=(14, 8)) # 
     circle_spot_size = 2
+
+    # Empty the 6th plot, also possible: ax[-1, -1].axis('off')
+    ax[1, 2].axis('off')
 
     # Show processed brightfield image
     ax[0, 0].imshow(bf_dict['proc_brightfield_image'], cmap='gray')

@@ -49,7 +49,7 @@ def define_input_parameters():
         'scta_vis_cells': False, # Visualize individual cells True/False, default: False
         'scta_plot_cell_window': 15, # Radius in pixels for plotting individual cells and their tracks
         'scta_vis_interactive': False, # Interactively cycle through cells True/False, default: False
-        'scta_vis_rangemax': 0.4, # Color-coding in the range of [0:(vis_rangemax*inputParameter.plotDiffHist_max)], default: 0.4
+        'scta_vis_rangemax': 0.4, # Color-coding in the range of [0:plot_DiffHist_max)], default: 0.4
 
         # Histograms for diffusion analysis
         'plot_diff_hist_min': 4E-3, # Plot and histogram from um^2/s to um^2/s, default: 4E-3

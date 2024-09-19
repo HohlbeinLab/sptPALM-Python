@@ -122,10 +122,12 @@ def sptPALM_analyse_movies():
 #         if para.get('NormIncAnalysis', False):
 #             para = norm_increments_analysis(para)
 
-#         # 2.8 Save current analysis as Matlab workspace
-#         saveFile = para['filename_analysis_csv'].replace('.csv', '')
-#         save_path = os.path.join(inputParameter['dataPathOutp'], f"{saveFile}.mat")
-#         shutil.copyfile(para['filename_thunderstormCSV'], save_path)
+        # # 2.8 Save current analysis as Matlab workspace
+        # saveFile = para['filename_analysis_csv'].replace('.csv', '')
+        # save_path = os.path.join(temp_path, f"{saveFile}")
+        # with open(save_path, 'wb') as f:
+        #     pickle.dump(para, f)
+        # print('Para dictionary for current movie was saved as pickle file')
 
         # Cell array containing all para structs
         data[ii] = para
@@ -133,8 +135,9 @@ def sptPALM_analyse_movies():
     # 3. Save entire DATA dictionary
     with open(temp_path + para['fn_combined_data'], 'wb') as f:
         pickle.dump(data, f)
-    print('Data saved as pickle file')
+    print('Complete data (all movies) saved as pickle file')
     
+    ## To open the data:
     # with open(temp_path + para['fn_combined_data'] + '.pkl', 'rb') as f:
     #     data_loaded = pickle.load(f)
         
