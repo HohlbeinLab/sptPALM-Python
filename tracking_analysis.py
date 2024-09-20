@@ -26,7 +26,7 @@ def tracking_analysis(para):
         raise ValueError(f"\n Problem! para['use_segmentations'] = {para['use_segmentations']}, should be True or False!\n")
 
     # Load csv data into a DataFrame
-    print(f"  loadFile [tracking]: {para['fn_locs'][:-4] + para['fn_csv_handle']}")
+    print(f"  LoadFile [tracking]: {para['fn_locs'][:-4] + para['fn_csv_handle']}")
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     csv_data = pd.read_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'])
 
@@ -120,7 +120,7 @@ def tracking_analysis(para):
 
     # Update CSV file with track_ids
     csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
-    print(f"  track_ids have updated in {para['fn_locs'][:-4] + para['fn_csv_handle']}")
+    print(f"  Track_ids have updated in {para['fn_locs'][:-4] + para['fn_csv_handle']}")
 
     para['tracks'] = tracks
     print('  Tracks have been stored in the para dictionary!')

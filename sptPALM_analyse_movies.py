@@ -8,7 +8,7 @@ Created on Wed Aug 28 20:58:09 2024
 
 # import tkinter as tk
 # import sys
-from tkinter import simpledialog, filedialog
+from tkinter import simpledialog, filedialog, askstring
 import os
 import pickle
 
@@ -20,11 +20,12 @@ from diffusion_analysis import diffusion_analysis
 from plot_hist_diffusion_track_length import plot_hist_diffusion_track_length
 from single_cell_tracking_analysis import single_cell_tracking_analysis
 from plot_single_cell_tracking_analysis import plot_single_cell_tracking_analysis
-# from NormIncrements_Analysis import norm_increments_analysis
+
 
 
 def sptPALM_analyse_movies():
     print('\nRun sptPALM_analyse_movies.py')
+    
     # 1.1 Define input parameters
     input_parameter = define_input_parameters()
     
@@ -35,29 +36,36 @@ def sptPALM_analyse_movies():
     # prompt = "Enter new name for saving sptDataMovies.mat or press OK/Enter"
     # inputParameter['dataFileNameMat'] = simpledialog.askstring("Rename sptDataMovies.mat?", prompt, initialvalue='sptDataMovies.mat')
    
- #TEMPORARILY DISABLED (to avoid pausing execution of the analysis}
-    # fn_output_default = input_parameter['fn_combined_data']
+#TEMPORARILY DISABLED (to avoid pausing execution of the analysis}
+    input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
+                              f"Enter new name for saving {input_parameter['fn_movies']} or press OK/Enter", 
+                              initialvalue=input_parameter['fn_movies'])
+    # previous version:
+    # fn_output_default = input_parameter['fn_movies']
     # user_input = input(f"  Enter string or press enter (default is: {n_output_default}): ")
     # if not user_input:
     #      user_input = fn_output_default 
-    # input_parameter['fn_combined_output'] = user_input
+    # input_parameter['fn_movies'] = user_input
       
     
     # Fall-back to GUI if no list of ThunderSTORM.csv files 
-    # '*_thunder_.csv' are specified in DefineInputParameters.m
+    # '*_thunder_.csv' are specified in define_input_parameters.py
     if not input_parameter['fn_locs']:
+        starting_directory = os.path.join(input_parameter['data_dir'],
+                                          input_parameter['default_output_dir'])
         files = filedialog.askopenfilenames(
+            initialdir = starting_directory, 
             title="Select *.csv from ThunderSTORM or other SMLM programs",
             filetypes=[("CSV files", "*_thunder.csv")])
         input_parameter['fn_locs_csv'] = list(files)
         if files:
-            # Overwrites inputParameter['data_pathname'] as defined in 'define_inpuit_parameters.py'
-            input_parameter['data_pathname'] = os.path.dirname(files[0])
-            os.chdir(input_parameter['data_pathname'])
+            # Overwrites inputParameter['data_pathname'] as defined in 'define_input_parameters.py'
+            input_parameter['data_dir'] = os.path.dirname(files[0])
+            os.chdir(input_parameter['data_dir'])
             
     # Check whether an equal number of files for localisations and segmentations was selected
     # in the SPECIAL CASE that several *_thunder.csv files, but only one brightfield image
-    # were selected, ask wether to continue. If yes is chosen, this brightfiield image
+    # were selected, ask whether to continue. If yes is chosen, this brightfiield image
     # is used for all loaded *_thunder.csv files.
     if input_parameter.get('use_segmentations'):
         if len(input_parameter['fn_locs']) != len(input_parameter['fn_proc_brightfield']):
@@ -118,24 +126,18 @@ def sptPALM_analyse_movies():
             para = single_cell_tracking_analysis(para)
             para = plot_single_cell_tracking_analysis(para)
 
-#         # 2.7 Optional Analysis of normalized increment distribution
-#         if para.get('NormIncAnalysis', False):
-#             para = norm_increments_analysis(para)
-
-        # # 2.8 Save current analysis as Matlab workspace
-        # saveFile = para['filename_analysis_csv'].replace('.csv', '')
-        # save_path = os.path.join(temp_path, f"{saveFile}")
-        # with open(save_path, 'wb') as f:
-        #     pickle.dump(para, f)
-        # print('Para dictionary for current movie was saved as pickle file')
+        # 2.8 Save current analysis as Matlab workspace
+        with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:
+            pickle.dump(para, f)
+        print(f"  parameter dictionary for current movie {ii} our of {input_parameter['fn_locs']} movies(s) was saved as pickle file")
 
         # Cell array containing all para structs
         data[ii] = para
 
     # 3. Save entire DATA dictionary
-    with open(temp_path + para['fn_combined_data'], 'wb') as f:
+    with open(temp_path + para['fn_movies'], 'wb') as f:
         pickle.dump(data, f)
-    print('Complete data (all movies) saved as pickle file')
+    print(f"Analysis of infividual movie(s) saved as pickle file: {para['fn_movies']}")
     
     ## To open the data:
     # with open(temp_path + para['fn_combined_data'] + '.pkl', 'rb') as f:

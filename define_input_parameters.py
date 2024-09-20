@@ -17,8 +17,8 @@ def define_input_parameters():
         'fn_csv_handle': '_py_out.csv', # Will be used to name the csv file of the analysed data
         'fn_dict_handle': '_py_out.pkl', # Will be used to name the pickle file of the analysed data
         'fn_diffs_handle': '_diff_coeffs.csv', # Will be used to name the file of diffusion coefficients
-        'fn_combined_data': 'sptDataMovies.pkl', # Filename of combined output
-
+        'fn_movies': 'sptData_movies.pkl', # Filename of movies output
+        'fn_combined_movies': 'sptData_combined_movies.pkl', # Filename of combined conditions output
         
         'condition_names': [], # Initialise, further defined below
         'condition_files': [], # Initialise, further defined below
