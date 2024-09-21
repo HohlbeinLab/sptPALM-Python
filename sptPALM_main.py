@@ -9,10 +9,12 @@ Created on Wed Aug 28 11:52:59 2024
 from define_input_parameters import define_input_parameters
 from sptPALM_analyse_movies import sptPALM_analyse_movies
 from sptPALM_combine_data import sptPALM_combine_data
+from sptPALM_plot_combined_data import sptPALM_plot_combined_data
+import pdb
 
 data = {}
 para = {}
-combined_data = {}
+comb_data = {}
 
 def merge_data_folders_files():
     print('-2-1-')
@@ -22,18 +24,14 @@ def combine_thunderstorm_csv_files():
     print('-2-4-')
     # Combine_ThunderSTORM_csv_files implementation here
     return []
-def sptPALM_plot_combined_data(combined_data=None):
-    print('-5-')
-    # Your implementation here
-    return combined_data
-def sptPALM_anaDDA(condition, combined_data=None):
+def sptPALM_anaDDA(condition, comb_data=None):
     print('-6-')
     # Your implementation here
-    return combined_data
-def sptPALM_MCDDA(condition, combined_data=None):
+    return comb_data
+def sptPALM_MCDDA(condition, comb_data=None):
     print('-7-')
     # Your implementation here
-    return combined_data
+    return comb_data
 
 
 while True:
@@ -61,11 +59,13 @@ while True:
             break
         
         case 1:  # Careful, this was a dirty hack in Matlab and might not work here!
-            print(' Edit parameters for data analysis!')
-            print(' Look for DefineInputParameters.py and edit it.')
-            print(' Then save the file and continue.')
+            print('Edit parameters for data analysis!')
+            print('  Look for the input_parameter in the Variable Explorer and edit it.')
+            print("  When done, type '!continue' into the command line.")
             input_parameter = define_input_parameters()
-        
+            # Doesn't yet enable accessing the Variable Explorer :(
+            pdb.set_trace()  # This will pause execution and open the debugger
+                
         case 2:  # Combine_ThunderSTORM_csv_files
             while True:
                 print('--')
@@ -105,51 +105,51 @@ while True:
         
         case 3:  # sptPALM_analyse_Movies
             data, input_parameter, para = sptPALM_analyse_movies()
-            print('DATA now available in the workspace\n')
+            print("'data' now available in the workspace\n")
         
         case 4:  # sptPALM_combineData
             if data:
-                combined_data = sptPALM_combine_data(data)
+                comb_data = sptPALM_combine_data(data)
             else:
                 print('No DATA from option 3 available')
                 print('Continue with GUI to select DATA from "sptData_movies.pkl" or similar')
-                CombinedDATA = sptPALM_combine_data()
-            print('CombinedDATA now available in the workspace\n')
+                comb_data = sptPALM_combine_data()
+            print("'comb_data' now available in the workspace\n")
         
         case 5:  # sptPALM_PlotCombinedData
-            print('NRun sptPALM_PlotCombinedData(CombinedDATA)')
-            if combined_data:
-                combined_data = sptPALM_plot_combined_data(combined_data)
+            print('Run sptPALM_plot_combined_data(comb_data)')
+            if comb_data:
+                comb_data = sptPALM_plot_combined_data(comb_data)
             else:
-                print('No combined_data from option 4 available')
-                print('Continue with GUI to select combined_data '
-                      '("sptDataCombinedMovies.mat" or similar)')
-                combined_data = sptPALM_plot_combined_data()
+                print("No comb_data from option 4 available")
+                print('Continue with GUI to select comb_data '
+                      '("sptData_combined_movies.pkl" or similar)')
+                comb_data = sptPALM_plot_combined_data()
         
         case 6:  # anaDDA
             print('run sptPALM_anaDDA(CombinedDATA, 1) on condition 1')
-            if combined_data:
-                combined_data = sptPALM_anaDDA(1, combined_data)
+            if comb_data:
+                comb_data = sptPALM_anaDDA(1, comb_data)
             else:
-                print('No combined_data from option 4 available')
-                print('Continue with GUI to select combined_data '
+                print("No 'comb_data' from option 4 available")
+                print("Continue with GUI to select 'comb_data' "
                       '("sptDataCombinedMovies.mat" or similar)')
-                combined_data = sptPALM_anaDDA(1)
+                comb_data = sptPALM_anaDDA(1)
         
         case 7:  # MCDDA
-            if combined_data:
-                combined_data = sptPALM_MCDDA(1, combined_data)
+            if comb_data:
+                comb_data = sptPALM_MCDDA(1, comb_data)
             else:
-                print('No combined_data from option 4 available')
-                print('Continue with GUI to select combined_data '
+                print('No comb_data from option 4 available')
+                print('Continue with GUI to select comb_data '
                       '("sptDataCombinedMovies.mat" or similar)')
-                combined_data = sptPALM_MCDDA(1)
+                comb_data = sptPALM_MCDDA(1)
         
         case 8: # Run everything until anaDDA
             data, para = sptPALM_analyse_movies()
-            combined_data = sptPALM_combine_data(data)
-            combined_data = sptPALM_plot_combined_data(combined_data)
-            combined_data = sptPALM_anaDDA(1, combined_data)
+            comb_data = sptPALM_combine_data(data)
+            comb_data = sptPALM_plot_combined_data(comb_data)
+            comb_data = sptPALM_anaDDA(1, comb_data)
         
         case _:
             print("Invalid option, please choose a valid number.")

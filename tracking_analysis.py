@@ -89,7 +89,7 @@ def tracking_analysis(para):
 
             # Accumulate track structure, check that tracks_temp isn't empty
             if len(tracks_temp)>0:
-                tracks = pd.concat([tracks, tracks_temp], ignore_index=True)
+                tracks = pd.concat([df for df in [tracks, tracks_temp] if not df.empty], ignore_index=True)
         print(f"   ...cell {jj+1} of {len(cell_ids)}.")
     else:
         # No segmentation scenario

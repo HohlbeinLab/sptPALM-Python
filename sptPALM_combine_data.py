@@ -7,8 +7,6 @@ Created on Wed Aug 28 20:58:09 2024
 """
 
 
-import scipy.io as sio
-import numpy as np
 import pandas as pd
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
@@ -16,121 +14,129 @@ from tkinter.simpledialog import askstring
 import os
 import pickle
 from define_input_parameters import define_input_parameters
+from helper_functions import string_input_with_default
 
 def sptPALM_combine_data(data=None):
     
     print('\nRun sptPALM_combine_data()')
 
     # loaded more as a dummy here: define input parameters
+    # Best to use only 
     input_parameter = define_input_parameters()
     
-    # # 1.1 Check whether DATA was passed to the function
-    # if data is None:
-    #     # Use Tkinter for file dialog
-    #     Tk().withdraw()  # Close root window
-    #     starting_directory = os.path.join(input_parameter['data_dir'],
-    #                                               input_parameter['default_output_dir'])
-    #     filename = askopenfilename(initialdir = starting_directory, 
-    #                                 filetypes = [("pickle file", "*.pkl")],
-    #                                 title = "Select *.pkl file from sptPALM_analyse_movies.py")
-    #     if filename:
-    #         with open(filename, 'rb') as f:
-    #             data = pickle.load(f)
-    #     else:
-    #         raise ValueError("No file selected!")
-    # else:
-    #     filename = None
-    
-    # For bugfixing - Replace the following line with your file path if needed
+    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
     filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_movies.pkl'
     with open(filename, 'rb') as f:
         data = pickle.load(f)
     
-    temp = data[0]
-
+    # 1.1 Check whether DATA was passed to the function
+    if data is None:
+        # Use Tkinter for file dialog
+        Tk().withdraw()  # Close root window
+        starting_directory = os.path.join(input_parameter['data_dir'],
+                                                  input_parameter['default_output_dir'])
+        filename = askopenfilename(initialdir = starting_directory, 
+                                    filetypes = [("pickle file", "*.pkl")],
+                                    title = "Select *.pkl file from sptPALM_analyse_movies.py")
+        if filename:
+            with open(filename, 'rb') as f:
+                data = pickle.load(f)
+        else:
+            raise ValueError("No file selected!")
+    else:
+        print('  Careful, there might be no data available to proceed!')
+ 
     # Optional part to modify input parameters before combining data
     # Placeholder for define_input_parameters.py functionality
 
-    # Allow savename to be changed (default: 'sptData_combined_movies.pkl')
-    input_parameter['fn_combined_movies'] = askstring(f"Rename {input_parameter['fn_combined_movies']}?", 
-                              f"Enter new name for saving {input_parameter['fn_combined_movies']} or press OK/Enter", 
-                              initialvalue=input_parameter['fn_combined_movies'])
-
-    breakpoint()
-
- #TEMPORARILY DISABLED (to avoid pausing execution of the analysis}
-    # fn_output_default = input_parameter['fn_combined_data']
-    # user_input = input(f"  Enter string or press enter (default is: {n_output_default}): ")
-    # if not user_input:
-    #      user_input = fn_output_default 
-    # input_parameter['fn_combined_output'] = user_input
-
-
+    # # GUI version: Allow savename to be changed (default: 'sptData_combined_movies.pkl')
+    # input_parameter['fn_combined_movies'] = askstring(f"Rename {input_parameter['fn_combined_movies']}?", 
+    #                           f"Enter new name for saving {input_parameter['fn_combined_movies']} or press OK/Enter", 
+    #                           initialvalue=input_parameter['fn_combined_movies'])
     
-    CombinedDATA = {}
-    # CombinedDATA['NumberMoviesLoaded'] = len(DATA['MOVIES'])
-    # print(f"... there were in total {CombinedDATA['NumberMoviesLoaded']} movie(s) found in '{filename}'")
+    # CMD Version:
+    fn_output_default = data['input_parameter']['fn_combined_movies']
+    data['input_parameter']['fn_combined_movies'] = string_input_with_default("  Rename filename or press OK/Enter", fn_output_default)
 
-    # CombinedDATA['numberConditions'] = len(DATA['inputParameter']['Condition_name'])  # number of conditions
-    # CombinedDATA['numberMoviesPerCondition'] = [len(cond_files) for cond_files in DATA['inputParameter']['Condition_files']]  # movies per condition
-    
-    # CombinedDATA['Condition_name'] = DATA['inputParameter']['Condition_name']
-    # CombinedDATA['Condition_files'] = DATA['inputParameter']['Condition_files']
 
-    # # Check whether any combining is possible
-    # if CombinedDATA['numberConditions'] == 0:
-    #     raise ValueError('Please set a number of combinable files in DefineInputParameters.m (Option 1)')
+    comb_data = {}
+    comb_data['#_movies_loaded'] = len(data['movies'])
+    print(f"  ... there were in total {comb_data['#_movies_loaded']} movie(s) found in '{filename}'")
+
+    comb_data['#_conditions'] = len(data['input_parameter']['condition_names'])  # number of conditions
+    comb_data['#_movies_per_condition'] = [len(movies) for movies in data['input_parameter']['condition_files']]  # movies per condition
+    comb_data['condition_names'] = data['input_parameter']['condition_names']
+    comb_data['condition_files'] = data['input_parameter']['condition_files']
+
+    # Check whether any combining is possible
+    if comb_data['#_conditions'] == 0:
+        raise ValueError('Please set a number of combinable files in define_input_parameters.py (Option 1)')
 
     # # Assign data to a combined table
-    # tmp_id = 0
-    # condi_table_Celldata = []
-    # condi_table_Diffdata = []
-    # condi_table_anaDDAtracks = []
-    # condis_numberCells = []
+    tmp_max_track_id = 0
+    tmp_max_frame = 0
+    condi_table = {}
+    condi_table['cell_data'] = {} 
+    condi_table['diff_data'] = {} 
+    condi_table['anaDDA_tracks'] = {} 
+    # condi_table['anaDDA_condis'] = []
+    condi_table['condis_#_cells'] = {}
 
-    # for ff in range(CombinedDATA['numberConditions']):
-    #     tmp_SCTA_table = []
-    #     tmp_Dcoef_table = []
-    #     tmp_tracks_table = []
+    for ff in range(comb_data['#_conditions']):
+        tmp_scta_table = data['movies'][ff]['scta_table'].iloc[0:0].copy()
+        tmp_dcoef_table = data['movies'][ff]['diff_coeffs_filtered_list'].iloc[0:0].copy()
+        tmp_tracks_table = data['movies'][ff]['tracks'].iloc[0:0].copy()
 
-    #     # Check whether data is loaded that doesn't exist
-    #     if max(CombinedDATA['Condition_files'][ff]) > CombinedDATA['NumberMoviesLoaded']:
-    #         raise ValueError('Please check (1.2): You are trying to load a non-existing movie!')
+        # Check whether data is loaded that doesn't exist
+        if max(comb_data['condition_files'][ff]) > comb_data['#_movies_loaded']:
+            raise ValueError('Please check: You are trying to load a non-existing movie!')
 
-    #     # For each movie per condition
-    #     for jj in range(CombinedDATA['numberMoviesPerCondition'][ff]):
-    #         tmp_ParaNr = CombinedDATA['Condition_files'][ff][jj]  # current movie ID
-    #         tmp_SCTA_table.extend(DATA['MOVIES'][tmp_ParaNr]['SCTA_table'])  # append cellwise data
-    #         tmp_Dcoef_table.extend(DATA['MOVIES'][tmp_ParaNr]['DiffCoeffsList'])  # append diffcoefficients
+        # For each movie per condition
+        for jj in range(comb_data['#_movies_per_condition'][ff]):
+
+            tmp_ParaNr = comb_data['condition_files'][ff][jj]  # current movie ID
+            tmp_scta_table = pd.concat(
+                [tmp_scta_table, data['movies'][tmp_ParaNr]['scta_table']])  # append cellwise data
+            tmp_dcoef_table = pd.concat(
+                [tmp_dcoef_table, data['movies'][tmp_ParaNr]['diff_coeffs_filtered_list']])  # append diffcoefficients
             
-    #         # --- append tracks of condition for anaDDA:
-    #         tmp_tracks = np.array(DATA['MOVIES'][tmp_ParaNr]['tracks_filtered']) / [1000, 1000, 1, 1]  # rescale to um
-    #         tmp_tracks[:, 3] += tmp_id  # update trackID for continuous assignments
-    #         tmp_tracks_table.extend(tmp_tracks)  # append tracker tracks (for anaDDA)
-    #         tmp_id = tmp_tracks_table[-1][3]  # tmp_id for shifting trackID
+            # --- append tracks of condition for anaDDA:
+            tmp_tracks = data['movies'][tmp_ParaNr]['tracks_filtered'].copy()
+            tmp_tracks.loc[:, 'track_id'] += tmp_max_track_id  # update track_id for continuous assignments
+            # breakpoint()
+            tmp_tracks.loc[:, 'frame'] += tmp_max_frame  # update frame_id for continuous assignments
+            
+            tmp_tracks_table = pd.concat([tmp_tracks_table, tmp_tracks])  # append diffcoefficients
+            
+            tmp_max_track_id = max(tmp_tracks_table['track_id'])  # tmp_id for shifting track_id
+            tmp_max_frame = max(tmp_tracks_table['frame'])  # tmp_id for shifting frame_id
+            
+        # Store important variables
+        condi_table['cell_data'][ff] = tmp_scta_table  # a
+        condi_table['diff_data'][ff] = tmp_dcoef_table  # all diffcoefficients per condition
+       
+        anaDDA_tracks = tmp_tracks_table[['x [um]', 'y [um]', 'frame', 'track_id']] 
+        anaDDA_tracks['frame_time'] = data['input_parameter']['frametime']
+        condi_table['anaDDA_tracks'][ff] = anaDDA_tracks
 
-    #     # Store important variables
-    #     condi_table_Celldata.append(tmp_SCTA_table)  # all cellwise data per condition
-    #     condi_table_Diffdata.append(tmp_Dcoef_table)  # all diffcoefficients per condition
+        # condi_table['anaDDA_condis'].append(f"anaDDA: {comb_data['condition_names'][ff]}")
+        condi_table['condis_#_cells'][ff] = len(tmp_scta_table)  # how many valid cells per condition
+
+    comb_data['cell_data'] = condi_table['cell_data']
+    comb_data['diff_data'] = condi_table['diff_data']
+    comb_data['anaDDA_tracks'] = condi_table['anaDDA_tracks']
+    # comb_data['anaDDA_condis']= condi_table['anaDDA_condis']
+    comb_data['condis_#_cells'] = condi_table['condis_#_cells']
+    comb_data['input_parameter'] = data['input_parameter']
+
+    # 3. Save comb_data dictionary
+    temp_path = os.path.join(data['input_parameter']['data_dir'], data['input_parameter']['default_output_dir'])
+    with open(temp_path + data['input_parameter']['fn_combined_movies'], 'wb') as f:
+        pickle.dump(comb_data, f)
         
-    #     # Use anaDDA format for tracks
-    #     tmp_tracks_table = np.array(tmp_tracks_table)
-    #     anaDDA_tracks = np.column_stack((tmp_tracks_table[:, :3], pd.factorize(tmp_tracks_table[:, 3])[0], 
-    #                                      np.ones(tmp_tracks_table.shape[0]) * DATA['inputParameter']['frametime']))
-        
-    #     condi_table_anaDDAtracks.append([anaDDA_tracks, f"anaDDA: {CombinedDATA['Condition_name'][ff]}"])
-    #     condis_numberCells.append(len(tmp_SCTA_table))  # how many valid cells per condition
-
-    # CombinedDATA['condi_table_Celldata'] = condi_table_Celldata
-    # CombinedDATA['condi_table_Diffdata'] = condi_table_Diffdata
-    # CombinedDATA['condi_table_anaDDAtracks'] = condi_table_anaDDAtracks
-    # CombinedDATA['condis_numberCells'] = condis_numberCells
-    # CombinedDATA['inputParameter'] = DATA['inputParameter']
-
-    # # Save combined data
-    # sio.savemat(f"{DATA['inputParameter']['dataPathOutp']}/{saveFileName}", CombinedDATA, do_compression=True)
-
-    return CombinedDATA
+    print(f"Analysis of infividual movie(s) saved as pickle file: {data['input_parameter']['fn_combined_movies']}")
+ 
+    return comb_data
 
 
 

@@ -8,7 +8,8 @@ Created on Wed Aug 28 20:58:09 2024
 
 # import tkinter as tk
 # import sys
-from tkinter import simpledialog, filedialog, askstring
+from tkinter import simpledialog, filedialog
+from tkinter.simpledialog import askstring
 import os
 import pickle
 
@@ -20,7 +21,7 @@ from diffusion_analysis import diffusion_analysis
 from plot_hist_diffusion_track_length import plot_hist_diffusion_track_length
 from single_cell_tracking_analysis import single_cell_tracking_analysis
 from plot_single_cell_tracking_analysis import plot_single_cell_tracking_analysis
-
+from helper_functions import yes_no_input,string_input_with_default
 
 
 def sptPALM_analyse_movies():
@@ -28,36 +29,26 @@ def sptPALM_analyse_movies():
     
     # 1.1 Define input parameters
     input_parameter = define_input_parameters()
-    
-    # Allow savename to be changed (default: 'sptDataMovies.mat')
-    # NOT NEEDED, REMEMBER FOR LATER
-    # root = tk.Tk()
-    # root.withdraw()  # Hide the root window    
-    # prompt = "Enter new name for saving sptDataMovies.mat or press OK/Enter"
-    # inputParameter['dataFileNameMat'] = simpledialog.askstring("Rename sptDataMovies.mat?", prompt, initialvalue='sptDataMovies.mat')
    
-#TEMPORARILY DISABLED (to avoid pausing execution of the analysis}
-    input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
-                              f"Enter new name for saving {input_parameter['fn_movies']} or press OK/Enter", 
-                              initialvalue=input_parameter['fn_movies'])
-    # previous version:
-    # fn_output_default = input_parameter['fn_movies']
-    # user_input = input(f"  Enter string or press enter (default is: {n_output_default}): ")
-    # if not user_input:
-    #      user_input = fn_output_default 
-    # input_parameter['fn_movies'] = user_input
-      
-    
+# # #TEMPORARILY DISABLED, GUI version: (to avoid pausing execution of the analysis}
+#     input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
+#                               f"Enter new name for saving {input_parameter['fn_movies']} or press OK/Enter", 
+#                               initialvalue=input_parameter['fn_movies'])
+    #  CMD version
+    fn_output_default = input_parameter['fn_movies']
+    input_parameter['fn_movies'] = string_input_with_default("  Enter string or press enter", fn_output_default)
+
     # Fall-back to GUI if no list of ThunderSTORM.csv files 
     # '*_thunder_.csv' are specified in define_input_parameters.py
     if not input_parameter['fn_locs']:
+        print('  Select data with GUI...')
         starting_directory = os.path.join(input_parameter['data_dir'],
                                           input_parameter['default_output_dir'])
         files = filedialog.askopenfilenames(
             initialdir = starting_directory, 
             title="Select *.csv from ThunderSTORM or other SMLM programs",
             filetypes=[("CSV files", "*_thunder.csv")])
-        input_parameter['fn_locs_csv'] = list(files)
+        input_parameter['fn_locs'] = list(files)
         if files:
             # Overwrites inputParameter['data_pathname'] as defined in 'define_input_parameters.py'
             input_parameter['data_dir'] = os.path.dirname(files[0])
@@ -69,12 +60,11 @@ def sptPALM_analyse_movies():
     # is used for all loaded *_thunder.csv files.
     if input_parameter.get('use_segmentations'):
         if len(input_parameter['fn_locs']) != len(input_parameter['fn_proc_brightfield']):
-            if len(input_parameter['fn_proc_brightfield']) == 1 and len(input_parameter['fn_locs_csv']) > 1:
-                print('Only one brightfield image but >1 CSV files were chosen!')
-                proceed = simpledialog.askinteger("Continue?", "Enter 1 to continue or 0 to cancel:", initialvalue=1)
-                if proceed == 1:
+            if len(input_parameter['fn_proc_brightfield']) == 1 and len(input_parameter['fn_locs']) > 1:
+                print('  Only one brightfield image but >1 CSV files were chosen!')
+                if yes_no_input("  Do you want to continue?", default="yes"):
                     temp = input_parameter['fn_proc_brightfield'][0]
-                    input_parameter['fn_proc_brightfield'] = [temp] * len(input_parameter['fn_locs_csv'])
+                    input_parameter['fn_proc_brightfield'] = [temp] * len(input_parameter['fn_locs'])
                 else:
                     raise Exception('User chose to cancel the process.')
             else:
@@ -93,6 +83,7 @@ def sptPALM_analyse_movies():
 
     # 2. sptPALM data analysis (looping over each movie)
     data = {}
+    data['movies'] = {}
     for ii in range(len(input_parameter['fn_locs'])):
         input_parameter['movie_number'] = ii #start with 0 not 1
 
@@ -129,15 +120,18 @@ def sptPALM_analyse_movies():
         # 2.8 Save current analysis as Matlab workspace
         with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:
             pickle.dump(para, f)
-        print(f"  parameter dictionary for current movie {ii} our of {input_parameter['fn_locs']} movies(s) was saved as pickle file")
-
+        print(f"  Parameter dictionary for current movie {ii} out of {len(input_parameter['fn_locs'])} movies(s) was saved as pickle file")
+        # print('\n')
         # Cell array containing all para structs
-        data[ii] = para
+        
+        data['movies'][ii] = para
 
     # 3. Save entire DATA dictionary
+
+    data['input_parameter'] = input_parameter
     with open(temp_path + para['fn_movies'], 'wb') as f:
         pickle.dump(data, f)
-    print(f"Analysis of infividual movie(s) saved as pickle file: {para['fn_movies']}")
+    print(f"Analysis of individual movie(s) saved as pickle file: {para['fn_movies']}")
     
     ## To open the data:
     # with open(temp_path + para['fn_combined_data'] + '.pkl', 'rb') as f:

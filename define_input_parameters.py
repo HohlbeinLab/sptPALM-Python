@@ -55,7 +55,7 @@ def define_input_parameters():
         'plot_diff_hist_min': 4E-3, # Plot and histogram from um^2/s to um^2/s, default: 4E-3
         'plot_diff_hist_max': 10, # Plot and histogram from um^2/s to um^2/s, default: 10
         
-        # Parameters for plotting figures
+        # Parameters for plotting figures etc
         'fontsize': 10, # Default: 10
         'linewidth': 1, # Default: 1
         'plot_norm_histograms': 'probability', # Carefull: Matlab: choose either 'count' (default) | 'probability' | 'countdensity' | 'pdf' | 'cumcount' | 'cdf'
@@ -63,6 +63,7 @@ def define_input_parameters():
         'plot_frame_number': True, # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
         'dpi': 150, # DPI setting for plotting figures, default: 300
         'cmap_applied': 'gist_ncar', ##was: 'nipy_spectral', tab20c, 
+        'timeout': 10, # Value for timeout in seconds for I/O before reverting to default selection, default: 5 or None
         # 'para': {}  # Structure that will later save all parameters and settings
     }
 
@@ -72,7 +73,8 @@ def define_input_parameters():
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [
         # '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-        'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+        'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
@@ -82,13 +84,13 @@ def define_input_parameters():
 
     # Name and assign your measurement conditions/files
     #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
-    input_parameter['condition_names'].append('start')
-    input_parameter['condition_files'].append([1])  # refers to the order of files defined above
+    input_parameter['condition_names'].append('Cond_1')
+    input_parameter['condition_files'].append([0])  # refers to the order of files defined above
     
     # DO NOT REMOVE THE FOLLOWING LINES!
     # Copy or uncomment the following lines if necessary
-    # input_parameter['condition_names'].append('standard')
-    # input_parameter['condition_files'].append([1,2])  # refers to the order of files defined above
+    input_parameter['condition_names'].append('Cond_2')
+    input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
 
     # Histogramming of diffusion coefficients per copynumber
     INTERVAL = 200
