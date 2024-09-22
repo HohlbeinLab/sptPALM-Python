@@ -21,13 +21,13 @@ def sptPALM_combine_data(data=None):
     print('\nRun sptPALM_combine_data()')
 
     # loaded more as a dummy here: define input parameters
-    # Best to use only 
     input_parameter = define_input_parameters()
+    filename = []
     
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_movies.pkl'
-    with open(filename, 'rb') as f:
-        data = pickle.load(f)
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     data = pickle.load(f)
     
     # 1.1 Check whether DATA was passed to the function
     if data is None:
@@ -45,6 +45,7 @@ def sptPALM_combine_data(data=None):
             raise ValueError("No file selected!")
     else:
         print('  Careful, there might be no data available to proceed!')
+        
  
     # Optional part to modify input parameters before combining data
     # Placeholder for define_input_parameters.py functionality
@@ -54,13 +55,14 @@ def sptPALM_combine_data(data=None):
     #                           f"Enter new name for saving {input_parameter['fn_combined_movies']} or press OK/Enter", 
     #                           initialvalue=input_parameter['fn_combined_movies'])
     
-    # CMD Version:
+    # CMD Version: Allow savename to be changed (default: 'sptData_combined_movies.pkl')
     fn_output_default = data['input_parameter']['fn_combined_movies']
     data['input_parameter']['fn_combined_movies'] = string_input_with_default("  Rename filename or press OK/Enter", fn_output_default)
 
 
     comb_data = {}
     comb_data['#_movies_loaded'] = len(data['movies'])
+
     print(f"  ... there were in total {comb_data['#_movies_loaded']} movie(s) found in '{filename}'")
 
     comb_data['#_conditions'] = len(data['input_parameter']['condition_names'])  # number of conditions
@@ -115,7 +117,7 @@ def sptPALM_combine_data(data=None):
         condi_table['cell_data'][ff] = tmp_scta_table  # a
         condi_table['diff_data'][ff] = tmp_dcoef_table  # all diffcoefficients per condition
        
-        anaDDA_tracks = tmp_tracks_table[['x [um]', 'y [um]', 'frame', 'track_id']] 
+        anaDDA_tracks = tmp_tracks_table[['x [µm]', 'y [µm]', 'frame', 'track_id']] 
         anaDDA_tracks['frame_time'] = data['input_parameter']['frametime']
         condi_table['anaDDA_tracks'][ff] = anaDDA_tracks
 

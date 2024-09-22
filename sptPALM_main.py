@@ -10,6 +10,8 @@ from define_input_parameters import define_input_parameters
 from sptPALM_analyse_movies import sptPALM_analyse_movies
 from sptPALM_combine_data import sptPALM_combine_data
 from sptPALM_plot_combined_data import sptPALM_plot_combined_data
+from sptPALM_MCDDA import sptPALM_MCDDA
+
 import pdb
 
 data = {}
@@ -28,11 +30,6 @@ def sptPALM_anaDDA(condition, comb_data=None):
     print('-6-')
     # Your implementation here
     return comb_data
-def sptPALM_MCDDA(condition, comb_data=None):
-    print('-7-')
-    # Your implementation here
-    return comb_data
-
 
 while True:
     print('-')

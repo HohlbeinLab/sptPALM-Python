@@ -24,15 +24,16 @@ def load_csv(para):
     csv_input_file = pd.read_csv(para['data_dir'] + para['fn_locs'])
 
     # Change x,y,z from thunderSTORM from nm to um
-    try:
-        csv_input_file['x [nm]'] = csv_input_file['x [nm]'] /1000
-        csv_input_file['y [nm]'] = csv_input_file['y [nm]'] /1000
-        csv_input_file['z [nm]'] = csv_input_file['z [nm]'] /1000
-    except: 
-        print("\n  ATTENTION, 'Something went wrong in going from nm to um !")
-        input("  Press Enter to continue...\n")
-    else:
-        print("  Conversion of localisations from nm to um done!")  
+    columns_temp = ['x [nm]', 'y [nm]', 'z [nm]']
+    
+    # Loop through the columns and check for existence
+    for ii in range(len(columns_temp)):
+        if columns_temp[ii] in csv_input_file.columns:
+            print(f"  Column '{columns_temp[ii]}' exists.")
+            csv_input_file[columns_temp[ii]] = csv_input_file[columns_temp[ii]]/1000  # Convert nm to µm
+            print("  Conversion of localisations from nm to µm done!")
+        else:
+            print(f"  Column '{columns_temp[ii]}' does not exist!")  
 
     # Create a list of column names matching our internal naming 
     # to external naming such as, e.g., provided by ThunderSTORM
@@ -41,9 +42,9 @@ def load_csv(para):
                        ('frame', 'frame'),
                        ('cell_id', ''), 
                        ('track_id', ''),
-                       ('x [um]', 'x [nm]'),
-                       ('y [um]', 'y [nm]'), 
-                       ('z [um]', 'z [nm]'),
+                       ('x [µm]', 'x [nm]'),
+                       ('y [µm]', 'y [nm]'), 
+                       ('z [µm]', 'z [nm]'),
                        ('brightness', 'intensity [photon]'), 
                        ('background', 'bkgstd [photon]'), 
                        ('i0', 'offset [photon]'),
@@ -72,12 +73,16 @@ def load_csv(para):
             csv_data['track_id'] = -1
         elif row['internal_naming'] == 'cell_area':
             csv_data['cell_area_id'] = -1
-        else: # read data from provided *.csv file
-            try:
+        else: # read data from provided *.csv file after checking column exists
+
+            if row['external_naming'] in csv_input_file.columns:
                 csv_data[row['internal_naming']] = csv_input_file[row['external_naming']]
-            except: 
-                print(f"\n ATTENTION, '{row['external_naming']}' not found in {para['fn_locs_csv']} !")
-                input("Press Enter to continue...")
+            else:
+                print(f"\n ATTENTION, '{row['external_naming']}' not found in {para['fn_locs']}!")
+                print(f"\n ATTENTION, '{row['external_naming']}' rows are set to -1!")
+                csv_data[row['internal_naming']] = -1
+                # input("Press Enter to continue...")
+           
         print(f"   ...csv-data column: {row['internal_naming']} <= {row['external_naming']}")
     
     #For Python, convention is that everything should start at 0 (not 1), therefore

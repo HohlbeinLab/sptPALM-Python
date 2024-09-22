@@ -24,12 +24,12 @@ def plot_single_cell_tracking_analysis(para):
     # Check for x- and y-positions and transform them into pixels
     column_names = ['x', 'y', 'cell_id', 'cell_area']  # Replace with your actual column names
     para['bf_dict']['loc_pixel_table_filt'] = pd.DataFrame(np.zeros((len(para['tracks_filtered']), len(column_names))), columns=column_names)
-    para['bf_dict']['loc_pixel_table_filt'].loc[:, ['x','y']] = para['tracks_filtered'][['x [um]', 'y [um]']].to_numpy()
+    para['bf_dict']['loc_pixel_table_filt'].loc[:, ['x','y']] = para['tracks_filtered'][['x [µm]', 'y [µm]']].to_numpy()
   
     para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] = np.clip(np.round(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] / (
-        para['pixel_size'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[1])
+        para['pixelsize'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[1])
     para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'] = np.clip(np.round(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'] / (
-        para['pixel_size'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[0])
+        para['pixelsize'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[0])
     
     para = plot_tracks_histograms(para)
     
@@ -75,8 +75,8 @@ def plot_tracks_in_cells(para):
                 
                 # Select rows from tempCellTracks where 'track_id' matches tempCellTracks['track_id'][pp]
                 selected_rows = tempCellTracks[tempCellTracks['track_id'] == tempCellTracks['track_id'][pp]]
-                x = selected_rows['x [um]']/para['pixel_size']
-                y = selected_rows['y [um]']/para['pixel_size'] 
+                x = selected_rows['x [µm]']/para['pixelsize']
+                y = selected_rows['y [µm]']/para['pixelsize'] 
                 
                 ax.plot(x, y, linewidth=para['linewidth'], color=lineColor)
 
@@ -149,7 +149,7 @@ def plot_tracks_histograms(para):
 
 
     # Show histogram: areas per cell
-    ax[1, 2].hist(para['scta_table']['cell_area']*(para['pixel_size']*para['pixel_size']), bins=np.arange(0, 5, 0.5),
+    ax[1, 2].hist(para['scta_table']['cell_area']*(para['pixelsize']*para['pixelsize']), bins=np.arange(0, 5, 0.5),
                   edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
     ax[1, 2].set_title('Histogram: area per cell')
     ax[1, 2].set_xlabel('Area (um^2) per cell')

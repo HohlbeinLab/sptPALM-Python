@@ -42,11 +42,11 @@ def diffusion_analysis(para):
             # Account for 1-frame memories
             if con <= para['track_memory'] + 1 and con != 0:
                 # Calculate MSD (single frame MSD!)
-                msd[ii] += (((temp_array.iloc[jj+1]['x [um]'] - temp_array.iloc[jj]['x [um]']) ** 2 + 
-                              (temp_array.iloc[jj+1]['y [um]'] - temp_array.iloc[jj]['y [um]']) ** 2) / con)
+                msd[ii] += (((temp_array.iloc[jj+1]['x [µm]'] - temp_array.iloc[jj]['x [µm]']) ** 2 + 
+                              (temp_array.iloc[jj+1]['y [µm]'] - temp_array.iloc[jj]['y [µm]']) ** 2) / con)
             else:
-                msd[ii] += ((temp_array.iloc[jj+1]['x [um]'] - temp_array.iloc[jj]['x [um]']) ** 2 + 
-                            (temp_array.iloc[jj+1]['y [um]'] - temp_array.iloc[jj]['y [um]']) ** 2)
+                msd[ii] += ((temp_array.iloc[jj+1]['x [µm]'] - temp_array.iloc[jj]['x [µm]']) ** 2 + 
+                            (temp_array.iloc[jj+1]['y [µm]'] - temp_array.iloc[jj]['y [µm]']) ** 2)
 
         # Divide by total number of steps
         msd[ii] /= para['diff_hist_steps_min']  # Mean square displacement

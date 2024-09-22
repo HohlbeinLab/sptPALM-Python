@@ -45,7 +45,7 @@ def tracking_analysis(para):
         cell_ids = cell_ids[1:] if cell_ids[0] == -1 else cell_ids 
 
         # Initialise tracks DataFrame 
-        tracks = pd.DataFrame(columns = ['x [um]', 'y [um]', 'frame', 'track_id'])
+        tracks = pd.DataFrame(columns = ['x [µm]', 'y [µm]', 'frame', 'track_id'])
        
         # Perform tracking for each segmented cell
         print("  Tracking...")
@@ -59,17 +59,17 @@ def tracking_analysis(para):
             part_csv_data = csv_data[csv_data['cell_id'] == cell_ids[jj]]
 
             # Extract required data for tracking:
-            xy_frame_temp = part_csv_data[['x [um]', 'y [um]', 'frame', 'loc_id']] 
+            xy_frame_temp = part_csv_data[['x [µm]', 'y [µm]', 'frame', 'loc_id']] 
 
             # Perform tracking
             if len(xy_frame_temp) > 0:
                 # Link Positions to Form Trajectories
                 linked = pd.DataFrame()
-                # Tracking: linked will contain ['x [um]', 'y [um]'], 'frame', 'particle' => track_id
+                # Tracking: linked will contain ['x [µm]', 'y [µm]'], 'frame', 'particle' => track_id
                 linked = tp.link_df(xy_frame_temp, 
                                     search_range=para['track_steplength_max'],
                                     memory=para['track_memory'],
-                                    pos_columns= ['x [um]', 'y [um]'],)
+                                    pos_columns= ['x [µm]', 'y [µm]'],)
                 #trackPy returns "particle' let's rename it 'track_id'
                 linked.rename(columns={'particle': 'track_id'}, inplace=True)
             else:
@@ -93,11 +93,11 @@ def tracking_analysis(para):
         print(f"   ...cell {jj+1} of {len(cell_ids)}.")
     else:
         # No segmentation scenario
-        xy_frame_temp = csv_data[['x [um]', 'y [um]', 'frame', 'loc_id']] #if num_cell > 0 else 0
+        xy_frame_temp = csv_data[['x [µm]', 'y [µm]', 'frame', 'loc_id']] #if num_cell > 0 else 0
         linked = tp.link_df(xy_frame_temp,
                                         memory=para['track_memory'],
                                         search_range=para['track_steplength_max'],
-                                        pos_columns= ['x [um]', 'y [um]'])
+                                        pos_columns= ['x [µm]', 'y [µm]'])
        
         #trackPy returns "particle' let's rename for track_id
         linked.rename(columns={'particle': 'track_id'}, inplace=True)
@@ -136,24 +136,24 @@ def plot_trackPy_data(linked, para):
     fig, ax = plt.subplots(2, 2, figsize=(14, 10))
     ax[0, 0].set_title('Particle Trajectories')
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,0], pos_columns=['x [um]', 'y [um]'])
+    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,0], pos_columns=['x [µm]', 'y [µm]'])
     ax[0, 0].set_ylabel('y (um)')
     ax[0, 0].set_xlabel('x (um)')
 
     # Calculate and correct drift!
-    d = tp.compute_drift(filtered, pos_columns= ['x [um]', 'y [um]'])
+    d = tp.compute_drift(filtered, pos_columns= ['x [µm]', 'y [µm]'])
     d.plot(ax = ax[1, 0])
     ax[1, 0].set_ylabel('x,y (um)')
     ax[1, 0].set_xlabel('frames')
     ax[1, 0].set_title('Drift')
 
     # filtered_drift_corrected = tp.subtract_drift(filtered.copy(), d)
-    # tp.plot_traj(filtered_drift_corrected, ax = ax[0,1], pos_columns= ['x [um]', 'y [um]'])
+    # tp.plot_traj(filtered_drift_corrected, ax = ax[0,1], pos_columns= ['x [µm]', 'y [µm]'])
     # ax[0, 1].set_title('Particle Trajectories: drift corrected')
     # ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
     ax[0, 1].set_title('Particle Trajectories')
     ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,1], pos_columns=['x [um]', 'y [um]'])
+    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,1], pos_columns=['x [µm]', 'y [µm]'])
     ax[0, 1].set_title('Particle Trajectories')
     ax[0, 1].set_ylabel('y (um)')
     ax[0, 1].set_xlabel('x (um)')  
@@ -161,7 +161,7 @@ def plot_trackPy_data(linked, para):
     ax[0, 1].set_xlim(0, 0.5)
 
     # Compute Mean Squared Displacement (MSD)
-    msd = tp.emsd(filtered, mpp=1, fps=1/para['frametime'], max_lagtime = 7, pos_columns= ['x [um]', 'y [um]'])
+    msd = tp.emsd(filtered, mpp=1, fps=1/para['frametime'], max_lagtime = 7, pos_columns= ['x [µm]', 'y [µm]'])
 
     # Plots and fits Mean Squared Displacement (MSD)
     ax[1, 1].set_title('Mean Squared Displacement: with fit, no drift correction')

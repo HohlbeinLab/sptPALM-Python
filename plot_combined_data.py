@@ -24,7 +24,7 @@ def plot_combined_data(para):
     # Check for x- and y-positions and transform them into pixels
     column_names = ['x', 'y', 'cell_id', 'cell_area']  # Replace with your actual column names
     para['bf_dict']['loc_pixel_table_filt'] = pd.DataFrame(np.zeros((len(para['tracks_filtered']), len(column_names))), columns=column_names)
-    para['bf_dict']['loc_pixel_table_filt'].loc[:, ['x','y']] = para['tracks_filtered'][['x [um]', 'y [um]']].to_numpy()
+    para['bf_dict']['loc_pixel_table_filt'].loc[:, ['x','y']] = para['tracks_filtered'][['x [µm]', 'y [µm]']].to_numpy()
   
     para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] = np.clip(np.round(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] / (
         para['pixel_size'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[1])
@@ -75,8 +75,8 @@ def plot_tracks_in_cells(para):
                 
                 # Select rows from tempCellTracks where 'track_id' matches tempCellTracks['track_id'][pp]
                 selected_rows = tempCellTracks[tempCellTracks['track_id'] == tempCellTracks['track_id'][pp]]
-                x = selected_rows['x [um]']/para['pixel_size']
-                y = selected_rows['y [um]']/para['pixel_size'] 
+                x = selected_rows['x [µm]']/para['pixel_size']
+                y = selected_rows['y [µm]']/para['pixel_size'] 
                 
                 ax.plot(x, y, linewidth=para['linewidth'], color=lineColor)
 

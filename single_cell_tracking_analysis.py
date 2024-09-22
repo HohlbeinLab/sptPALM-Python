@@ -81,7 +81,7 @@ def single_cell_tracking_analysis(para):
                     )
                 
                 # List of columns to select from part_csv_data for concatenation
-                columns_to_concatenate = ['track_id', 'frame', 'x [um]', 'y [um]', 'loc_id']  # Example columns
+                columns_to_concatenate = ['track_id', 'frame', 'x [µm]', 'y [µm]', 'loc_id']  # Example columns
 
                 # Concatenate only the selected columns
                 para['tracks_filtered'] = pd.concat(

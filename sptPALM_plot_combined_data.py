@@ -27,10 +27,10 @@ def sptPALM_plot_combined_data(comb_data=None):
     # Best to use only 
     input_parameter = define_input_parameters()
     
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
-    with open(filename, 'rb') as f:
-        comb_data = pickle.load(f)
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     comb_data = pickle.load(f)
     
     # 1.1 Check whether DATA was passed to the function
     if comb_data is None:
@@ -48,44 +48,28 @@ def sptPALM_plot_combined_data(comb_data=None):
             raise ValueError("No file selected!")
     else:
         print('  Careful, there might be no data available to proceed!')
- 
-    
-    
     
     # Figure A: plot stack plot with diffusion coefficients)
     plot_stacked_diff_histo(comb_data)
 
-    # # Check for x- and y-positions and transform them into pixels
-    # column_names = ['x', 'y', 'cell_id', 'cell_area']  # Replace with your actual column names
-    # para['bf_dict']['loc_pixel_table_filt'] = pd.DataFrame(np.zeros((len(para['tracks_filtered']), len(column_names))), columns=column_names)
-    # para['bf_dict']['loc_pixel_table_filt'].loc[:, ['x','y']] = para['tracks_filtered'][['x [um]', 'y [um]']].to_numpy()
-  
-    # para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] = np.clip(np.round(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'] / (
-    #     para['pixel_size'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[1])
-    # para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'] = np.clip(np.round(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'] / (
-    #     para['pixel_size'])).astype(int), 1, para['bf_dict']['proc_brightfield_segm_image'].shape[0])
+    # Figure B: cell by cell specific plots
     
-    # para = plot_tracks_histograms(para)
     
     return comb_data    
  
 def plot_stacked_diff_histo(comb_data):
-    
-
-   
+      
     fig1 = plt.figure('Diffusion coefficients versus copy numbers per cell')
     plt.clf()
     
     # Aspect ratio (pbaspect equivalent)
     fig1.set_size_inches(10, 1)
     
-    copynumber_intervals = comb_data['input_parameter']['copynumber_intervals']
     edges = np.arange(np.log10(comb_data['input_parameter']['plot_diff_hist_min']),
                       np.log10(comb_data['input_parameter']['plot_diff_hist_max']) + 0.1, 0.1)
     
     # Initialize a list to store axes
     axes = []
-   
     
     # Loop through each copy number interval
     for jj in range(len(comb_data['input_parameter']['copynumber_intervals'])):
@@ -111,20 +95,15 @@ def plot_stacked_diff_histo(comb_data):
             data_temp = data_temp[(data_temp['copy_temp'] >= copy_interval_min) & 
                       (data_temp['copy_temp'] < copy_interval_max)]
 
-            
-            # breakpoint()
-            # data_filtered = data_temp[filter_vec]
-            
-           
             # Plot histogram
             ax.hist(data_temp['diff_temp'], bins=10**edges, alpha=0.4)
             # ax.hist(data_filtered, bins=10 ** edges, alpha=0.4, density=(Para1.PlotNormHistograms == 'probability'))
     
         # Set x limits and log scale
         ax.set_xlim([comb_data['input_parameter']['plot_diff_hist_min'],
-                                                  comb_data['input_parameter']['plot_diff_hist_max']])
+                     comb_data['input_parameter']['plot_diff_hist_max']])
         ax.set_xscale('log')
-    
+        
         # Configure x-axis label only for the last subplot
         if jj == len(comb_data['input_parameter']['copynumber_intervals'])-1:
             ax.legend(comb_data['condition_names'], loc='upper left')
@@ -136,7 +115,7 @@ def plot_stacked_diff_histo(comb_data):
         ax.set_ylabel(comb_data['input_parameter']['plot_norm_histograms'])
         
         # Set font size
-        # ax.tick_params(axis='both', which='major', labelsize=Para1.fontSize)
+        ax.tick_params(axis='both', which='major', labelsize=comb_data['input_parameter']['fontsize'])
     
         # Set title
         ax.set_title(f"Diffcoeff for copynumber: {comb_data['input_parameter']['copynumber_intervals'][jj][0] } to {comb_data['input_parameter']['copynumber_intervals'][jj][1] }")
@@ -144,7 +123,6 @@ def plot_stacked_diff_histo(comb_data):
     # Adjust figure position and size
     fig1.set_size_inches(5, 8)
     plt.tight_layout()
-    
     
     plt.show()
         

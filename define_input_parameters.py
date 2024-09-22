@@ -24,7 +24,7 @@ def define_input_parameters():
         'condition_files': [], # Initialise, further defined below
         'copynumber_intervals': [], # Initialise, further definied below
 
-        'pixel_size': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
+        'pixelsize': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
 
         # Segmentation of cells allows linking localisations to individual cells
         'cellarea_pixels_min': 50,  # Filter cells for minum area (area is given in number of pixels), default: 50
@@ -92,8 +92,38 @@ def define_input_parameters():
     input_parameter['condition_names'].append('Cond_2')
     input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
 
+    # # Directory containing your data (make sure you end with a '/' or '\')
+    # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
+
+    # # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
+    # input_parameter['fn_locs'] = [
+    #     '230208_Cas12aScrambled_EM620_LASER1_1_MMStack_Pos0.ome_MLE_thunder.csv',
+    #     '230208_Cas12aScrambled_EM620_LASER1_2_MMStack_Pos0.ome_MLE_thunder.csv',
+    #     '230131_Cas12aTargeting-0.15_EM620_LASER2_1_MMStack_Pos0.ome_MLE_thunder.csv',
+    #     '230131_Cas12aTargeting-0.15_EM620_LASER2_2_MMStack_Pos0.ome_MLE_thunder.csv',
+    # ]
+    # #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
+    # #filename is also used to locate the segmented image and corresponding csv-table!)
+    # input_parameter['fn_proc_brightfield'] = [
+    #     '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
+    #     '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
+    #     '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
+    #     '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
+    # ]
+
+    # # Name and assign your measurement conditions/files
+    # #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
+    # input_parameter['condition_names'].append('Cas12a_scrambled')
+    # input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
+    
+    # # DO NOT REMOVE THE FOLLOWING LINES!
+    # # Copy or uncomment the following lines if necessary
+    # input_parameter['condition_names'].append('Cas12a_targetting')
+    # input_parameter['condition_files'].append([2,3])  # refers to the order of files defined above
+
+
     # Histogramming of diffusion coefficients per copynumber
-    INTERVAL = 200
+    INTERVAL = 100
     for i in range(1, 6):
         input_parameter['copynumber_intervals'].append([(i-1)*INTERVAL+1, i*INTERVAL])
 

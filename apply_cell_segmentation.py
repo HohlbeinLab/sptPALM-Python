@@ -45,11 +45,11 @@ def apply_cell_segmentation(para):
     column_names = ['x', 'y', 'cell_id', 'cell_area']  # Replace with your actual column names
     bf_dict['loc_pixel_table'] = pd.DataFrame(np.zeros((len(csv_data), len(column_names))), columns=column_names)
 
-    bf_dict['loc_pixel_table'].loc[:, ['x','y']] = csv_data[['x [um]', 'y [um]']].to_numpy()
+    bf_dict['loc_pixel_table'].loc[:, ['x','y']] = csv_data[['x [µm]', 'y [µm]']].to_numpy()
     bf_dict['loc_pixel_table'].loc[:, 'x'] = np.clip(np.round(bf_dict['loc_pixel_table'].loc[:, 'x'] / (
-        para['pixel_size'])).astype(int), 1, bf_dict['proc_brightfield_segm_image'].shape[1])
+        para['pixelsize'])).astype(int), 1, bf_dict['proc_brightfield_segm_image'].shape[1])
     bf_dict['loc_pixel_table'].loc[:, 'y'] = np.clip(np.round(bf_dict['loc_pixel_table'].loc[:, 'y'] / (
-        para['pixel_size'])).astype(int), 1, bf_dict['proc_brightfield_segm_image'].shape[0])
+        para['pixelsize'])).astype(int), 1, bf_dict['proc_brightfield_segm_image'].shape[0])
 
     bf_dict['loc_pixel_table'].loc[:, 'cell_id'] = -1  
     bf_dict['loc_pixel_table'].loc[:, 'cell_area'] = -1  
