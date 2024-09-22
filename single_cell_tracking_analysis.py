@@ -56,6 +56,7 @@ def single_cell_tracking_analysis(para):
 
         # Find unique track_ids and total number of trackslocalisations per track
         track_ids, track_locs = np.unique(part_csv_data['track_id'], return_counts=True)
+        
         # Write data into DataFrame
         track_df = pd.DataFrame({'track_id': track_ids, 'locs': track_locs})
 

@@ -71,7 +71,8 @@ def sptPALM_plot_combined_data(comb_data=None):
  
 def plot_stacked_diff_histo(comb_data):
     
-    breakpoint()
+
+   
     fig1 = plt.figure('Diffusion coefficients versus copy numbers per cell')
     plt.clf()
     
@@ -84,52 +85,67 @@ def plot_stacked_diff_histo(comb_data):
     
     # Initialize a list to store axes
     axes = []
+   
     
     # Loop through each copy number interval
-    for jj in range(copynumber_intervals.shape[0]):
+    for jj in range(len(comb_data['input_parameter']['copynumber_intervals'])):
+        
         # Create subplot in the specified grid
-        temp = (copynumber_intervals.shape[0], 1, jj + 1)
+        temp = (len(comb_data['input_parameter']['copynumber_intervals']), 1, jj + 1)
         ax = plt.subplot(*temp)
         axes.append(ax)
-        plt.hold(True)  # Note: In modern versions of matplotlib, `plt.hold(True)` is default behavior
-    
+  
         # Loop through each condition
         for ff in range(comb_data['#_conditions']):
-            data = comb_data['diff_data'][ff]['diff_coeffs_filtered_list']
-            copy = comb_data['diff_data'][ff]['copynumber']
-            
+
             # Filter data based on copy number intervals
-            tmp_ind = (copy >= copynumber_intervals[jj, 0]) & (copy <= copynumber_intervals[jj, 1])
-            data_filtered = data[tmp_ind]
+            data_temp = pd.DataFrame({'diff_temp': comb_data['diff_data'][ff]['diff_coeffs_filtered'],
+                                      'copy_temp': comb_data['diff_data'][ff]['copynumber']
+                                      })
+
+            # Define the copy number interval for the current `jj`
+            copy_interval_min = comb_data['input_parameter']['copynumber_intervals'][jj][0]
+            copy_interval_max = comb_data['input_parameter']['copynumber_intervals'][jj][1]
+
+            # Filter data_temp based on the copy number intervals
+            data_temp = data_temp[(data_temp['copy_temp'] >= copy_interval_min) & 
+                      (data_temp['copy_temp'] < copy_interval_max)]
+
             
+            # breakpoint()
+            # data_filtered = data_temp[filter_vec]
+            
+           
             # Plot histogram
-            ax.hist(data_filtered, bins=10 ** edges, alpha=0.4)
+            ax.hist(data_temp['diff_temp'], bins=10**edges, alpha=0.4)
             # ax.hist(data_filtered, bins=10 ** edges, alpha=0.4, density=(Para1.PlotNormHistograms == 'probability'))
     
         # Set x limits and log scale
         ax.set_xlim([comb_data['input_parameter']['plot_diff_hist_min'],
-                                                  comb_data['input_parameter']['plot_diff_hist_ax']])
+                                                  comb_data['input_parameter']['plot_diff_hist_max']])
         ax.set_xscale('log')
     
         # Configure x-axis label only for the last subplot
-        if jj == copynumber_intervals.shape[0] - 1:
-            ax.legend(comb_data['condition_name'][jj], loc='northwest')
+        if jj == len(comb_data['input_parameter']['copynumber_intervals'])-1:
+            ax.legend(comb_data['condition_names'], loc='upper left')
             ax.set_xlabel('Diffusion coefficient (μm²/sec)')
         else:
             ax.set_xticklabels([])
     
         # Set y-axis label
-        # ax.set_ylabel(Para1.PlotNormHistograms)
+        ax.set_ylabel(comb_data['input_parameter']['plot_norm_histograms'])
         
         # Set font size
         # ax.tick_params(axis='both', which='major', labelsize=Para1.fontSize)
     
         # Set title
-        ax.set_title(f'Diffcoeff for copynumber: {int(copynumber_intervals[jj, 0])} to {int(copynumber_intervals[jj, 1])}')
+        ax.set_title(f"Diffcoeff for copynumber: {comb_data['input_parameter']['copynumber_intervals'][jj][0] } to {comb_data['input_parameter']['copynumber_intervals'][jj][1] }")
     
     # Adjust figure position and size
     fig1.set_size_inches(5, 8)
     plt.tight_layout()
+    
+    
     plt.show()
         
     
