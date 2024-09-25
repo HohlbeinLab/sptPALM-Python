@@ -15,7 +15,7 @@ print("\nRun single cell simulation!")
 sim_input = define_parameters_simulation();
     
 # Function for setting all starting positions, starting states etc
-[particleData, simInput] = initiate_simulation(sim_input);
+[particleData, sim_input] = initiate_simulation(sim_input);
 
 #function for moving particles and checking for state changes
-[particleData, tracks] = particle_diffusion(simInput, particleData);
+[particleData, tracks] = particle_diffusion(sim_input, particleData);

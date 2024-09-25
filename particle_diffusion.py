@@ -52,8 +52,7 @@ def particle_diffusion(sim_input, particle_data):
                 diff_quot = sim_input['species'][ii]['diff_quot']
 
                 if num_states == 2:
-                    kAB, kBA = rates
-                    handle_two_state(particle_data, loc_state_changes, kAB, kBA, diff_quot)
+                    handle_two_state(particle_data, loc_state_changes, rates, diff_quot, sim_input)
                 elif num_states == 3:
                     handle_three_state(particle_data, loc_state_changes, rates, diff_quot, sim_input)
                 elif num_states == 4:
@@ -142,9 +141,24 @@ def apply_boundary_conditions(particle_data, temp_xyz_steps, loc_species, sim_in
     particle_data['posReject'][loc_species] = reject_pos_left_part | reject_pos_cylinder_part | reject_pos_right_part
 
 
-def handle_two_state(particle_data, loc_state_changes, kAB, kBA, diff_quot):
+def handle_two_state(particle_data, loc_state_changes, rates, diff_quot, sim_input):
+    kAB, kBA = rates
     particle_data['active_state'][loc_state_changes] = particle_data['next_state'][loc_state_changes]
+    
+    
+    
     particle_data['active_diff_quot'][loc_state_changes] = diff_quot[particle_data['active_state'][loc_state_changes]]
+
+
+        # Assign active diffusion quotient for each particle
+        # Convert 'active_state' to a numpy array
+        active_states = particle_data.loc[loc_species, 'active_state'].astype(int).to_numpy() 
+        
+        # Use the active_states array to index into the diff_quot list
+        particle_data.loc[loc_species, 'active_diff_quot'] = np.array(sim_input['species'][ii]['diff_quot'])[active_states]
+
+
+
     
     find_state_A = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
     particle_data['next_state'][find_state_A] = 2

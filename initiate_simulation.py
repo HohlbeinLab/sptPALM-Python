@@ -5,11 +5,9 @@ Created on Wed Aug 28 20:58:09 2024
 
 @author: hohlbein
 """
- 
     
 import numpy as np
 import pandas as pd
-import math
 
 def initiate_simulation(sim_input):
     print('\nRun initiate_simulation.py')
