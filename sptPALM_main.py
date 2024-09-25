@@ -40,9 +40,8 @@ while True:
     3: sptPALM_analyse_movies
     4: sptPALM_combine_data
     5: sptPALM_plot_combined_data
-    6: sptPALM_anaDDA
-    7: sptPALM_MCDDA
-    8: sptPALM_runAll (Options 3-6)\n"""
+    6: sptPALM_MCDDA
+    \n"""
     # Check prompt
     try:
         prompt_input = int(input(PROMPT))
@@ -123,17 +122,17 @@ while True:
                       '("sptData_combined_movies.pkl" or similar)')
                 comb_data = sptPALM_plot_combined_data()
         
-        case 6:  # anaDDA
-            print('run sptPALM_anaDDA(CombinedDATA, 1) on condition 1')
-            if comb_data:
-                comb_data = sptPALM_anaDDA(1, comb_data)
-            else:
-                print("No 'comb_data' from option 4 available")
-                print("Continue with GUI to select 'comb_data' "
-                      '("sptDataCombinedMovies.mat" or similar)')
-                comb_data = sptPALM_anaDDA(1)
+        # case 6:  # anaDDA
+        #     print('run sptPALM_anaDDA(CombinedDATA, 1) on condition 1')
+        #     if comb_data:
+        #         comb_data = sptPALM_anaDDA(1, comb_data)
+        #     else:
+        #         print("No 'comb_data' from option 4 available")
+        #         print("Continue with GUI to select 'comb_data' "
+        #               '("sptDataCombinedMovies.mat" or similar)')
+        #         comb_data = sptPALM_anaDDA(1)
         
-        case 7:  # MCDDA
+        case 6:  # MCDDA
             if comb_data:
                 comb_data = sptPALM_MCDDA(1, comb_data)
             else:
@@ -142,11 +141,11 @@ while True:
                       '("sptDataCombinedMovies.mat" or similar)')
                 comb_data = sptPALM_MCDDA(1)
         
-        case 8: # Run everything until anaDDA
-            data, para = sptPALM_analyse_movies()
-            comb_data = sptPALM_combine_data(data)
-            comb_data = sptPALM_plot_combined_data(comb_data)
-            comb_data = sptPALM_anaDDA(1, comb_data)
+        # case 8: # Run everything until anaDDA
+        #     data, para = sptPALM_analyse_movies()
+        #     comb_data = sptPALM_combine_data(data)
+        #     comb_data = sptPALM_plot_combined_data(comb_data)
+        #     comb_data = sptPALM_anaDDA(1, comb_data)
         
         case _:
             print("Invalid option, please choose a valid number.")

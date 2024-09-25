@@ -8,17 +8,13 @@ Created on Wed Aug 28 20:58:09 2024
 
 
 import os
-import numpy as np
-from skimage.io import imread
-import pandas as pd
 import pickle
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from tkinter.simpledialog import askstring
-import matplotlib.pyplot as plt
 
 from define_input_parameters import define_input_parameters
 from define_parameters_simulation import define_parameters_simulation
+from initiate_simulation import initiate_simulation
 
  # Assuming Para1 is a dictionary-like object
 def sptPALM_MCDDA(condition, comb_data=None):
@@ -51,25 +47,21 @@ def sptPALM_MCDDA(condition, comb_data=None):
             raise ValueError("No file selected!")
     else:
         print('  Careful, there might be no data available to proceed!')
-        
-    
+           
     # Access the data fields
     condi_table_anaDDAtracks = comb_data['anaDDA_tracks']
     input_param = comb_data['input_parameter']
     
-    # Choose condition for MCDDA
-    condi = condition
-    breakpoint()
-    print(f"Running MCDDA on tracks assigned for ... {comb_data['anaDDA_tracks'][condi]}")
+    print(f"  Running MCDDA on tracks assigned for ... {comb_data['condition_names'][condition]}\n")
     
     # Use tracks for anaDDA
-    tracks = comb_data['anaDDA_tracks'][condi]
+    tracks = comb_data['anaDDA_tracks'][condition]
     
     # Set parameters for simulation
     sim_input = define_parameters_simulation()
     
-    # # Initiate the simulation
-    # particle_data, sim_input = initiate_simulation(sim_input)
+    # Initiate the simulation
+    particle_data, sim_input = initiate_simulation(sim_input)
     
     # # Generate average diffusion coefficients for each track
     # sorted_tracks = tracks[tracks[:, 3].argsort()]  # Sort rows by 4th column (MATLAB index 4 is Python index 3)

@@ -27,10 +27,10 @@ def sptPALM_plot_combined_data(comb_data=None):
     # Best to use only 
     input_parameter = define_input_parameters()
     
-    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
-    # with open(filename, 'rb') as f:
-    #     comb_data = pickle.load(f)
+    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
+    with open(filename, 'rb') as f:
+        comb_data = pickle.load(f)
     
     # 1.1 Check whether DATA was passed to the function
     if comb_data is None:
@@ -78,7 +78,11 @@ def plot_stacked_diff_histo(comb_data):
         temp = (len(comb_data['input_parameter']['copynumber_intervals']), 1, jj + 1)
         ax = plt.subplot(*temp)
         axes.append(ax)
-  
+    
+        
+    
+# Histogram could be plotted better nexto each other without shading, 
+# see here:  https://matplotlib.org/stable/gallery/statistics/histogram_multihist.html#sphx-glr-gallery-statistics-histogram-multihist-py
         # Loop through each condition
         for ff in range(comb_data['#_conditions']):
 

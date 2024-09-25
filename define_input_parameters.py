@@ -85,7 +85,7 @@ def define_input_parameters():
     # Name and assign your measurement conditions/files
     #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
     input_parameter['condition_names'].append('Cond_1')
-    input_parameter['condition_files'].append([0])  # refers to the order of files defined above
+    input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
     
     # DO NOT REMOVE THE FOLLOWING LINES!
     # Copy or uncomment the following lines if necessary
