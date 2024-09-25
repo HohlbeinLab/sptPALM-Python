@@ -8,7 +8,8 @@ Created on Wed Aug 28 20:58:09 2024
  
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FFMpegWriter
+from matplotlib.animation import PillowWriter
+import time
 
 def particle_diffusion(sim_input, particle_data):
     
@@ -19,10 +20,10 @@ def particle_diffusion(sim_input, particle_data):
     tracks = np.zeros((0, 5))
     valid_x = ~np.isnan(particle_data['xPos'])
     tracks = np.column_stack((
-        particle_data['xPos'][valid_x] + loc_error_matrix[valid_x, 0],  # x-values
-        particle_data['yPos'][valid_x] + loc_error_matrix[valid_x, 1],  # y-values
+        particle_data.loc[valid_x, 'xPos'] + loc_error_matrix[valid_x, 0],  # x-values
+        particle_data.loc[valid_x, 'yPos']  + loc_error_matrix[valid_x, 1],  # y-values
         np.ones(np.sum(valid_x)),  # frame, currently first frame
-        particle_data['particle'][valid_x],  # track_ID
+        particle_data.loc[valid_x, 'particle'],  # track_ID
         sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
     ))
 
@@ -30,21 +31,26 @@ def particle_diffusion(sim_input, particle_data):
 
     # Initialize video recording if needed
     if sim_input['display_figures']:
-        writer = FFMpegWriter(fps=10)
-        fig = plt.figure()
-        plt.xlim([0, sim_input['radius_cell'] + 2 * sim_input['length_cell']])
-        plt.ylim([-sim_input['radius_cell'], sim_input['radius_cell']])
-        ax = fig.add_subplot(111, projection='3d')
 
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        # ax.set_xlim([0, sim_input['total_length_cell']])
+        # ax.set_ylim([-sim_input['radius_cell'], sim_input['radius_cell']])
+        # ax.set_zlim([-sim_input['radius_cell'], sim_input['radius_cell']])
+        # Manually open the video writer
+        writer = PillowWriter(fps=5)  # Set the frame rate for GIF
+        writer.setup(fig, "Diffusion.gif", dpi=200)
+
+    start = time.time()
     # Main simulation loop
     for step_counter in range(1, int(max(sim_input['track_lengths']) * sim_input['frametime'] / sim_input['steptime']) + 1):
-        
+
         temp_xyz_steps = np.zeros((sim_input['total_number_particles'], 3))
         
         for ii in range(sim_input['#_species']):
             # Get species-specific particles
-            loc_species = np.where(particle_data['species'] == ii + 1)[0]
-            loc_state_changes = loc_species[particle_data['state_time_remaining'][loc_species] < sim_input['steptime']]
+            loc_species = np.where(particle_data['species'] == ii)[0]# was ii + 1, but we now count speci
+            loc_state_changes = loc_species[particle_data.loc[loc_species, 'state_time_remaining'] < sim_input['steptime']]
             
             if len(loc_state_changes) > 0:
                 num_states = sim_input['species'][ii]['#_states']
@@ -62,197 +68,207 @@ def particle_diffusion(sim_input, particle_data):
 
             # Calculate random steps in X, Y, Z direction
             temp_xyz_steps[loc_species, :] = np.sqrt(
-                2 * particle_data['active_diff_quot'][loc_species] * sim_input['steptime']
+                2 * particle_data.loc[loc_species, 'active_diff_quot'].values[:, np.newaxis] * sim_input['steptime']
             ) * np.random.randn(len(loc_species), 3)
 
             # Apply boundary conditions if needed
-            if sim_input['confineDiffusion']:
+            if sim_input['confined_diffusion']:
                 apply_boundary_conditions(particle_data, temp_xyz_steps, loc_species, sim_input)
 
             # Update particle positions
-            particle_data['xPos'][loc_species] += temp_xyz_steps[loc_species, 0] * (~particle_data['posReject'][loc_species])
-            particle_data['yPos'][loc_species] += temp_xyz_steps[loc_species, 1] * (~particle_data['posReject'][loc_species])
-            particle_data['zPos'][loc_species] += temp_xyz_steps[loc_species, 2] * (~particle_data['posReject'][loc_species])
+            particle_data.loc[loc_species, 'xPos'] += temp_xyz_steps[loc_species, 0] * (~particle_data.loc[loc_species, 'pos_reject'])
+            particle_data.loc[loc_species, 'yPos'] += temp_xyz_steps[loc_species, 1] * (~particle_data.loc[loc_species, 'pos_reject'])
+            particle_data.loc[loc_species, 'zPos'] += temp_xyz_steps[loc_species, 2] * (~particle_data.loc[loc_species, 'pos_reject'])
 
         # Decrease remaining track and state times
-        particle_data['trackLengthRemain'][particle_data['trackLengthRemain'] > sim_input['avoidFloat0']] -= sim_input['steptime'] / sim_input['frametime']
-        particle_data['state_time_remaining'][particle_data['state_time_remaining'] > sim_input['avoidFloat0']] -= sim_input['steptime']
+        check_length_remaining = particle_data['track_length_remaining'] > sim_input['avoidFloat0']
+        particle_data.loc[check_length_remaining, 'track_length_remaining'] -= sim_input['steptime'] / sim_input['frametime']
+        
+        check_state_time_remaining = particle_data['state_time_remaining'] > sim_input['avoidFloat0']
+        particle_data.loc[check_state_time_remaining, 'state_time_remaining'] -= sim_input['steptime']
         
         # Mark particles that 'bleached' as NaN
-        delete_entries = np.where(particle_data['trackLengthRemain'] < sim_input['avoidFloat0'])[0]
-        particle_data['xPos'][delete_entries] = np.nan
-        particle_data['yPos'][delete_entries] = np.nan
-        particle_data['zPos'][delete_entries] = np.nan
-        particle_data['trackLengthRemain'][delete_entries] = 0
+        delete_entries = np.where(particle_data['track_length_remaining'] < sim_input['avoidFloat0'])[0]
+        particle_data.loc[delete_entries, 'xPos'] = np.nan
+        particle_data.loc[delete_entries, 'yPos'] = np.nan
+        particle_data.loc[delete_entries, 'zPos'] = np.nan
+        particle_data.loc[delete_entries, 'track_length_remaining'] = 0
 
         # Record the positions every frame
         if step_counter % int(sim_input['frametime'] / sim_input['steptime']) == 0:
-            print(f' Round: {step_counter // (sim_input["frametime"] / sim_input["steptime"])}, Steps simulated: {step_counter}')
+            print(f' Round: {int(step_counter) // (sim_input["frametime"] / sim_input["steptime"])}, Steps simulated: {step_counter}')
             
-            if sim_input['displayFigures']:
-                plt.cla()
+            if sim_input['display_figures']:
+                plt.cla()  # Clear the plot for the new frame
+                # ax = fig.add_subplot(111, projection='3d')
                 ax.scatter(particle_data['xPos'], particle_data['yPos'], particle_data['zPos'])
+                ax.set_xlim([0, sim_input['total_length_cell']])
+                ax.set_ylim([-sim_input['radius_cell'], sim_input['radius_cell']])
+                ax.set_zlim([-sim_input['radius_cell'], sim_input['radius_cell']])
                 ax.set_xlabel('x (µm)')
                 ax.set_ylabel('y (µm)')
                 ax.set_zlabel('z (µm)')
                 ax.set_title(f'frame: {step_counter // (sim_input["frametime"] / sim_input["steptime"])}')
+                # Save the current frame to the GIF
                 writer.grab_frame()
+
 
             loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (len(particle_data['xPos']), 3))
             valid_x = ~np.isnan(particle_data['xPos'])
             tracks_temp = np.column_stack((
-                particle_data['xPos'][valid_x] + loc_error_matrix[valid_x, 0],  # x-values
-                particle_data['yPos'][valid_x] + loc_error_matrix[valid_x, 1],  # y-values
+                particle_data.loc[valid_x, 'xPos']+ loc_error_matrix[valid_x, 0],  # x-values
+                particle_data.loc[valid_x, 'yPos']+ loc_error_matrix[valid_x, 1],  # y-values
                 np.ones(np.sum(valid_x)) * (1 + step_counter // (sim_input['frametime'] / sim_input['steptime'])),
-                particle_data['particle'][valid_x],  # track_ID
+                particle_data.loc[valid_x, 'particle'],  # track_ID
                 sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
             ))
             tracks = np.vstack([tracks, tracks_temp])
 
-    print(f'Number of remaining particles (not bleached): {np.sum(particle_data["trackLengthRemain"] > sim_input["avoidFloat0"])}')
+    print(f'Number of remaining particles (not bleached): {np.sum(particle_data["track_length_remaining"] > sim_input["avoidFloat0"])}')
 
-    if sim_input['displayFigures']:
-        plt.close()
+    if sim_input['display_figures']:
+        # Manually close the video writer
+        writer.finish()
+        plt.close(fig)
+        plt.show()
+
+
+    # How long did the tracking take?
+    end = time.time()
+    rounded_time = round(end-start, 2)
+    print(f"  Time for tracking: {rounded_time} seconds")
 
     return particle_data, tracks
 
 def apply_boundary_conditions(particle_data, temp_xyz_steps, loc_species, sim_input):
     # Left part of the cell boundary condition
-    reject_pos_left_part = (particle_data['xPos'][loc_species] + temp_xyz_steps[loc_species, 0] < sim_input['radius_cell']) & (
-        (particle_data['xPos'][loc_species] + temp_xyz_steps[loc_species, 0] - sim_input['radius_cell'])**2 +
-        (particle_data['yPos'][loc_species] + temp_xyz_steps[loc_species, 1])**2 +
-        (particle_data['zPos'][loc_species] + temp_xyz_steps[loc_species, 2])**2 > sim_input['radius_cell']**2
+    reject_pos_left_part = (particle_data.loc[loc_species, 'xPos'][loc_species] + temp_xyz_steps[loc_species, 0] < sim_input['radius_cell']) & (
+        (particle_data.loc[loc_species, 'xPos'] + temp_xyz_steps[loc_species, 0] - sim_input['radius_cell'])**2 +
+        (particle_data.loc[loc_species, 'yPos'] + temp_xyz_steps[loc_species, 1])**2 +
+        (particle_data.loc[loc_species, 'zPos'] + temp_xyz_steps[loc_species, 2])**2 > sim_input['radius_cell']**2
     )
 
     # Cylindrical part of the boundary condition
     reject_pos_cylinder_part = (
-        (particle_data['yPos'][loc_species] + temp_xyz_steps[loc_species, 1])**2 +
-        (particle_data['zPos'][loc_species] + temp_xyz_steps[loc_species, 2])**2 > sim_input['radius_cell']**2
+        (particle_data.loc[loc_species, 'yPos'] + temp_xyz_steps[loc_species, 1])**2 +
+        (particle_data.loc[loc_species, 'zPos'] + temp_xyz_steps[loc_species, 2])**2 > sim_input['radius_cell']**2
     )
 
     # Right part of the cell boundary condition
-    reject_pos_right_part = (particle_data['xPos'][loc_species] + temp_xyz_steps[loc_species, 0] > (sim_input['length_cell'] + sim_input['radius_cell'])) & (
-        (particle_data['xPos'][loc_species] + temp_xyz_steps[loc_species, 0] - (sim_input['length_cell'] + sim_input['radius_cell']))**2 +
-        (particle_data['yPos'][loc_species] + temp_xyz_steps[loc_species, 1])**2 +
-        (particle_data['zPos'][loc_species] + temp_xyz_steps[loc_species, 2])**2 > sim_input['radius_cell']**2
+    reject_pos_right_part = (particle_data.loc[loc_species, 'xPos'] + temp_xyz_steps[loc_species, 0] > (sim_input['length_cell'] + sim_input['radius_cell'])) & (
+        (particle_data.loc[loc_species, 'xPos'] + temp_xyz_steps[loc_species, 0] - (sim_input['length_cell'] + sim_input['radius_cell']))**2 +
+        (particle_data.loc[loc_species, 'yPos'] + temp_xyz_steps[loc_species, 1])**2 +
+        (particle_data.loc[loc_species, 'zPos'] + temp_xyz_steps[loc_species, 2])**2 > sim_input['radius_cell']**2
     )
 
     # Combine all positions that violate the boundary conditions
-    particle_data['posReject'][loc_species] = reject_pos_left_part | reject_pos_cylinder_part | reject_pos_right_part
+    particle_data.loc[loc_species, 'pos_reject'] = reject_pos_left_part | reject_pos_cylinder_part | reject_pos_right_part
 
 
 def handle_two_state(particle_data, loc_state_changes, rates, diff_quot, sim_input):
     kAB, kBA = rates
-    particle_data['active_state'][loc_state_changes] = particle_data['next_state'][loc_state_changes]
-    
-    
-    
-    particle_data['active_diff_quot'][loc_state_changes] = diff_quot[particle_data['active_state'][loc_state_changes]]
+    particle_data.loc[loc_state_changes, 'active_state'] = particle_data.loc[loc_state_changes, 'next_state']
+       
+    active_states = particle_data.loc[loc_state_changes, 'active_state'].astype(int).to_numpy() 
+    particle_data.loc[loc_state_changes, 'active_diff_quot'] = np.array(diff_quot[active_states])
 
-
-        # Assign active diffusion quotient for each particle
-        # Convert 'active_state' to a numpy array
-        active_states = particle_data.loc[loc_species, 'active_state'].astype(int).to_numpy() 
-        
-        # Use the active_states array to index into the diff_quot list
-        particle_data.loc[loc_species, 'active_diff_quot'] = np.array(sim_input['species'][ii]['diff_quot'])[active_states]
-
-
-
+ 
+    find_state_A = loc_state_changes[particle_data['active_state'][loc_state_changes] == 0]
+    particle_data.loc[find_state_A, 'next_state'] = 1
+    particle_data.loc[find_state_A, 'state_time_remaining'] = np.log(np.random.rand(len(find_state_A))) / (-kAB)
     
-    find_state_A = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
-    particle_data['next_state'][find_state_A] = 2
-    particle_data['state_time_remaining'][find_state_A] = np.log(np.random.rand(len(find_state_A))) / (-kAB)
-    
-    find_state_B = loc_state_changes[particle_data['active_state'][loc_state_changes] == 2]
-    particle_data['next_state'][find_state_B] = 1
-    particle_data['state_time_remaining'][find_state_B] = np.log(np.random.rand(len(find_state_B))) / (-kBA)
+    find_state_B = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
+    particle_data.loc[find_state_B, 'next_state'] = 0
+    particle_data.loc[find_state_B, 'state_time_remaining']= np.log(np.random.rand(len(find_state_B))) / (-kBA)
 
 
 def handle_three_state(particle_data, loc_state_changes, rates, diff_quot, sim_input):
     kAB, kBA, kBC, kCB, kAC, kCA = rates
 
     # Change state to the next, already known state
-    particle_data['active_state'][loc_state_changes] = particle_data['next_state'][loc_state_changes]
+    particle_data.loc[loc_state_changes, 'active_state']= particle_data['next_state'][loc_state_changes]
+    
     # Update diffusion coefficient depending on the current state
-    particle_data['active_diff_quot'][loc_state_changes] = diff_quot[particle_data['active_state'][loc_state_changes]]
+    active_states = particle_data.loc[loc_state_changes, 'active_state'].astype(int).to_numpy() 
+    particle_data.loc[loc_state_changes, 'active_diff_quot'] = np.array(diff_quot[active_states])
     
     # Generate random values for state transitions
     temp_rand = np.random.rand(len(loc_state_changes), 2)
 
     # State A transitions
-    find_state_A = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
+    find_state_A = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 0]
     # A to B
     temp_switch_AB = find_state_A[kAB / (kAB + kAC) >= temp_rand[find_state_A, 0]]
-    particle_data['next_state'][temp_switch_AB] = 2
-    particle_data['state_time_remaining'][temp_switch_AB] = np.log(temp_rand[temp_switch_AB, 1]) / -kAB
+    particle_data.loc[temp_switch_AB, 'next_state']= 1
+    particle_data.loc[temp_switch_AB, 'state_time_remaining']= np.log(temp_rand[temp_switch_AB, 1]) / -kAB
     # A to C
     temp_switch_AC = find_state_A[kAB / (kAB + kAC) < temp_rand[find_state_A, 0]]
-    particle_data['next_state'][temp_switch_AC] = 3
-    particle_data['state_time_remaining'][temp_switch_AC] = np.log(temp_rand[temp_switch_AC, 1]) / -kAC
+    particle_data.loc[temp_switch_AC, 'next_state'] = 2
+    particle_data.loc[temp_switch_AC, 'state_time_remaining'] = np.log(temp_rand[temp_switch_AC, 1]) / -kAC
 
     # State B transitions
-    find_state_B = loc_state_changes[particle_data['active_state'][loc_state_changes] == 2]
+    find_state_B = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
     # B to A
     temp_switch_BA = find_state_B[kBA / (kBA + kBC) >= temp_rand[find_state_B, 0]]
-    particle_data['next_state'][temp_switch_BA] = 1
-    particle_data['state_time_remaining'][temp_switch_BA] = np.log(temp_rand[temp_switch_BA, 1]) / -kBA
+    particle_data.loc[temp_switch_BA, 'next_state']= 0
+    particle_data.loc[temp_switch_BA, 'state_time_remaining'] = np.log(temp_rand[temp_switch_BA, 1]) / -kBA
     # B to C
     temp_switch_BC = find_state_B[kBA / (kBA + kBC) < temp_rand[find_state_B, 0]]
-    particle_data['next_state'][temp_switch_BC] = 3
-    particle_data['state_time_remaining'][temp_switch_BC] = np.log(temp_rand[temp_switch_BC, 1]) / -kBC
+    particle_data.loc[temp_switch_BC, 'next_state']= 2
+    particle_data.loc[temp_switch_BC, 'state_time_remaining'] = np.log(temp_rand[temp_switch_BC, 1]) / -kBC
 
     # State C transitions
-    find_state_C = loc_state_changes[particle_data['active_state'][loc_state_changes] == 3]
+    find_state_C = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 2]
     # C to A
     temp_switch_CA = find_state_C[kCA / (kCA + kCB) >= temp_rand[find_state_C, 0]]
-    particle_data['next_state'][temp_switch_CA] = 1
-    particle_data['state_time_remaining'][temp_switch_CA] = np.log(temp_rand[temp_switch_CA, 1]) / -kCA
+    particle_data.loc[temp_switch_CA, 'next_state'] = 0
+    particle_data.loc[temp_switch_CA, 'state_time_remaining']= np.log(temp_rand[temp_switch_CA, 1]) / -kCA
     # C to B
     temp_switch_CB = find_state_C[kCA / (kCA + kCB) < temp_rand[find_state_C, 0]]
-    particle_data['next_state'][temp_switch_CB] = 2
-    particle_data['state_time_remaining'][temp_switch_CB] = np.log(temp_rand[temp_switch_CB, 1]) / -kCB
+    particle_data.loc[temp_switch_CB, 'next_state']= 1
+    particle_data.loc[temp_switch_CB, 'state_time_remaining']= np.log(temp_rand[temp_switch_CB, 1]) / -kCB
 
 
 def handle_four_state(particle_data, loc_state_changes, rates, diff_quot, sim_input):
     kAB, kBA, kBC, kCB, kCD, kDC = rates
 
     # Change state to the next, already known state
-    particle_data['active_state'][loc_state_changes] = particle_data['next_state'][loc_state_changes]
+    particle_data.loc[loc_state_changes, 'active_state'] = particle_data.loc[loc_state_changes, 'next_state']
     # Update diffusion coefficient depending on the current state
-    particle_data['active_diff_quot'][loc_state_changes] = diff_quot[particle_data['active_state'][loc_state_changes]]
+    active_states = particle_data.loc[loc_state_changes, 'active_state'].astype(int).to_numpy() 
+    particle_data.loc[loc_state_changes, 'active_diff_quot'] = np.array(diff_quot[active_states])   
     
     # Generate random values for state transitions
     temp_rand = np.random.rand(len(loc_state_changes), 1)
 
     # State A to B
-    find_state_A = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
-    particle_data['next_state'][find_state_A] = 2
-    particle_data['state_time_remaining'][find_state_A] = np.log(temp_rand[find_state_A]) / -kAB
+    find_state_A = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state']== 0]
+    particle_data.loc[find_state_A, 'next_state'] = 1
+    particle_data.loc[find_state_A, 'state_time_remaining'] = np.log(temp_rand[find_state_A]) / -kAB
 
     # State B transitions
-    find_state_B = loc_state_changes[particle_data['active_state'][loc_state_changes] == 2]
+    find_state_B = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 1]
     # B to A
     temp_switch_BA = find_state_B[kBA / (kBA + kBC) >= temp_rand[find_state_B, 0]]
-    particle_data['next_state'][temp_switch_BA] = 1
-    particle_data['state_time_remaining'][temp_switch_BA] = np.log(temp_rand[temp_switch_BA]) / -kBA
+    particle_data.loc[temp_switch_BA, 'next_state'] = 0
+    particle_data.loc[temp_switch_BA, 'state_time_remaining']= np.log(temp_rand[temp_switch_BA]) / -kBA
     # B to C
     temp_switch_BC = find_state_B[kBA / (kBA + kBC) < temp_rand[find_state_B, 0]]
-    particle_data['next_state'][temp_switch_BC] = 3
-    particle_data['state_time_remaining'][temp_switch_BC] = np.log(temp_rand[temp_switch_BC]) / -kBC
+    particle_data.loc[temp_switch_BC, 'next_state'] = 2
+    particle_data.loc[temp_switch_BC,'state_time_remaining'] = np.log(temp_rand[temp_switch_BC]) / -kBC
 
     # State C transitions
-    find_state_C = loc_state_changes[particle_data['active_state'][loc_state_changes] == 3]
+    find_state_C = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 2]
     # C to B
     temp_switch_CB = find_state_C[kCB / (kCB + kCD) >= temp_rand[find_state_C, 0]]
-    particle_data['next_state'][temp_switch_CB] = 2
-    particle_data['state_time_remaining'][temp_switch_CB] = np.log(temp_rand[temp_switch_CB]) / -kCB
+    particle_data.loc[temp_switch_CB, 'next_state'] = 1
+    particle_data.loc[temp_switch_CB, 'state_time_remaining'] = np.log(temp_rand[temp_switch_CB]) / -kCB
     # C to D
     temp_switch_CD = find_state_C[kCB / (kCB + kCD) < temp_rand[find_state_C, 0]]
-    particle_data['next_state'][temp_switch_CD] = 4
-    particle_data['state_time_remaining'][temp_switch_CD] = np.log(temp_rand[temp_switch_CD]) / -kCD
+    particle_data.loc[temp_switch_CD, 'next_state'] = 3
+    particle_data.loc[temp_switch_CD, 'state_time_remaining'] = np.log(temp_rand[temp_switch_CD]) / -kCD
 
     # State D to C
-    find_state_D = loc_state_changes[particle_data['active_state'][loc_state_changes] == 4]
-    particle_data['next_state'][find_state_D] = 3
-    particle_data['state_time_remaining'][find_state_D] = np.log(temp_rand[find_state_D]) / -kDC
+    find_state_D = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 3]
+    particle_data.loc[find_state_D, 'next_state'] = 2
+    particle_data.loc[find_state_D, 'state_time_remaining'] = np.log(temp_rand[find_state_D]) / -kDC

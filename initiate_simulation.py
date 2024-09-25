@@ -13,18 +13,23 @@ def initiate_simulation(sim_input):
     print('\nRun initiate_simulation.py')
     # Calculate some parameters from the input
     sim_input['total_number_particles'] = np.sum(sim_input['#_particles_per_species'][:sim_input['#_species']])
+    print(f"  We simulate a total of {sim_input['total_number_particles']} particles")
+    
     sim_input['total_length_cell'] = 2 * sim_input['radius_cell'] + sim_input['length_cell']
 
     sim_input['total_duration_simulation'] = len(sim_input['track_lengths']) * sim_input['frametime']
     sim_input['steps_simulation'] = sim_input['total_duration_simulation'] / sim_input['steptime']
-    print(f"  We simulate a total of {sim_input['steps_simulation']} steps")
+    print(f"  We simulate a total of {int(sim_input['steps_simulation'])} steps")
 
     # Simulate starting positions
     # Prepare particle_data DataFrame
     particle_data = pd.DataFrame(np.zeros((sim_input['total_number_particles'], 12)), 
                                 columns=['particle', 'species', 'xPos', 'yPos', 'zPos', 'pos_reject', 'active_state',
-                                         'active_diff_quot', 'next_state', 'state_time_remaining', 'track_length', 'track_length_remain'])
-    particle_data['particle'] = np.arange(1, sim_input['total_number_particles'] + 1)
+                                         'active_diff_quot', 'next_state', 'state_time_remaining', 'track_length', 'track_length_remaining'])
+    float_strings = ['xPos', 'yPos', 'zPos','active_diff_quot','state_time_remaining']
+    particle_data[float_strings] = particle_data[float_strings].astype(float)
+
+    particle_data['particle'] = np.arange(0, sim_input['total_number_particles'])
     particle_data['pos_reject'] = True  # Initially, all positions are invalid
 
     temp_counter = 0
@@ -32,7 +37,7 @@ def initiate_simulation(sim_input):
     for ii in range(sim_input['#_species']):
         start_idx = temp_counter
         end_idx = temp_counter + sim_input['#_particles_per_species'][ii]
-        particle_data.loc[start_idx:end_idx, 'species'] = ii + 1
+        particle_data.loc[start_idx:end_idx, 'species'] = ii
         temp_counter = end_idx
 
         # Avoid any rates being zero to avoid issues with probabilities
@@ -71,13 +76,13 @@ def initiate_simulation(sim_input):
     # Define states for each species
     for ii in range(sim_input['#_species']):
         print(f"Species: {ii + 1}")
-        loc_species = particle_data.index[particle_data['species'] == ii + 1].tolist()
+        loc_species = particle_data.index[particle_data['species'] == ii].tolist()
         diff_quot = sim_input['species'][ii]['diff_quot']
 
         for idx, dq in enumerate(diff_quot):
-            print(f"  State {idx + 1}:")
-            print(f"    stepSize per frame (µm): {np.sqrt(2 * dq * sim_input['frametime'])}")
-            print(f"    stepSize per step (µm): {np.sqrt(2 * dq * sim_input['steptime'])}")
+            print(f"  State {idx}:")
+            print(f"    stepsize per frame (µm): {round(np.sqrt(2 * dq * sim_input['frametime']),2)}")
+            print(f"    stepssize per step (µm): {round(np.sqrt(2 * dq * sim_input['steptime']),2)}")
         
         numberStates = sim_input['species'][ii]['#_states']
         if numberStates == 1:
@@ -102,7 +107,7 @@ def initiate_simulation(sim_input):
 
     # Set track lengths using an exponential distribution and round
     particle_data['track_length'] = np.ceil(np.random.exponential(sim_input['mean_track_length'], sim_input['total_number_particles']))
-    particle_data['track_length_remain'] = particle_data['track_length']
+    particle_data['track_length_remaining'] = particle_data['track_length']
 
     return particle_data, sim_input
 
@@ -114,7 +119,7 @@ def handle_one_state_init(sim_input, particle_data, loc_species):
     return particle_data
 
 def handle_two_states_init(ii, sim_input, particle_data, loc_species):
-    kAB, kBA = sim_input['species'][ii]['rates'][:2]
+    kAB, kBA = sim_input['species'][ii]['rates']
     probA = kBA / (kBA + kAB)
     tempRand = np.random.rand(sim_input['total_number_particles'], 2)
 
