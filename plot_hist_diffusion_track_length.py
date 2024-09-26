@@ -22,7 +22,7 @@ def plot_hist_diffusion_track_length(para):
     fig1.suptitle('Histogram: Diffusion coefficients and track lengths')
 
     # Plot histogram of diffusion coefficients (density= False,)
-    edges = np.arange(np.log10(para['plot_diff_hist_min']), np.log10(para['plot_diff_hist_max']) + 0.1, 0.1)
+    edges = np.arange(np.log10(para['plot_diff_hist_min']), np.log10(para['plot_diff_hist_max']) + para['binwidth'], para['binwidth'])
     ax1.hist(diff_coeffs_temp, bins=10**edges, edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
     # Plot weighted or something else:
     # ax1.hist(diff_coeffs_temp, bins=10**edges, density=True, weights=1/len(diff_coeffs_temp)* np.ones(len(diff_coeffs_temp)), edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)

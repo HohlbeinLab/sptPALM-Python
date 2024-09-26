@@ -54,6 +54,7 @@ def define_input_parameters():
         # Histograms for diffusion analysis
         'plot_diff_hist_min': 4E-3, # Plot and histogram from um^2/s to um^2/s, default: 4E-3
         'plot_diff_hist_max': 10, # Plot and histogram from um^2/s to um^2/s, default: 10
+        'binwidth': 0.1, # width of bins, default: 0.1
         
         # Parameters for plotting figures etc
         'fontsize': 10, # Default: 10

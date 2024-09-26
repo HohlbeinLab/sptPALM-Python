@@ -20,7 +20,7 @@ def diffusion_analysis(para):
     track_length = np.bincount(ic)
     track_ids_length = np.column_stack((track_ids, track_length))
  
-    # Filter tracks that are longer than DiffHistSteps_min and shorter than DiffHistSteps_max
+    # Filter tracks that are longer than diff_hist_steps_min and shorter than diff_hist_steps_max
     filter_vec = (track_length > para['diff_hist_steps_min']) & (track_length < para['diff_hist_steps_max'])
     track_ids_length_filtered = track_ids_length[filter_vec, :]
 

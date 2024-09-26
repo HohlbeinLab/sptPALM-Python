@@ -17,19 +17,10 @@ def particle_diffusion(sim_input, particle_data):
     # Initialize particle localizations and add localization noise
     loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (sim_input['total_number_particles'], 3))
 
-    # Tracks matrix: structure -> x values, y values, frame number, track id, frame time
-    # tracks = np.zeros((0, 5))
     columns_pd = ['x [µm]', 'y [µm]', 'frame', 'track_id', 'frametime']
     tracks = pd.DataFrame(columns = columns_pd)
     valid_x = ~np.isnan(particle_data['xPos'])
-    # tracks = np.column_stack((
-    #     particle_data.loc[valid_x, 'xPos'] + loc_error_matrix[valid_x, 0],  # x-values
-    #     particle_data.loc[valid_x, 'yPos']  + loc_error_matrix[valid_x, 1],  # y-values
-    #     np.ones(np.sum(valid_x)),  # frame, currently first frame
-    #     particle_data.loc[valid_x, 'particle'],  # track_ID
-    #     sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
-    # ))
-    # tracks = pd.DataFrame(columns = ['x [µm]', 'y [µm]', 'frame', 'track_id'])
+
     tracks[columns_pd] = pd.DataFrame({
         columns_pd[0]: particle_data.loc[valid_x, 'xPos'].values + loc_error_matrix[valid_x, 0],  # x-values with error
         columns_pd[1]: particle_data.loc[valid_x, 'yPos'].values + loc_error_matrix[valid_x, 1],  # y-values with error
@@ -37,7 +28,6 @@ def particle_diffusion(sim_input, particle_data):
         columns_pd[3]: particle_data.loc[valid_x, 'particle'].values,  # Track ID
         columns_pd[4]: sim_input['frametime']  # Frame time (constant)
     })
-    
     
     print('Start of simulation')
 
@@ -58,8 +48,6 @@ def particle_diffusion(sim_input, particle_data):
         
         for ii in range(sim_input['#_species']):
             # Get species-specific particles
-            # loc_species = np.where(particle_data['species'] == ii)[0]
-            # New and faster
             loc_species = np.where((particle_data['species'] == ii) & (particle_data['track_length_remaining'] > 0))[0]
 
             loc_state_changes = loc_species[particle_data.loc[loc_species, 'state_time_remaining'] < sim_input['steptime']]
@@ -121,18 +109,6 @@ def particle_diffusion(sim_input, particle_data):
                 ax.set_title(f'frame: {step_counter // (sim_input["frametime"] / sim_input["steptime"])}')
                 # Save the current frame to the GIF
                 writer.grab_frame()
-
-            # Currently only writing x and y position 
-            # loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (len(particle_data['xPos']), 3))
-            # valid_x = ~np.isnan(particle_data['xPos'])
-            # tracks_temp = np.column_stack((
-            #     particle_data.loc[valid_x, 'xPos'] + loc_error_matrix[valid_x, 0],  # x-values
-            #     particle_data.loc[valid_x, 'yPos'] + loc_error_matrix[valid_x, 1],  # y-values
-            #     np.ones(np.sum(valid_x)) * (1 + step_counter // (sim_input['frametime'] / sim_input['steptime'])),
-            #     particle_data.loc[valid_x, 'particle'],  # track_ID
-            #     sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
-            # ))
-            # tracks = np.vstack([tracks, tracks_temp])
             
             # loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (len(particle_data['xPos']), 3))
             valid_x = ~np.isnan(particle_data['xPos'])
@@ -154,7 +130,6 @@ def particle_diffusion(sim_input, particle_data):
         writer.finish()
         plt.close(fig)
         plt.show()
-
 
     # How long did the tracking take?
     end = time.time()
