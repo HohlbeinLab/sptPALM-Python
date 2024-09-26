@@ -14,7 +14,7 @@ def define_parameters_simulation():
     sim_input = {
     # Number of species and particles per species
     '#_species': 1,  # number of species
-    '#_particles_per_species': [20000, 10000],  # particles per species
+    '#_particles_per_species': [500000, 10000],  # particles per species
     
     # Cell dimensions (in µm)
     'radius_cell': 0.5,  # radius of the cap
@@ -35,7 +35,7 @@ def define_parameters_simulation():
     
     # Fitting and plotting options
     'perform_fitting': False,  # Whether to perform fitting or not
-    'display_figures': True,  # Display figures
+    'display_figures': False,  # Display figures
     'plot_diff_hist_min': 0.004,  # Diffusion coefficient histogram min (µm^2/s)
     'plot_diff_hist_max': 10,  # Diffusion coefficient histogram max (µm^2/s)
     'binWidth': 0.1,  # Bin width for histogram

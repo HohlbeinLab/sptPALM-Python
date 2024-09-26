@@ -7,6 +7,7 @@ Created on Wed Aug 28 20:58:09 2024
 """
  
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
 import time
@@ -17,16 +18,27 @@ def particle_diffusion(sim_input, particle_data):
     loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (sim_input['total_number_particles'], 3))
 
     # Tracks matrix: structure -> x values, y values, frame number, track id, frame time
-    tracks = np.zeros((0, 5))
+    # tracks = np.zeros((0, 5))
+    columns_pd = ['x [µm]', 'y [µm]', 'frame', 'track_id', 'frametime']
+    tracks = pd.DataFrame(columns = columns_pd)
     valid_x = ~np.isnan(particle_data['xPos'])
-    tracks = np.column_stack((
-        particle_data.loc[valid_x, 'xPos'] + loc_error_matrix[valid_x, 0],  # x-values
-        particle_data.loc[valid_x, 'yPos']  + loc_error_matrix[valid_x, 1],  # y-values
-        np.ones(np.sum(valid_x)),  # frame, currently first frame
-        particle_data.loc[valid_x, 'particle'],  # track_ID
-        sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
-    ))
-
+    # tracks = np.column_stack((
+    #     particle_data.loc[valid_x, 'xPos'] + loc_error_matrix[valid_x, 0],  # x-values
+    #     particle_data.loc[valid_x, 'yPos']  + loc_error_matrix[valid_x, 1],  # y-values
+    #     np.ones(np.sum(valid_x)),  # frame, currently first frame
+    #     particle_data.loc[valid_x, 'particle'],  # track_ID
+    #     sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
+    # ))
+    # tracks = pd.DataFrame(columns = ['x [µm]', 'y [µm]', 'frame', 'track_id'])
+    tracks[columns_pd] = pd.DataFrame({
+        columns_pd[0]: particle_data.loc[valid_x, 'xPos'].values + loc_error_matrix[valid_x, 0],  # x-values with error
+        columns_pd[1]: particle_data.loc[valid_x, 'yPos'].values + loc_error_matrix[valid_x, 1],  # y-values with error
+        columns_pd[2]: 1,  # Frame number (set to 1)
+        columns_pd[3]: particle_data.loc[valid_x, 'particle'].values,  # Track ID
+        columns_pd[4]: sim_input['frametime']  # Frame time (constant)
+    })
+    
+    
     print('Start of simulation')
 
     # Initialize video recording if needed
@@ -34,9 +46,6 @@ def particle_diffusion(sim_input, particle_data):
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        # ax.set_xlim([0, sim_input['total_length_cell']])
-        # ax.set_ylim([-sim_input['radius_cell'], sim_input['radius_cell']])
-        # ax.set_zlim([-sim_input['radius_cell'], sim_input['radius_cell']])
         # Manually open the video writer
         writer = PillowWriter(fps=5)  # Set the frame rate for GIF
         writer.setup(fig, "Diffusion.gif", dpi=200)
@@ -49,7 +58,10 @@ def particle_diffusion(sim_input, particle_data):
         
         for ii in range(sim_input['#_species']):
             # Get species-specific particles
-            loc_species = np.where(particle_data['species'] == ii)[0]# was ii + 1, but we now count speci
+            # loc_species = np.where(particle_data['species'] == ii)[0]
+            # New and faster
+            loc_species = np.where((particle_data['species'] == ii) & (particle_data['track_length_remaining'] > 0))[0]
+
             loc_state_changes = loc_species[particle_data.loc[loc_species, 'state_time_remaining'] < sim_input['steptime']]
             
             if len(loc_state_changes) > 0:
@@ -89,9 +101,7 @@ def particle_diffusion(sim_input, particle_data):
         
         # Mark particles that 'bleached' as NaN
         delete_entries = np.where(particle_data['track_length_remaining'] < sim_input['avoidFloat0'])[0]
-        particle_data.loc[delete_entries, 'xPos'] = np.nan
-        particle_data.loc[delete_entries, 'yPos'] = np.nan
-        particle_data.loc[delete_entries, 'zPos'] = np.nan
+        particle_data.loc[delete_entries, ['xPos', 'yPos','zPos']] = np.nan
         particle_data.loc[delete_entries, 'track_length_remaining'] = 0
 
         # Record the positions every frame
@@ -112,18 +122,31 @@ def particle_diffusion(sim_input, particle_data):
                 # Save the current frame to the GIF
                 writer.grab_frame()
 
-
-            loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (len(particle_data['xPos']), 3))
+            # Currently only writing x and y position 
+            # loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (len(particle_data['xPos']), 3))
+            # valid_x = ~np.isnan(particle_data['xPos'])
+            # tracks_temp = np.column_stack((
+            #     particle_data.loc[valid_x, 'xPos'] + loc_error_matrix[valid_x, 0],  # x-values
+            #     particle_data.loc[valid_x, 'yPos'] + loc_error_matrix[valid_x, 1],  # y-values
+            #     np.ones(np.sum(valid_x)) * (1 + step_counter // (sim_input['frametime'] / sim_input['steptime'])),
+            #     particle_data.loc[valid_x, 'particle'],  # track_ID
+            #     sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
+            # ))
+            # tracks = np.vstack([tracks, tracks_temp])
+            
+            # loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (len(particle_data['xPos']), 3))
             valid_x = ~np.isnan(particle_data['xPos'])
-            tracks_temp = np.column_stack((
-                particle_data.loc[valid_x, 'xPos']+ loc_error_matrix[valid_x, 0],  # x-values
-                particle_data.loc[valid_x, 'yPos']+ loc_error_matrix[valid_x, 1],  # y-values
-                np.ones(np.sum(valid_x)) * (1 + step_counter // (sim_input['frametime'] / sim_input['steptime'])),
-                particle_data.loc[valid_x, 'particle'],  # track_ID
-                sim_input['frametime'] * np.ones(np.sum(valid_x))  # frametime
-            ))
-            tracks = np.vstack([tracks, tracks_temp])
-
+            loc_error_matrix[valid_x, :] = np.random.normal(0, sim_input['loc_error'], (np.sum(valid_x), 3))
+            tracks_temp = pd.DataFrame(columns = columns_pd)            
+            tracks_temp[columns_pd] = pd.DataFrame({
+                columns_pd[0]: particle_data.loc[valid_x, 'xPos'].values + loc_error_matrix[valid_x, 0],  # x-values with error
+                columns_pd[1]: particle_data.loc[valid_x, 'yPos'].values + loc_error_matrix[valid_x, 1],  # y-values with error
+                columns_pd[2]: (1 + step_counter // (sim_input['frametime'] / sim_input['steptime'])), 
+                columns_pd[3]: particle_data.loc[valid_x, 'particle'].values,  # Track ID
+                columns_pd[4]: sim_input['frametime']  # Frame time (constant)
+            })
+            
+            tracks = pd.concat([df for df in [tracks, tracks_temp] if not df.empty], ignore_index=True)
     print(f'Number of remaining particles (not bleached): {np.sum(particle_data["track_length_remaining"] > sim_input["avoidFloat0"])}')
 
     if sim_input['display_figures']:

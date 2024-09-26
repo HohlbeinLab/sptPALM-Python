@@ -21,8 +21,7 @@ def initiate_simulation(sim_input):
     sim_input['steps_simulation'] = sim_input['total_duration_simulation'] / sim_input['steptime']
     print(f"  We simulate a total of {int(sim_input['steps_simulation'])} steps")
 
-    # Simulate starting positions
-    # Prepare particle_data DataFrame
+    # Simulate starting positions and prepare particle_data DataFrame
     particle_data = pd.DataFrame(np.zeros((sim_input['total_number_particles'], 12)), 
                                 columns=['particle', 'species', 'xPos', 'yPos', 'zPos', 'pos_reject', 'active_state',
                                          'active_diff_quot', 'next_state', 'state_time_remaining', 'track_length', 'track_length_remaining'])
@@ -65,7 +64,6 @@ def initiate_simulation(sim_input):
         sum_pos_reject = particle_data['pos_reject'].sum()
 
     if sim_input['display_figures']:
-        from mpl_toolkits.mplot3d import Axes3D
         import matplotlib.pyplot as plt
 
         fig = plt.figure()
@@ -112,7 +110,6 @@ def initiate_simulation(sim_input):
     return particle_data, sim_input
 
 
-
 def handle_one_state_init(sim_input, particle_data, loc_species):
     particle_data.loc[loc_species, 'active_state'] = 0
     particle_data.loc[loc_species, ['state_time_remaining', 'next_state']] = np.nan
@@ -133,7 +130,6 @@ def handle_two_states_init(ii, sim_input, particle_data, loc_species):
     particle_data.loc[tempStateB, 'next_state'] = 0
     particle_data.loc[tempStateB, 'state_time_remaining'] = np.log(tempRand[tempStateB, 1]) / (-kBA)
     return particle_data
-
            
 def handle_three_states_init(ii, sim_input, particle_data, loc_species):           
     kAB, kBA, kBC, kCB, kAC, kCA = sim_input['species'][ii]['rates']

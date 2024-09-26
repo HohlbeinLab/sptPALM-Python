@@ -20,10 +20,9 @@ sim_input = define_parameters_simulation();
 #function for moving particles and checking for state changes
 [particleData, tracks] = particle_diffusion(sim_input, particleData);
 
-# maybe best to switch to Pandas here...
 
-# Pandas: sorted_tracks = tracks.sort_values(by=tracks.columns[3]) 
+# sorted_tracks = tracks.sort_values(by=tracks.columns[3]) 
 
 
-# [D, DtrackLengthMatrix] = generate_D_from_tracks_Sim(sortrows(sorted_tracks,4), sim_input, max(sim_input.track_lengths)+1);
+[D, DtrackLengthMatrix] = generate_D_from_tracks_sim(sortrows(sorted_tracks,4), sim_input, max(sim_input.track_lengths)+1);
 
