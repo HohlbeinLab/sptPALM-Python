@@ -12,38 +12,39 @@ import pandas as pd
 def generate_D_from_tracks_sim(tracks, sim_input, truncation):
     # Initialize
     particle_data = pd.DataFrame(np.zeros((len(tracks), 3)), columns=['D_coeff', 'tracklength', 'frametime'])
-
- #   MSD = np.zeros((n_molecules, 3))  # Initialize with 3 columns: D, track length, frame time
     kk = 0
 
     # Get a count of unique track ids and the number of occurrences for each
     table = tracks['track_id'].value_counts().reset_index()
-    table.columns = ['track_id', 'count']
+    table.columns = ['track_id', '#_locs']
 
     # For each track length in sim_input
     for i, track_len in enumerate(sim_input['track_lengths']):
-        print(f" track length: {i}")
-        # Select molecules where the count of track frames equals (i + 1)
-        selected_molecules = table[table['count'] == i + 2]
+        print(f" track length: {i+1} out of {truncation}")
+
+        # Select molecules where number of locs per track is 1 + tracklength
+        selected_molecules = table[table['#_locs'] == track_len + 1 ]
 
         if not selected_molecules.empty:
             kk_start = kk
 
             # Loop over each selected molecule
             for _, selected_molecule in selected_molecules.iterrows():
+                
+
                 # Get the indices of the selected track
-                selected_track = tracks[tracks['track_id'] == selected_molecule['track_id']].iloc[:, :3]
+                selected_track = tracks[tracks['track_id'] == selected_molecule['track_id']].iloc[:, :3].reset_index()
 
                 maxlength = min([truncation + 1, len(selected_track)])
                 
-                # breakpoint()
                 # Sum all squared displacements in the track
                 for jj in range(maxlength -1):
-                    displacement_x = selected_track.iloc[jj+1, 0] - selected_track.iloc[jj, 0]
-                    displacement_y = selected_track.iloc[jj+1, 1] - selected_track.iloc[jj, 1]
+
+                    displacement_x = selected_track.loc[jj+1, 'x [µm]'] - selected_track.loc[jj, 'x [µm]']
+                    displacement_y = selected_track.loc[jj+1, 'y [µm]'] - selected_track.loc[jj, 'y [µm]']
 
                     # Check if frame difference is 2
-                    if selected_track.iloc[jj+1, 2] - selected_track.iloc[jj, 2] == 2:
+                    if selected_track.loc[jj+1, 'frame'] - selected_track.loc[jj, 'frame'] == 2:
                         particle_data.loc[kk, 'D_coeff'] += (displacement_x**2 + displacement_y**2) / 2
                     else:
                         particle_data.loc[kk, 'D_coeff'] += (displacement_x**2 + displacement_y**2)
@@ -52,7 +53,8 @@ def generate_D_from_tracks_sim(tracks, sim_input, truncation):
                 kk += 1
 
             # Store the length of the track
-            particle_data.loc[kk_start:kk, 'tracklength'] = maxlength - 1
+            particle_data.loc[kk_start:kk-1, 'tracklength'] = maxlength-1
+
 
     # Set frame time for all tracks
     particle_data.loc[:, 'frametime'] = sim_input['frametime']
@@ -71,11 +73,13 @@ def generate_D_from_tracks_sim(tracks, sim_input, truncation):
                       np.log10(sim_input['plot_diff_hist_max']) + sim_input['binwidth'],
                       sim_input['binwidth'])
 
-    D_track_length_matrix = np.zeros((len(edges), len(sim_input['track_lengths']) + 1))
-    D_track_length_matrix[:, 0] = 10 ** edges
 
-    for i in range(len(sim_input['track_lengths'])):
-        hist, _ = np.histogram(D[D[:, 1] == i, 0], bins=10 ** edges)
-        D_track_length_matrix[:-1, i + 1] = hist
+    D_track_length_matrix = pd.DataFrame(np.zeros((len(edges), len(sim_input['track_lengths']) + 1)), columns=['Bins'] + list(sim_input['track_lengths']))
+   
+    D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
+
+    for i, track_len in enumerate(sim_input['track_lengths']):
+        hist, _ = np.histogram(D.loc[D.loc[:, 'tracklength']== track_len, 'D_coeff'], bins=10 ** edges)
+        D_track_length_matrix.loc[D_track_length_matrix.index[:-1], track_len] = hist
 
     return D, D_track_length_matrix

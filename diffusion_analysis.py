@@ -28,11 +28,12 @@ def diffusion_analysis(para):
     msd = np.zeros(len(track_ids_length_filtered))
    
     diffs_df = pd.DataFrame()
-    # For each track (which can have many localizations/positions)
+    # For each track (which can have many localizations)
     print("  MSD analysis...")
     for ii in range(len(track_ids_length_filtered)):
         if ii % 500 == 0 and ii > 0:
             print(f"   ...track {ii} out of {len(track_ids_length_filtered)} valid tracks,")
+        
         temp_array = para['tracks'][para['tracks']['track_id'] == track_ids_length_filtered[ii,0]]
     
         # Calculate averaged MSD for DiffHistSteps_min + 1 steps

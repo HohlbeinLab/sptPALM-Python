@@ -14,14 +14,14 @@ def define_parameters_simulation():
     sim_input = {
     # Number of species and particles per species
     '#_species': 1,  # number of species
-    '#_particles_per_species': [200000, 10000],  # particles per species
+    '#_particles_per_species': [50000, 10000],  # particles per species
     
     # Cell dimensions (in µm)
     'radius_cell': 0.5,  # radius of the cap
     'length_cell': 2,    # length of the cylindrical part
     
     # Track lengths and diffusion constraints
-    'track_lengths': np.arange(1, 9),  # Track lengths (1 to 8 frames)
+    'track_lengths': np.arange(1, 9),  # Track lengths (2 to 8 frames) tracklenght of 1 is two locs
     'mean_track_length': 3,  # Mean track length for exponential distribution
     
     # Simulation parameters
@@ -69,7 +69,7 @@ def define_parameters_simulation():
         '#_states': 2,
         'diff_quot': np.array([0, 2]),  # Diffusion coefficients for each state (µm^2/s)
         # two states: sim_input.species(ii).rates = [kAB, kBA]
-        'rates': np.array([60, 40])}   # Transition rates between states (1/s)
+        'rates': np.array([60, 60])}   # Transition rates between states (1/s)
         # For fitting purposes
     species['diff_quot_init_guess'] = species['diff_quot'] * sim_input['multiplicator']    
     species['diff_quot_lb_ub'] = np.array([[np.nan, 0],

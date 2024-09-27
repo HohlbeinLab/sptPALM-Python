@@ -10,6 +10,7 @@ from define_parameters_simulation import define_parameters_simulation
 from initiate_simulation import initiate_simulation
 from particle_diffusion import particle_diffusion
 from generate_D_from_tracks_sim import generate_D_from_tracks_sim
+from plot_diff_histograms_sim import plot_diff_histograms_sim
 
 print("\nRun single cell simulation!")
 # Function for setting all parameters
@@ -21,10 +22,7 @@ sim_input = define_parameters_simulation();
 #function for moving particles and checking for state changes
 [particleData, tracks] = particle_diffusion(sim_input, particleData);
 
-
-
 sorted_tracks = tracks.sort_values(by=['track_id', 'frame']) 
-
-
 [D, DtrackLengthMatrix] = generate_D_from_tracks_sim(sorted_tracks, sim_input, max(sim_input['track_lengths']));
 
+plot_diff_histograms_sim(D, sim_input)
