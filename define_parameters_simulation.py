@@ -14,7 +14,7 @@ def define_parameters_simulation():
     sim_input = {
     # Number of species and particles per species
     '#_species': 1,  # number of species
-    '#_particles_per_species': [50000, 10000],  # particles per species
+    '#_particles_per_species': [200000, 10000],  # particles per species
     
     # Cell dimensions (in µm)
     'radius_cell': 0.5,  # radius of the cap
@@ -45,8 +45,11 @@ def define_parameters_simulation():
     'avoidFloat0': 1e-09,  # To avoid rates being exactly zero
    
     # Species-specific parameters
-    'species': []
-    }
+    'species': [],
+   
+   #Plotting stuff
+   'dpi': 150, # DPI setting for plotting figures, default: 300
+   }
  
     # sim_input.species(ii).diffQuot = [A, B, ...]; 
     # Possibilities for states

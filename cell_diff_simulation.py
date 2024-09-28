@@ -23,6 +23,6 @@ sim_input = define_parameters_simulation();
 [particleData, tracks] = particle_diffusion(sim_input, particleData);
 
 sorted_tracks = tracks.sort_values(by=['track_id', 'frame']) 
-[D, DtrackLengthMatrix] = generate_D_from_tracks_sim(sorted_tracks, sim_input, max(sim_input['track_lengths']));
+[D, D_track_length_matrix] = generate_D_from_tracks_sim(sorted_tracks, sim_input, max(sim_input['track_lengths']));
 
-plot_diff_histograms_sim(D, sim_input)
+plot_diff_histograms_sim(D, D_track_length_matrix, sim_input)
