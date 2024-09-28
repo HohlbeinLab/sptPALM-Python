@@ -14,9 +14,8 @@ from skimage.io import imread
 import pandas as pd
 
 # Assuming Para1 is a dictionary-like object
-def plot_single_cell_tracking_analysis(para):
-
-    print('\nRun Plot_SingleCellTrackingAnalysis()')
+def plot_single_cell_analysis_sptPALM(para):
+    print('\nRun plot_single_cell_analysis_sptPALM.py')
     
     # Figure A: display tracks in cells (with color-coded diffusion coefficients)
     para = plot_tracks_in_cells(para)

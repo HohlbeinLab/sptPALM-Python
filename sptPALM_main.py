@@ -6,11 +6,11 @@ Created on Wed Aug 28 11:52:59 2024
 @author: hohlbein
 """
 
-from define_input_parameters import define_input_parameters
-from sptPALM_analyse_movies import sptPALM_analyse_movies
-from sptPALM_combine_data import sptPALM_combine_data
-from sptPALM_plot_combined_data import sptPALM_plot_combined_data
-from sptPALM_MCDDA import sptPALM_MCDDA
+from set_parameters_sptPALM import set_parameters_sptPALM
+from analyse_movies_sptPALM import analyse_movies_sptPALM
+from combine_analysed_data_sptPALM import combine_analysed_data_sptPALM
+from plot_combined_data_sptPALM import plot_combined_data_sptPALM
+from MC_diffusion_distribution_analysis_sptPALM import MC_diffusion_distribution_analysis_sptPALM
 
 import pdb
 
@@ -37,10 +37,10 @@ while True:
     0: Exit
     1: Edit parameters for data analysis
     2: Sub programs (ImageJ/Fiji macros, etc.)
-    3: sptPALM_analyse_movies
-    4: sptPALM_combine_data
-    5: sptPALM_plot_combined_data
-    6: sptPALM_MCDDA
+    3: Analyse individual movies
+    4: Combine individually analysed movies
+    5: Plot combined data
+    6: Monte-Carlo DDA
     \n"""
     # Check prompt
     try:
@@ -58,7 +58,7 @@ while True:
             print('Edit parameters for data analysis!')
             print('  Look for the input_parameter in the Variable Explorer and edit it.')
             print("  When done, type '!continue' into the command line.")
-            input_parameter = define_input_parameters()
+            input_parameter = set_parameters_sptPALM()
             # Doesn't yet enable accessing the Variable Explorer :(
             pdb.set_trace()  # This will pause execution and open the debugger
                 
@@ -100,27 +100,27 @@ while True:
                         continue
         
         case 3:  # sptPALM_analyse_Movies
-            data, input_parameter, para = sptPALM_analyse_movies()
+            data, input_parameter, para = analyse_movies_sptPALM()
             print("'data' now available in the workspace\n")
         
         case 4:  # sptPALM_combineData
             if data:
-                comb_data = sptPALM_combine_data(data)
+                comb_data = combine_analysed_data_sptPALM(data)
             else:
                 print('No DATA from option 3 available')
                 print('Continue with GUI to select DATA from "sptData_movies.pkl" or similar')
-                comb_data = sptPALM_combine_data()
+                comb_data = combine_analysed_data_sptPALM()
             print("'comb_data' now available in the workspace\n")
         
         case 5:  # sptPALM_PlotCombinedData
-            print('Run sptPALM_plot_combined_data(comb_data)')
+            print('Run splot_combined_data_sptPALM(comb_data)')
             if comb_data:
-                comb_data = sptPALM_plot_combined_data(comb_data)
+                comb_data = plot_combined_data_sptPALM(comb_data)
             else:
                 print("No comb_data from option 4 available")
                 print('Continue with GUI to select comb_data '
                       '("sptData_combined_movies.pkl" or similar)')
-                comb_data = sptPALM_plot_combined_data()
+                comb_data = plot_combined_data_sptPALM()
         
         # case 6:  # anaDDA
         #     print('run sptPALM_anaDDA(CombinedDATA, 1) on condition 1')
@@ -134,12 +134,12 @@ while True:
         
         case 6:  # MCDDA
             if comb_data:
-                comb_data = sptPALM_MCDDA(1, comb_data)
+                comb_data = MC_diffusion_distribution_analysis_sptPALM(1, comb_data)
             else:
                 print('No comb_data from option 4 available')
                 print('Continue with GUI to select comb_data '
                       '("sptDataCombinedMovies.mat" or similar)')
-                comb_data = sptPALM_MCDDA(1)
+                comb_data = MC_diffusion_distribution_analysis_sptPALM(1)
         
         # case 8: # Run everything until anaDDA
         #     data, para = sptPALM_analyse_movies()

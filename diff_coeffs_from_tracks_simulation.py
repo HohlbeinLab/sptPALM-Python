@@ -104,7 +104,7 @@ def calculate_MSD(df, col_name1, col_name2, group_size):
     MSD = squared_displacements.mean(axis = 1)
     
     #Ensure that D_coff is showing up behind each localisation later
-    MSD = np.repeat(MSD, group_size, axis=None)
+    MSD = np.repeat(MSD, group_size, axis = None)
     
     
     return MSD

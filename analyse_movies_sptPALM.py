@@ -13,22 +13,22 @@ from tkinter.simpledialog import askstring
 import os
 import pickle
 
-from define_input_parameters import define_input_parameters
-from load_csv import load_csv
-from apply_cell_segmentation import apply_cell_segmentation
-from tracking_analysis import tracking_analysis
-from diffusion_analysis import diffusion_analysis
-from plot_hist_diffusion_track_length import plot_hist_diffusion_track_length
-from single_cell_tracking_analysis import single_cell_tracking_analysis
-from plot_single_cell_tracking_analysis import plot_single_cell_tracking_analysis
-from helper_functions import yes_no_input,string_input_with_default
+from set_parameters_sptPALM import set_parameters_sptPALM
+from load_localisations_from_csv import load_localisations_from_csv
+from apply_cell_segmentation_sptPALM import apply_cell_segmentation_sptPALM
+from tracking_sptPALM import tracking_sptPALM
+from analyse_diffusion_sptPALM import analyse_diffusion_sptPALM
+from plot_diffusion_tracklengths_sptPALM import plot_diffusion_tracklengths_sptPALM
+from single_cell_analysis_sptPALM import single_cell_analysis_sptPALM
+from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
+from helper_functions import yes_no_input, string_input_with_default
 
 
-def sptPALM_analyse_movies():
-    print('\nRun sptPALM_analyse_movies.py')
+def analyse_movies_sptPALM():
+    print('\nRun analyse_movies_sptPALM.py')
     
     # 1.1 Define input parameters
-    input_parameter = define_input_parameters()
+    input_parameter = set_parameters_sptPALM()
    
 # # #TEMPORARILY DISABLED, GUI version: (to avoid pausing execution of the analysis}
 #     input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
@@ -36,12 +36,13 @@ def sptPALM_analyse_movies():
 #                               initialvalue=input_parameter['fn_movies'])
     #  CMD version
     fn_output_default = input_parameter['fn_movies']
-    input_parameter['fn_movies'] = string_input_with_default("  Enter string or press enter", fn_output_default)
+    print('  Rename data structure to be saved later?')
+    input_parameter['fn_movies'] = string_input_with_default("  Enter new string or press enter", fn_output_default)
 
     # Fall-back to GUI if no list of ThunderSTORM.csv files 
     # '*_thunder_.csv' are specified in define_input_parameters.py
     if not input_parameter['fn_locs']:
-        print('  Select data with GUI...')
+        print('  Select *.csv data with GUI...')
         starting_directory = os.path.join(input_parameter['data_dir'],
                                           input_parameter['default_output_dir'])
         files = filedialog.askopenfilenames(
@@ -61,8 +62,8 @@ def sptPALM_analyse_movies():
     if input_parameter.get('use_segmentations'):
         if len(input_parameter['fn_locs']) != len(input_parameter['fn_proc_brightfield']):
             if len(input_parameter['fn_proc_brightfield']) == 1 and len(input_parameter['fn_locs']) > 1:
-                print('  Only one brightfield image but >1 CSV files were chosen!')
-                if yes_no_input("  Do you want to continue?", default="yes"):
+                print('  Only one brightfield image but >1 *.csv files were chosen!')
+                if yes_no_input("  Do you want to continue? Default is yes", default="yes"):
                     temp = input_parameter['fn_proc_brightfield'][0]
                     input_parameter['fn_proc_brightfield'] = [temp] * len(input_parameter['fn_locs'])
                 else:
@@ -99,23 +100,23 @@ def sptPALM_analyse_movies():
         os.chdir(para['data_dir'])
 
         # 2.2 Loading and preparing localisation data
-        para = load_csv(para)
+        para = load_localisations_from_csv(para)
 
         # 2.3 Apply cell segmentation
         if input_parameter['use_segmentations']:
-            para = apply_cell_segmentation(para)
+            para = apply_cell_segmentation_sptPALM(para)
 
         # 2.4 Perform tracking
-        para = tracking_analysis(para)
+        para = tracking_sptPALM(para)
 
         # 2.5 Calculate and plot diffusion coefficients
-        para = diffusion_analysis(para)
-        para = plot_hist_diffusion_track_length(para)
+        para = analyse_diffusion_sptPALM(para)
+        para = plot_diffusion_tracklengths_sptPALM(para)
 
         # 2.6 Single Cell Tracking Analysis
         if input_parameter['use_segmentations']:
-            para = single_cell_tracking_analysis(para)
-            para = plot_single_cell_tracking_analysis(para)
+            para = single_cell_analysis_sptPALM(para)
+            para = plot_single_cell_analysis_sptPALM(para)
 
         # 2.8 Save current analysis as Matlab workspace
         with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:

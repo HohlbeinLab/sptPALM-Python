@@ -12,18 +12,18 @@ import pickle
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-from define_input_parameters import define_input_parameters
-from define_parameters_simulation import define_parameters_simulation
+from set_parameters_sptPALM import set_parameters_sptPALM
+from set_parameters_simulation import set_parameters_simulation
 from initiate_simulation import initiate_simulation
 
  # Assuming Para1 is a dictionary-like object
-def sptPALM_MCDDA(condition, comb_data=None):
+def MC_diffusion_distribution_analysis_sptPALM(condition, comb_data=None):
 
 
     print('\nRun sptPALM_MCDDA()')
     # loaded more as a dummy here: define input parameters
     # Best to use only 
-    input_parameter = define_input_parameters()
+    input_parameter = set_parameters_sptPALM()
     filename = []
     
     # TEMPORARY For bugfixing - Replace the following line with your file path if needed
@@ -58,7 +58,7 @@ def sptPALM_MCDDA(condition, comb_data=None):
     tracks = comb_data['anaDDA_tracks'][condition]
     
     # Set parameters for simulation
-    sim_input = define_parameters_simulation()
+    sim_input = set_parameters_simulation()
     
     # Initiate the simulation
     particle_data, sim_input = initiate_simulation(sim_input)

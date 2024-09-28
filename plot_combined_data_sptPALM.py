@@ -13,19 +13,19 @@ import numpy as np
 from skimage.io import imread
 import pandas as pd
 import pickle
-from define_input_parameters import define_input_parameters
+from set_parameters_sptPALM import set_parameters_sptPALM
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.simpledialog import askstring
 import matplotlib.pyplot as plt
 
 # Assuming Para1 is a dictionary-like object
-def sptPALM_plot_combined_data(comb_data=None):
+def plot_combined_data_sptPALM(comb_data=None):
 
-    print('\nRun sptPALM_plot_comb_data()')
+    print('\nRun plot_combined_data_sptPALM.py')
     # loaded more as a dummy here: define input parameters
     # Best to use only 
-    input_parameter = define_input_parameters()
+    input_parameter = set_parameters_sptPALM()
     
     # TEMPORARY For bugfixing - Replace the following line with your file path if needed
     filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'

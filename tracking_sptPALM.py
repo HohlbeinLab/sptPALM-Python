@@ -14,8 +14,8 @@ import warnings as warn
 import time
 import os
 
-def tracking_analysis(para):
-    print('\nRun tracking_analysis.py')
+def tracking_sptPALM(para):
+    print('\nRun tracking_sptPALM.py')
     
     # Load the *.csv file
     if not para['use_segmentations']:

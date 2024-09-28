@@ -16,8 +16,8 @@ import pandas as pd
 import numpy as np
 import os
 
-def load_csv(para):
-    print('\nRun load_csv.py')
+def load_localisations_from_csv(para):
+    print('\nRun load_localisations_from_csv.py')
     # Import *.csv data (for example obtained from running ThunderSTORM)
     print(f"  Pathname: {para['data_dir']}")  
     print(f"  Load_filename(s) [csv]: {para['fn_locs']}")    

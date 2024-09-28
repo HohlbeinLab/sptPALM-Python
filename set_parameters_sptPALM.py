@@ -7,8 +7,8 @@ Created on Wed Aug 28 21:54:13 2024
 """
 
 # Function defining all the input parameters and data to be analyzed
-def define_input_parameters():
-    print('\nRun define_input_parameters.py')
+def set_parameters_sptPALM():
+    print('\nRun set_parameters_sptPALM.py')
     input_parameter = {
         'data_dir': '', # Directory where the data is found (selection via GUI or pre-defined, see below) 
         'default_output_dir': 'output_python/', # Initialise new directory to which analysed data is saved        

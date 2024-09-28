@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import os
 from skimage.io import imread
 
-def apply_cell_segmentation(para):
-    print('Run apply_cell_segmentation.py')
+def apply_cell_segmentation_sptPALM(para):
+    print('Run apply_cell_segmentation_sptPALM.py')
     
     # Define filenames to load existing data (requires correct settings in ImageJ/Fiji macro 'Cell Segmentation')
     para['fn_proc_brightfield_segm'] = para['fn_proc_brightfield'][:-4] + '_segm.tif'

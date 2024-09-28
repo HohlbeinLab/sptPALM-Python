@@ -10,8 +10,8 @@ Created on Wed Aug 28 20:58:09 2024
 import pandas as pd
 import numpy as np
 
-def single_cell_tracking_analysis(para):
-    print('\nRun single_cell_tracking_analysis.py')
+def single_cell_analysis_sptPALM(para):
+    print('\nRun single_cell_analysis_sptPALM.py')
 
     # csv_data = para['csv_data'] but only take rows in which 'cell_id_ != -1
     csv_data = para['csv_data'][para['csv_data']['cell_id'] != -1]

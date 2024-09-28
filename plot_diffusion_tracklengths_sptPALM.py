@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import os
 
 
-def plot_hist_diffusion_track_length(para):
-    print('\nRun plot_hist_diffusion_track_length.py')
+def plot_diffusion_tracklengths_sptPALM(para):
+    print('\nRun plot_diffusion_tracklengths_sptPALM.py')
     # Convert MATLAB table to a numpy array and multiply by ConversionFactor
     diff_coeffs_temp = para['diff_coeffs_filtered_list']['diff_coeffs_filtered'].to_numpy()
 

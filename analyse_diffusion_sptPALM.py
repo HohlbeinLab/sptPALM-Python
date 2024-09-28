@@ -12,8 +12,8 @@ import numpy as np
 import os
 
 
-def diffusion_simulation(para):
-    print('\nRun diffusion_analysis.py')
+def analyse_diffusion_sptPALM(para):
+    print('\nRun analyse_diffusion_sptPALM.py')
 
     # Find unique elements in the track_id column
     track_ids, ic = np.unique(para['tracks']['track_id'], return_inverse=True)
@@ -73,7 +73,6 @@ def diffusion_simulation(para):
         print('  Careful, empty list of diffusion coefficients returned!')
 
     para['diff_coeffs_filtered_list'] = diffs_df
-    
     
     return para
 
