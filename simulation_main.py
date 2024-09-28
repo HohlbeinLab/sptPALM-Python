@@ -28,5 +28,5 @@ sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
 [D, D_track_length_matrix] = diff_coeffs_from_tracks_simulation(sorted_tracks, sim_input, max(sim_input['track_lengths']));
 
 # Functions for plotting the data
-D_track_length_matrix.sum().sum()
+# D_track_length_matrix.sum().sum()
 plot_diff_histograms_simulation(D.drop_duplicates('track_id'), D_track_length_matrix, sim_input)

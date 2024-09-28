@@ -18,16 +18,16 @@ from initiate_simulation import initiate_simulation
 
  # Assuming Para1 is a dictionary-like object
 def MC_diffusion_distribution_analysis_sptPALM(condition, comb_data=None):
-
-
-    print('\nRun sptPALM_MCDDA()')
+    print('\nRun sMC_diffusion_distribution_analysis_sptPALM.py')
     # loaded more as a dummy here: define input parameters
     # Best to use only 
     input_parameter = set_parameters_sptPALM()
     filename = []
     
     # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    print("\n  SPECIFIC FILE is being loaded: sptData_combined_movies.pkl")    
     filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
+
     with open(filename, 'rb') as f:
         comb_data = pickle.load(f)
     
