@@ -73,14 +73,14 @@ def initiate_simulation(sim_input):
 
     # Define states for each species
     for ii in range(sim_input['#_species']):
-        print(f"Species: {ii + 1}")
+        print(f"  Species: {ii + 1}")
         loc_species = particle_data.index[particle_data['species'] == ii].tolist()
         diff_quot = sim_input['species'][ii]['diff_quot']
 
         for idx, dq in enumerate(diff_quot):
-            print(f"  State {idx}:")
-            print(f"    stepsize per frame (µm): {round(np.sqrt(2 * dq * sim_input['frametime']),2)}")
-            print(f"    stepssize per step (µm): {round(np.sqrt(2 * dq * sim_input['steptime']),2)}")
+            print(f"    State {idx}:")
+            print(f"      stepsize per frame (µm): {round(np.sqrt(2 * dq * sim_input['frametime']),2)}")
+            print(f"      stepssize per step (µm): {round(np.sqrt(2 * dq * sim_input['steptime']),2)}")
         
         numberStates = sim_input['species'][ii]['#_states']
         if numberStates == 1:
@@ -118,6 +118,11 @@ def handle_one_state_init(sim_input, particle_data, loc_species):
 def handle_two_states_init(ii, sim_input, particle_data, loc_species):
     kAB, kBA = sim_input['species'][ii]['rates']
     probA = kBA / (kBA + kAB)
+    probB = kAB / (kBA + kAB)
+    print(f"    kAB (1/s): {kAB}")
+    print(f"    kBA (1/s): {kBA}")
+    print(f"    probA: {probA}, probB: {probB}")
+    print(f"    probA + probB = {probA + probB}")
     tempRand = np.random.rand(sim_input['total_number_particles'], 2)
 
     tempStateA = np.array(loc_species)[tempRand[loc_species, 0] <= probA]
@@ -141,11 +146,11 @@ def handle_three_states_init(ii, sim_input, particle_data, loc_species):
     probB = (kAC * kCB + kAB * (kCA + kCB)) / temp
     probC = (kAB * kBC + kAC * (kBA + kBC)) / temp
     
-    print(f"  kAB (1/s): {kAB}, kAC (1/s): {kAC}")
-    print(f"  kBA (1/s): {kBA}, kBC (1/s): {kBC}")
-    print(f"  kCA (1/s): {kCA}, kCB (1/s): {kCB}")
-    print(f"  probA: {probA}, probB: {probB}, probC: {probC}")
-    print(f"  probA + probB + probC = {probA + probB + probC}")
+    print(f"    kAB (1/s): {kAB}, kAC (1/s): {kAC}")
+    print(f"    kBA (1/s): {kBA}, kBC (1/s): {kBC}")
+    print(f"    kCA (1/s): {kCA}, kCB (1/s): {kCB}")
+    print(f"    probA: {probA}, probB: {probB}, probC: {probC}")
+    print(f"    probA + probB + probC = {probA + probB + probC}")
     
     tempRand = np.random.rand(sim_input['totalNumberParticles'], 3)
 
@@ -194,12 +199,12 @@ def handle_four_states_init(ii, sim_input, particle_data, loc_species):
     probC = (kAB * kBC * kDC) / temp
     probD = (kAB * kBC * kCD) / temp
     
-    print(f"  kAB (1/s): {kAB}")
-    print(f"  kBA (1/s): {kBA}, kBC (1/s): {kBC}")
-    print(f"  kCB (1/s): {kCB}, kCD (1/s): {kCD}")
-    print(f"  kDC (1/s): {kDC}")
-    print(f"  probA: {probA}, probB: {probB}, probC: {probC}, probD: {probD}")
-    print(f"  probA + probB + probC + probD = {probA + probB + probC + probD}")
+    print(f"    kAB (1/s): {kAB}")
+    print(f"    kBA (1/s): {kBA}, kBC (1/s): {kBC}")
+    print(f"    kCB (1/s): {kCB}, kCD (1/s): {kCD}")
+    print(f"    kDC (1/s): {kDC}")
+    print(f"    probA: {probA}, probB: {probB}, probC: {probC}, probD: {probD}")
+    print(f"    probA + probB + probC + probD = {probA + probB + probC + probD}")
 
     tempRand = np.random.rand(sim_input['totalNumberParticles'], 3)
 

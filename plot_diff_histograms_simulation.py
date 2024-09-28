@@ -8,20 +8,19 @@ Created on Wed Aug 28 11:52:59 2024
 
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 
-def plot_diff_histograms_sim(D, D_track_length_matrix, sim_input):
-    
+def plot_diff_histograms_simulation(D, D_track_length_matrix, sim_input):
+    print("\nRun plot_diff_histograms_simulation.py")
     # Create the bin edges using logarithmic values
     edges = D_track_length_matrix['Bins']
     
     # Initialize the figure
-    fig_handle = plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(8, 8))
     plt.suptitle('Histogram of diffusion coefficients per track length')
     
     # Loop through the track lengths and create histograms
     for ii, tra_len in enumerate(sim_input['track_lengths']):
-        breakpoint()
+        # breakpoint()
         # Create a subplot for each track length
         ax = plt.subplot(int(np.ceil(len(sim_input['track_lengths']) / 2)), 2, ii + 1)
         
@@ -33,10 +32,12 @@ def plot_diff_histograms_sim(D, D_track_length_matrix, sim_input):
         ax.set_xscale('log')  # Set the x-axis scale to logarithmic
         ax.set_xlabel('Diffusion coefficient (µm^2/s)')
         ax.set_ylabel('#')
-        
-        
+               
         # Plot the histogram
-        ax.stairs(D_track_length_matrix.loc[:,tra_len], edges, alpha=0.4)  # 'count' corresponds to `density=False`
+        ax.stairs(D_track_length_matrix.loc[D_track_length_matrix.index[:-1],tra_len], edges, alpha=0.4, fill = True)  # 'count' corresponds to `density=False`
+       
+        # ax.fill_between(D_track_length_matrix.loc[:,tra_len], edges, step="mid", alpha=0.4)
+        # ax.step(D_track_length_matrix.loc[:,tra_len], edges)  # 'count' corresponds to `density=False`
         
         # Set the limits of the x-axis
         ax.set_xlim([sim_input['plot_diff_hist_min'], sim_input['plot_diff_hist_max']])
@@ -44,6 +45,11 @@ def plot_diff_histograms_sim(D, D_track_length_matrix, sim_input):
     # Show the plot
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
     plt.show()
+ 
+    
+ 
+    
+ 
     
     # # Create the bin edges using logarithmic values
     # edges = np.arange(np.log10(sim_input['plot_diff_hist_min']), 

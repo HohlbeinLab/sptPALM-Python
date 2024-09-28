@@ -10,16 +10,13 @@ import numpy as np
 import pandas as pd
 import time
 
-def generate_D_from_tracks_sim(tracks, sim_input, truncation):
+def diff_coeffs_from_tracks_simulation(tracks, sim_input, truncation):
+    print("\nRun diff_coeffs_from_tracks_simulation.py")
     # Initialize
     tracks_data = tracks.copy()
     # Count occurrences of each unique track_ids
     tracklength_counts = tracks_data['track_id'].value_counts()
  
-    # track_id_unique = pd.unique(tracks_data['track_id']).tolist()
-    # idx_track_ids = tracks_data.index[tracks_data['#_locs'] == track_len + 1].tolist()
-    
-    
     # Map these counts back to the DataFrame as a new column '#_loc'
     tracks_data['#_locs'] = tracks_data['track_id'].map(tracklength_counts)
     # Some more additions
@@ -31,34 +28,36 @@ def generate_D_from_tracks_sim(tracks, sim_input, truncation):
     
     # For each tracklength in sim_input
     for i, track_len in enumerate(sim_input['track_lengths']):
-        print(f" track length: {i+1} out of {truncation}")
-        # selected_molecules = tracks_data[tracks_data['#_locs'] == track_len + 1]
+        # Find all tracks with a certain number of localisations per track
         idx = tracks_data.index[tracks_data['#_locs'] == track_len + 1].tolist()
-
+        # If idx is not empty/false
         if idx: # implicit booleanness
-            tracks_data.loc[idx,'MSD'] = calculate_MSD(tracks_data.loc[idx,:], 'x [µm]', 'y [µm]', track_len + 1)
+            tracks_data.loc[idx,'MSD'] = calculate_MSD(tracks_data.loc[idx,:],
+                                                       'x [µm]', 'y [µm]', track_len + 1)
     
     # How long did the MSD calculation take?
     end = time.time()
     rounded_time = round(end-start, 2)
-    print(f"  Time for tracking: {rounded_time} seconds")
+    print(f"  Time for MSD calculation: {rounded_time} seconds")
 
     # Correct for localization error if specified
     if sim_input['correct_diff_calc_loc_error']:
-        loc_error_correction = np.random.normal(0, sim_input['loc_error'], len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
+        loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
+                                                len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
         tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
     else:
         tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime'])
 
     D = tracks_data.copy()
 
-    # Create the histogram bins and track length matrix
+    # Create the histogram of diffusion coefficients as a function of track lengths
     edges = np.arange(np.log10(sim_input['plot_diff_hist_min']),
                       np.log10(sim_input['plot_diff_hist_max']) + sim_input['binwidth'],
                       sim_input['binwidth'])
 
-
-    D_track_length_matrix = pd.DataFrame(np.zeros((len(edges), len(sim_input['track_lengths']) + 1)), columns=['Bins'] + list(sim_input['track_lengths']))
+    D_track_length_matrix = pd.DataFrame(np.zeros((len(edges),
+                                                   len(sim_input['track_lengths']) + 1)),
+                                         columns=['Bins'] + list(sim_input['track_lengths']))
    
     D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
 
@@ -103,6 +102,7 @@ def calculate_MSD(df, col_name1, col_name2, group_size):
 # Adjust based on frame differences
 #     D_coeff_contribution = np.where(frame_diff == 2, squared_displacements / 2, squared_displacements)
     MSD = squared_displacements.mean(axis = 1)
+    
     #Ensure that D_coff is showing up behind each localisation later
     MSD = np.repeat(MSD, group_size, axis=None)
     

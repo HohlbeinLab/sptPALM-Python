@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
 import time
 
-def particle_diffusion(sim_input, particle_data):
-    
+def diffusion_simulation(sim_input, particle_data):
+    print('\nRun diffusion_simulation.py')
     # Initialize particle localizations and add localization noise
     loc_error_matrix = np.random.normal(0, sim_input['loc_error'], (sim_input['total_number_particles'], 3))
 
@@ -29,11 +29,8 @@ def particle_diffusion(sim_input, particle_data):
         columns_pd[4]: sim_input['frametime']  # Frame time (constant)
     })
     
-    print('Start of simulation')
-
     # Initialize video recording if needed
     if sim_input['display_figures']:
-
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         # Manually open the video writer
@@ -41,6 +38,7 @@ def particle_diffusion(sim_input, particle_data):
         writer.setup(fig, "Diffusion.gif", dpi=200)
 
     start = time.time()
+    
     # Main simulation loop
     for step_counter in range(1, int(max(sim_input['track_lengths']) * sim_input['frametime'] / sim_input['steptime']) + 1):
 
@@ -94,7 +92,7 @@ def particle_diffusion(sim_input, particle_data):
 
         # Record the positions every frame
         if step_counter % int(sim_input['frametime'] / sim_input['steptime']) == 0:
-            print(f' Round: {int(step_counter) // (sim_input["frametime"] / sim_input["steptime"])}, Steps simulated: {step_counter}')
+            print(f'  Frame {int(step_counter) // (sim_input["frametime"] / sim_input["steptime"])}: {step_counter} steps simulated')
             
             if sim_input['display_figures']:
                 plt.cla()  # Clear the plot for the new frame
@@ -123,7 +121,7 @@ def particle_diffusion(sim_input, particle_data):
             })
             
             tracks = pd.concat([df for df in [tracks, tracks_temp] if not df.empty], ignore_index=True)
-    print(f'Number of remaining particles (not bleached): {np.sum(particle_data["track_length_remaining"] > sim_input["avoidFloat0"])}')
+    print(f'  Number of remaining particles (not bleached): {np.sum(particle_data["track_length_remaining"] > sim_input["avoidFloat0"])}')
 
     if sim_input['display_figures']:
         # Manually close the video writer

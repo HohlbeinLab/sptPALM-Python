@@ -9,55 +9,55 @@ import numpy as np
 
 
 # Function defining all the input parameters and data to be analyzed
-def define_parameters_simulation():
-    print('\nRun define_parameters_simulation.py')
+def set_parameters_simulation():
+    print('\nRun set_parameters_simulation.py')
     sim_input = {
     # Number of species and particles per species
     '#_species': 1,  # number of species
-    '#_particles_per_species': [200000, 10000],  # particles per species
+    '#_particles_per_species': [100000, 10000],  # particles per species
     
     # Cell dimensions (in µm)
-    'radius_cell': 0.5,  # radius of the cap
-    'length_cell': 2,    # length of the cylindrical part
+    'radius_cell': 0.5,  # (µm) radius of the cap, edefault: 0.5
+    'length_cell': 2.0,    # (µm) length of the cylindrical part, default: 2.0
     
     # Track lengths and diffusion constraints
-    'track_lengths': np.arange(1, 9),  # Track lengths (2 to 8 frames) tracklenght of 1 is two locs
-    'mean_track_length': 3,  # Mean track length for exponential distribution
+    'track_lengths': np.arange(1, 9),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs
+    'mean_track_length': 3,  # Mean track length for exponential distribution, default 3
     
     # Simulation parameters
     'confined_diffusion': True,  # Confine diffusion within a cell
-    'loc_error': 0.035,  # Localization error (in µm)
-    'correct_diff_calc_loc_error': False,  # Match anaDDA settings
+    'loc_error': 0.035,  # (µm) Localization error (in µm), default: 0.035
+    'correct_diff_calc_loc_error': False,  # Match anaDDA settings, default: False
     
     # Timing parameters
-    'steptime': 0.001,  # Step time in seconds
-    'frametime': 0.01,  # Frame time in seconds
+    'steptime': 0.001,  # (s) step time in seconds, default: 0.001
+    'frametime': 0.01,  # (s) frame time in seconds, default: 0.02
     
     # Fitting and plotting options
     'perform_fitting': False,  # Whether to perform fitting or not
     'display_figures': False,  # Display figures
-    'plot_diff_hist_min': 0.004,  # Diffusion coefficient histogram min (µm^2/s)
-    'plot_diff_hist_max': 10,  # Diffusion coefficient histogram max (µm^2/s)
-    'binwidth': 0.1,  # Bin width for histogram
-    'multiplicator': 20,  # Multiplicator to scale diffusion coefficients
+    'plot_diff_hist_min': 0.004,  # Diffusion coefficient histogram min (µm^2/s), default: 0.004
+    'plot_diff_hist_max': 10.0,  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
+    'binwidth': 0.05,  # Bin width for histogram, default 0.1
+    'multiplicator': 20,  # Multiplicator to scale diffusion coefficients, default 20
     
     # Error handling values
-    'avoidFloat0': 1e-09,  # To avoid rates being exactly zero
+    'avoidFloat0': 1e-09,  # To avoid rates being exactly zero, default: 1e-09
    
     # Species-specific parameters
-    'species': [],
+    'species': [], #defined below
    
    #Plotting stuff
    'dpi': 150, # DPI setting for plotting figures, default: 300
    }
- 
-    # sim_input.species(ii).diffQuot = [A, B, ...]; 
-    # Possibilities for states
-    # one state: sim_input.species(ii).rates = [0]
-    # two states: sim_input.species(ii).rates = [kAB, kBA]
-    # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA]
-    # four linear (!) states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kCD, kDC]
-
+    """
+    sim_input.species(ii).diff_quot = [A, B, ...]; 
+    Possibilities for states
+    one state: sim_input.species(ii).rates = [0]
+    two states: sim_input.species(ii).rates = [kAB, kBA]
+    three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA]
+    four linear (!) states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kCD, kDC]
+    """
     
     # # Example species setup
     # species = {
@@ -72,7 +72,7 @@ def define_parameters_simulation():
         '#_states': 2,
         'diff_quot': np.array([0, 2]),  # Diffusion coefficients for each state (µm^2/s)
         # two states: sim_input.species(ii).rates = [kAB, kBA]
-        'rates': np.array([60, 60])}   # Transition rates between states (1/s)
+        'rates': np.array([10, 10])}   # Transition rates between states (1/s)
         # For fitting purposes
     species['diff_quot_init_guess'] = species['diff_quot'] * sim_input['multiplicator']    
     species['diff_quot_lb_ub'] = np.array([[np.nan, 0],

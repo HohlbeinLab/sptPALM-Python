@@ -12,7 +12,7 @@ import numpy as np
 import os
 
 
-def diffusion_analysis(para):
+def diffusion_simulation(para):
     print('\nRun diffusion_analysis.py')
 
     # Find unique elements in the track_id column
