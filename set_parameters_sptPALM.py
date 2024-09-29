@@ -73,9 +73,9 @@ def set_parameters_sptPALM():
 
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [
-        # '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-        'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
-        'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+        '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        # 'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+        # 'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
@@ -86,12 +86,12 @@ def set_parameters_sptPALM():
     # Name and assign your measurement conditions/files
     #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
     input_parameter['condition_names'].append('Cond_1')
-    input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
+    input_parameter['condition_files'].append([0])  # refers to the order of files defined above
     
     # DO NOT REMOVE THE FOLLOWING LINES!
     # Copy or uncomment the following lines if necessary
-    input_parameter['condition_names'].append('Cond_2')
-    input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
+    # input_parameter['condition_names'].append('Cond_2')
+    # input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
 
     # # Directory containing your data (make sure you end with a '/' or '\')
     # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
@@ -129,4 +129,107 @@ def set_parameters_sptPALM():
         input_parameter['copynumber_intervals'].append([(i-1)*INTERVAL+1, i*INTERVAL])
 
     return input_parameter
+
+
+
+import json
+
+# Define the default parameters in your function
+def default_parameters():
+    return {
+        'data_dir': '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/',
+        'default_output_dir': 'output_python/',
+        'fn_locs': [
+            'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+            'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        ],
+        'fn_proc_brightfield': [
+            '9NTFixTL_2_1_MMStack_Pos0.ome_procBrightfield.tif'
+        ],
+        'fn_csv_handle': '_py_out.csv',
+        'fn_dict_handle': '_py_out.pkl',
+        'fn_diffs_handle': '_diff_coeffs.csv',
+        'fn_movies': 'sptData_movies.pkl',
+        'fn_combined_movies': 'sptData_combined_movies.pkl',
+        'condition_names': ['Cond_1', 'Cond_2'],
+        'condition_files': [[0, 1], [0, 1]],
+        'copynumber_intervals': [[1, 100], [101, 200], [201, 300], [301, 400], [401, 500]],
+        'pixelsize': 0.119,
+        'cellarea_pixels_min': 50,
+        'cellarea_pixels_max': 300,
+        'use_segmentations': True,
+        'track_steplength_max': 0.5,
+        'track_memory': 0,
+        'frametime': 0.01,
+        'sigma_noise': 0.03,
+        'diff_hist_steps_min': 3,
+        'diff_hist_steps_max': 100,
+        'number_tracks_per_cell_min': 2,
+        'number_tracks_per_cell_max': 10000,
+        'scta_vis_cells': False,
+        'scta_plot_cell_window': 15,
+        'scta_vis_interactive': False,
+        'scta_vis_rangemax': 0.3,
+        'plot_diff_hist_min': 4E-3,
+        'plot_diff_hist_max': 10,
+        'binwidth': 0.1,
+        'fontsize': 10,
+        'linewidth': 1,
+        'plot_norm_histograms': 'probability',
+        'mod_define_input_parameters': False,
+        'plot_frame_number': True,
+        'dpi': 150,
+        'cmap_applied': 'gist_ncar',
+        'timeout': 10
+    }
+
+# Function to load parameters from a JSON file
+def load_parameters_from_json(file_path):
+    """Load parameters from a JSON file, with error handling."""
+    try:
+        with open(file_path, 'r') as f:
+            loaded_params = json.load(f)
+        print(f"Parameters loaded from {file_path}")
+        return loaded_params
+    except FileNotFoundError:
+        print(f"File {file_path} not found. Using default parameters.")
+        return None
+
+# Function to check if all required parameters are present
+def check_and_fill_parameters(loaded_params, default_params):
+    """Check if the loaded parameters are complete, fill missing ones with defaults."""
+    if loaded_params is None:
+        # If no parameters are loaded (e.g., file not found), return defaults
+        return default_params
+    
+    # Check for missing keys
+    for key, default_value in default_params.items():
+        if key not in loaded_params:
+            print(f"Warning: Missing parameter '{key}'. Using default value.")
+            loaded_params[key] = default_value
+    
+    # Check for extra keys
+    extra_keys = set(loaded_params.keys()) - set(default_params.keys())
+    if extra_keys:
+        print(f"Warning: Found unexpected parameters: {extra_keys}. They will be ignored.")
+    
+    return loaded_params
+
+# Function to load and check parameters
+def set_parameters_sptPALM_json(param_file='params.json'):
+    """Main function to load and validate parameters."""
+    default_params = default_parameters()
+    
+    # Load parameters from JSON
+    loaded_params = load_parameters_from_json(param_file)
+    
+    # Check and complete the parameters
+    final_params = check_and_fill_parameters(loaded_params, default_params)
+    
+    return final_params
+
+# Example of how this function can be used
+if __name__ == "__main__":
+    parameters = set_parameters_sptPALM('params.json')
+    print("Final parameters:", parameters)
 

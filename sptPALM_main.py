@@ -110,7 +110,7 @@ while True:
                 print('No DATA from option 3 available')
                 print('Continue with GUI to select DATA from "sptData_movies.pkl" or similar')
                 comb_data = combine_analysed_data_sptPALM()
-            print("'comb_data' now available in the workspace\n")
+            print("Combined data 'comb_data' now available in the workspace\n")
         
         case 5:  # sptPALM_PlotCombinedData
             print('Run splot_combined_data_sptPALM(comb_data)')
@@ -134,12 +134,12 @@ while True:
         
         case 6:  # MCDDA
             if comb_data:
-                comb_data = MC_diffusion_distribution_analysis_sptPALM(1, comb_data)
+                comb_data = MC_diffusion_distribution_analysis_sptPALM(0, comb_data)
             else:
                 print('No comb_data from option 4 available')
                 print('Continue with GUI to select comb_data '
                       '("sptDataCombinedMovies.mat" or similar)')
-                comb_data = MC_diffusion_distribution_analysis_sptPALM(1)
+                comb_data = MC_diffusion_distribution_analysis_sptPALM(0)
         
         # case 8: # Run everything until anaDDA
         #     data, para = sptPALM_analyse_movies()

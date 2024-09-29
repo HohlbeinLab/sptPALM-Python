@@ -60,12 +60,13 @@ def diff_coeffs_from_tracks_simulation(tracks, sim_input, truncation):
                                          columns=['Bins'] + list(sim_input['track_lengths']))
    
     D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
-
+    
     for i, track_len in enumerate(sim_input['track_lengths']):
         # Use idx_track_ids to prevent counting diffusion coefficients several times
         idx = tracklength_counts.index[tracklength_counts[:] == track_len + 1].tolist()
-        hist, _ = np.histogram(D.loc[idx, 'D_coeff'], bins=10 ** edges)
-        D_track_length_matrix.loc[D_track_length_matrix.index[:-1], track_len] = hist
+        if idx:
+            hist, _ = np.histogram(D.loc[idx, 'D_coeff'], bins=10 ** edges)
+            D_track_length_matrix.loc[D_track_length_matrix.index[:-1], track_len] = hist
 
     return D, D_track_length_matrix
 

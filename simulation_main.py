@@ -25,6 +25,7 @@ sim_input = set_parameters_simulation();
 
 # Function to calculate diffusion coefficients for different track lengths
 sorted_tracks = tracks.sort_values(by=['track_id', 'frame']) 
+breakpoint()
 [D, D_track_length_matrix] = diff_coeffs_from_tracks_simulation(sorted_tracks, sim_input, max(sim_input['track_lengths']));
 
 # Functions for plotting the data

@@ -103,7 +103,11 @@ def combine_analysed_data_sptPALM(data=None):
                 [tmp_dcoef_table, data['movies'][tmp_ParaNr]['diff_coeffs_filtered_list']])  # append diffcoefficients
             
             # --- append tracks of condition for anaDDA:
-            tmp_tracks = data['movies'][tmp_ParaNr]['tracks_filtered'].copy()
+            # A. Use all localisations in valid cells; not filtered for 'DiffHistSteps' and 'numberTracksPerCell'
+            tmp_tracks = data['movies'][tmp_ParaNr]['tracks'].copy()
+            # B. Use localisations in valid cells, filtered for 'diff_hist_steps' and '#_tracks_per_cell'    
+            #tmp_tracks = data['movies'][tmp_ParaNr]['tracks_filtered'].copy()
+            
             tmp_tracks.loc[:, 'track_id'] += tmp_max_track_id  # update track_id for continuous assignments
             # breakpoint()
             tmp_tracks.loc[:, 'frame'] += tmp_max_frame  # update frame_id for continuous assignments
@@ -118,7 +122,7 @@ def combine_analysed_data_sptPALM(data=None):
         condi_table['diff_data'][ff] = tmp_dcoef_table  # all diffcoefficients per condition
        
         anaDDA_tracks = tmp_tracks_table[['x [µm]', 'y [µm]', 'frame', 'track_id']] 
-        anaDDA_tracks['frame_time'] = data['input_parameter']['frametime']
+        anaDDA_tracks['frametime'] = data['input_parameter']['frametime']
         condi_table['anaDDA_tracks'][ff] = anaDDA_tracks
 
         # condi_table['anaDDA_condis'].append(f"anaDDA: {comb_data['condition_names'][ff]}")
@@ -136,7 +140,7 @@ def combine_analysed_data_sptPALM(data=None):
     with open(temp_path + data['input_parameter']['fn_combined_movies'], 'wb') as f:
         pickle.dump(comb_data, f)
         
-    print(f"Analysis of infividual movie(s) saved as pickle file: {data['input_parameter']['fn_combined_movies']}")
+    print(f"  Analysis of infividual movie(s) saved as pickle file: {data['input_parameter']['fn_combined_movies']}")
  
     return comb_data
 
