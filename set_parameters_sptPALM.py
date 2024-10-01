@@ -6,6 +6,7 @@ Created on Wed Aug 28 21:54:13 2024
 @author: hohlbein
 """
 
+
 # Function defining all the input parameters and data to be analyzed
 def set_parameters_sptPALM():
     print('\nRun set_parameters_sptPALM.py')
@@ -37,9 +38,10 @@ def set_parameters_sptPALM():
 
         # Diffusion analysis
         'frametime': 0.01, # Frametime in seconds, default: 0.01
-        'sigma_noise': 0.03, # Localization error (um), default: 0.03
+        'loc_error': 0.035, # Localization error (um), default: 0.03
         'diff_hist_steps_min': 3, # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
         'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, default: 100
+        'track_lengths': [1,2,3,4,5,6,7,8],  # Track lengths (2 to 8 frames) tracklength of 1 is two locs
 
         # Cell by cell analysis
         'number_tracks_per_cell_min': 2, # Minimum number of tracks for each cell, default: 1

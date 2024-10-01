@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import time
 
-def diff_coeffs_from_tracks_simulation(tracks, sim_input, truncation):
+def diff_coeffs_from_tracks_fast(tracks, sim_input, truncation):
     print("\nRun diff_coeffs_from_tracks_simulation.py")
     # Initialize
     tracks_data = tracks.copy()
@@ -40,13 +40,20 @@ def diff_coeffs_from_tracks_simulation(tracks, sim_input, truncation):
     rounded_time = round(end-start, 2)
     print(f"  Time for MSD calculation: {rounded_time} seconds")
 
-    # Correct for localization error if specified
-    if sim_input['correct_diff_calc_loc_error']:
-        loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
+    """
+        Following part is currently commented out. Probably specific ro anaDDA
+    """
+    # Correct for localization error if specified track data is co
+    # if sim_input['correct_diff_calc_loc_error']:
+    #     loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
+    #                                             len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
+    #     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
+    # else:
+    #     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime'])
+ 
+    loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
                                                 len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
-        tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
-    else:
-        tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime'])
+    tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
 
     D = tracks_data.copy()
 

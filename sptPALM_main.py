@@ -133,13 +133,15 @@ while True:
         #         comb_data = sptPALM_anaDDA(1)
         
         case 6:  # MCDDA
+            condition_to_select = 0
             if comb_data:
-                comb_data = MC_diffusion_distribution_analysis_sptPALM(0, comb_data)
+                condition = 0
+                comb_data = MC_diffusion_distribution_analysis_sptPALM(condition_to_select, comb_data)
             else:
                 print('No comb_data from option 4 available')
                 print('Continue with GUI to select comb_data '
                       '("sptDataCombinedMovies.mat" or similar)')
-                comb_data = MC_diffusion_distribution_analysis_sptPALM(0)
+                comb_data = MC_diffusion_distribution_analysis_sptPALM(condition_to_select)
         
         # case 8: # Run everything until anaDDA
         #     data, para = sptPALM_analyse_movies()

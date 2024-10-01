@@ -54,8 +54,8 @@ def analyse_diffusion_sptPALM(para):
 
     print(f"   ...track {ii+1} out of {len(track_ids_length_filtered)} valid tracks.")
 
-    # Calculate diffusion coefficient from MSD and correct for localization noise
-    diffquot = msd/(4 * para['frametime']) - (para['sigma_noise'] ** 2)/para['frametime']
+    # Calculate diffusion coefficient from MSD and correct for localization error
+    diffquot = msd/(4 * para['frametime']) - (para['loc_error'] ** 2)/para['frametime']
 
     # Save data
     diffs_df = pd.DataFrame({

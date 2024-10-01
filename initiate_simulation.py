@@ -152,7 +152,7 @@ def handle_three_states_init(ii, sim_input, particle_data, loc_species):
     print(f"    probA: {probA}, probB: {probB}, probC: {probC}")
     print(f"    probA + probB + probC = {probA + probB + probC}")
     
-    tempRand = np.random.rand(sim_input['totalNumberParticles'], 3)
+    tempRand = np.random.rand(sim_input['total_number_particles'], 3)
 
     # State A
     tempStateA = np.array(loc_species)[tempRand[loc_species, 0] <= probA]

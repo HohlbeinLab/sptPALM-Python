@@ -168,7 +168,6 @@ def handle_two_state(particle_data, loc_state_changes, rates, diff_quot, sim_inp
     active_states = particle_data.loc[loc_state_changes, 'active_state'].astype(int).to_numpy() 
     particle_data.loc[loc_state_changes, 'active_diff_quot'] = np.array(diff_quot[active_states])
 
- 
     find_state_A = loc_state_changes[particle_data['active_state'][loc_state_changes] == 0]
     particle_data.loc[find_state_A, 'next_state'] = 1
     particle_data.loc[find_state_A, 'state_time_remaining'] = np.log(np.random.rand(len(find_state_A))) / (-kAB)
@@ -182,17 +181,17 @@ def handle_three_state(particle_data, loc_state_changes, rates, diff_quot, sim_i
     kAB, kBA, kBC, kCB, kAC, kCA = rates
 
     # Change state to the next, already known state
-    particle_data.loc[loc_state_changes, 'active_state']= particle_data['next_state'][loc_state_changes]
+    particle_data.loc[loc_state_changes, 'active_state'] = particle_data.loc[loc_state_changes, 'next_state']
     
     # Update diffusion coefficient depending on the current state
     active_states = particle_data.loc[loc_state_changes, 'active_state'].astype(int).to_numpy() 
     particle_data.loc[loc_state_changes, 'active_diff_quot'] = np.array(diff_quot[active_states])
     
     # Generate random values for state transitions
-    temp_rand = np.random.rand(len(loc_state_changes), 2)
+    temp_rand = np.random.rand(sim_input['total_number_particles'], 2)
 
     # State A transitions
-    find_state_A = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 0]
+    find_state_A =  loc_state_changes[particle_data['active_state'][loc_state_changes] == 0]
     # A to B
     temp_switch_AB = find_state_A[kAB / (kAB + kAC) >= temp_rand[find_state_A, 0]]
     particle_data.loc[temp_switch_AB, 'next_state']= 1
@@ -203,7 +202,7 @@ def handle_three_state(particle_data, loc_state_changes, rates, diff_quot, sim_i
     particle_data.loc[temp_switch_AC, 'state_time_remaining'] = np.log(temp_rand[temp_switch_AC, 1]) / -kAC
 
     # State B transitions
-    find_state_B = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
+    find_state_B =  loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
     # B to A
     temp_switch_BA = find_state_B[kBA / (kBA + kBC) >= temp_rand[find_state_B, 0]]
     particle_data.loc[temp_switch_BA, 'next_state']= 0
@@ -214,7 +213,7 @@ def handle_three_state(particle_data, loc_state_changes, rates, diff_quot, sim_i
     particle_data.loc[temp_switch_BC, 'state_time_remaining'] = np.log(temp_rand[temp_switch_BC, 1]) / -kBC
 
     # State C transitions
-    find_state_C = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 2]
+    find_state_C =  loc_state_changes[particle_data['active_state'][loc_state_changes] == 2]
     # C to A
     temp_switch_CA = find_state_C[kCA / (kCA + kCB) >= temp_rand[find_state_C, 0]]
     particle_data.loc[temp_switch_CA, 'next_state'] = 0
@@ -235,36 +234,36 @@ def handle_four_state(particle_data, loc_state_changes, rates, diff_quot, sim_in
     particle_data.loc[loc_state_changes, 'active_diff_quot'] = np.array(diff_quot[active_states])   
     
     # Generate random values for state transitions
-    temp_rand = np.random.rand(len(loc_state_changes), 1)
+    temp_rand = np.random.rand(sim_input['total_number_particles'], 2)
 
     # State A to B
-    find_state_A = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state']== 0]
+    find_state_A = loc_state_changes[particle_data['active_state'][loc_state_changes] == 0]
     particle_data.loc[find_state_A, 'next_state'] = 1
     particle_data.loc[find_state_A, 'state_time_remaining'] = np.log(temp_rand[find_state_A]) / -kAB
 
     # State B transitions
-    find_state_B = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 1]
+    find_state_B = loc_state_changes[particle_data['active_state'][loc_state_changes] == 1]
     # B to A
     temp_switch_BA = find_state_B[kBA / (kBA + kBC) >= temp_rand[find_state_B, 0]]
     particle_data.loc[temp_switch_BA, 'next_state'] = 0
-    particle_data.loc[temp_switch_BA, 'state_time_remaining']= np.log(temp_rand[temp_switch_BA]) / -kBA
+    particle_data.loc[temp_switch_BA, 'state_time_remaining']= np.log(temp_rand[temp_switch_BA,1]) / -kBA
     # B to C
     temp_switch_BC = find_state_B[kBA / (kBA + kBC) < temp_rand[find_state_B, 0]]
     particle_data.loc[temp_switch_BC, 'next_state'] = 2
-    particle_data.loc[temp_switch_BC,'state_time_remaining'] = np.log(temp_rand[temp_switch_BC]) / -kBC
+    particle_data.loc[temp_switch_BC,'state_time_remaining'] = np.log(temp_rand[temp_switch_BC,1]) / -kBC
 
     # State C transitions
-    find_state_C = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 2]
+    find_state_C =  loc_state_changes[particle_data['active_state'][loc_state_changes] == 2]
     # C to B
     temp_switch_CB = find_state_C[kCB / (kCB + kCD) >= temp_rand[find_state_C, 0]]
     particle_data.loc[temp_switch_CB, 'next_state'] = 1
-    particle_data.loc[temp_switch_CB, 'state_time_remaining'] = np.log(temp_rand[temp_switch_CB]) / -kCB
+    particle_data.loc[temp_switch_CB, 'state_time_remaining'] = np.log(temp_rand[temp_switch_CB,1]) / -kCB
     # C to D
     temp_switch_CD = find_state_C[kCB / (kCB + kCD) < temp_rand[find_state_C, 0]]
     particle_data.loc[temp_switch_CD, 'next_state'] = 3
-    particle_data.loc[temp_switch_CD, 'state_time_remaining'] = np.log(temp_rand[temp_switch_CD]) / -kCD
+    particle_data.loc[temp_switch_CD, 'state_time_remaining'] = np.log(temp_rand[temp_switch_CD,1]) / -kCD
 
     # State D to C
-    find_state_D = loc_state_changes[particle_data.loc[loc_state_changes, 'active_state'] == 3]
+    find_state_D =  loc_state_changes[particle_data['active_state'][loc_state_changes] == 3]
     particle_data.loc[find_state_D, 'next_state'] = 2
-    particle_data.loc[find_state_D, 'state_time_remaining'] = np.log(temp_rand[find_state_D]) / -kDC
+    particle_data.loc[find_state_D, 'state_time_remaining'] = np.log(temp_rand[find_state_D,1]) / -kDC

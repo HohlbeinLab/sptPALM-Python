@@ -15,12 +15,13 @@ from tkinter.filedialog import askopenfilename
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_simulation import set_parameters_simulation
 from initiate_simulation import initiate_simulation
-from diff_coeffs_from_tracks_simulation import diff_coeffs_from_tracks_simulation
-from plot_diff_histograms_simulation import plot_diff_histograms_simulation
+from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
+from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
+from fit_data_with_MCDDA_sptPALM import fit_data_with_MCDDA_sptPALM
 
  # Assuming Para1 is a dictionary-like object
-def MC_diffusion_distribution_analysis_sptPALM(condition, comb_data=None):
-    print('\nRun sMC_diffusion_distribution_analysis_sptPALM.py')
+def MC_diffusion_distribution_analysis_sptPALM(condition_to_select, comb_data=None):
+    print('\nRun MC_diffusion_distribution_analysis_sptPALM.py')
     # loaded more as a dummy here: define input parameters
     # Best to use only 
     input_parameter = set_parameters_sptPALM()
@@ -51,27 +52,27 @@ def MC_diffusion_distribution_analysis_sptPALM(condition, comb_data=None):
         print('  Careful, there might be no data available to proceed!')
 
               
-    print(f"  Running MCDDA on tracks assigned for ... {comb_data['condition_names'][condition]}\n")
+    print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][condition_to_select]}\n")
     
-    # Use tracks for anaDDA
-    tracks = comb_data['anaDDA_tracks'][condition]
+    # Use tracks from anaDDA style of plotting tracks
+    tracks = comb_data['anaDDA_tracks'][condition_to_select]
+    
+    # Generate average diffusion coefficients for each track
+    sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
+    [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(sorted_tracks, input_parameter, max(input_parameter['track_lengths']));
+    
+    # Plot experimental data
+    # plot_diff_histograms_tracklength_resolved(D_track_length_matrix, input_parameter)
+ 
     
     # Set parameters for simulation
     sim_input = set_parameters_simulation()
     
     # Initiate the simulation
     particle_data, sim_input = initiate_simulation(sim_input)
-    
-    # Generate average diffusion coefficients for each track
-    sorted_tracks = tracks.sort_values(by=['track_id', 'frame']) 
-
-    [D, D_track_length_matrix] = diff_coeffs_from_tracks_simulation(sorted_tracks, sim_input, max(sim_input['track_lengths']));
-
-    # Plot final simulated data
-    plot_diff_histograms_simulation(D.drop_duplicates('track_id'), D_track_length_matrix, sim_input)
-    
-    # # Fit the data
-    # fit_data_with_MCDDA_sptPALM(D, DtrackLengthMatrix, sim_input)
+      
+    # Fit the experimental data
+    fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input)
 
     return comb_data    
     
