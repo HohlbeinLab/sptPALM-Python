@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Aug 28 21:54:13 2024
+This work is licensed under the CC BY 4.0 License.
+You are free to share and adapt this work, even for commercial purposes,
+as long as you provide appropriate credit to the original creator.
 
-@author: hohlbein
+Original Creator: Johannes Hohlbein (Wageningen University & Research)
+Date of Creation: September, 2024
+
+Full license details can be found at https://creativecommons.org/licenses/by/4.0/
 """
 import numpy as np
 
@@ -13,8 +18,8 @@ def set_parameters_simulation():
     print('\nRun set_parameters_simulation.py')
     sim_input = {
     # Number of species and particles per species
-    '#_species': 2,  # number of species
-    '#_particles_per_species': [40000, 960000],  # particles per species
+    '#_species': 1,  # number of species
+    '#_particles_per_species': [200000, 960000],  # particles per species
     
     # Cell dimensions (in µm)
     'radius_cell': 0.5,  # (µm) radius of the cap, edefault: 0.5
@@ -60,12 +65,12 @@ def set_parameters_simulation():
     """
     
     # Example species setup
-    species = {
-        '#_states': 1,
-        'diff_quot': [0],  # Diffusion coefficients for each state (µm^2/s)
-        'rates': [0],     # Transition rates between states (1/s)
-    }
-    sim_input['species'].append(species)
+    # species = {
+    #     '#_states': 1,
+    #     'diff_quot': [0],  # Diffusion coefficients for each state (µm^2/s)
+    #     'rates': [0],     # Transition rates between states (1/s)
+    # }
+    # sim_input['species'].append(species)
     
     # Following part can be copied for every species to be simulated
     # sim_input['avoidFloat0']

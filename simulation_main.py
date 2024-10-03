@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Aug 28 11:52:59 2024
+This work is licensed under the CC BY 4.0 License.
+You are free to share and adapt this work, even for commercial purposes,
+as long as you provide appropriate credit to the original creator.
 
-@author: hohlbein
+Original Creator: Johannes Hohlbein (Wageningen University & Research)
+Date of Creation: September, 2024
+
+Full license details can be found at https://creativecommons.org/licenses/by/4.0/
 """
 
 from set_parameters_simulation import set_parameters_simulation
