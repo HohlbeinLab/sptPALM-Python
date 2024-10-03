@@ -140,7 +140,7 @@ while True:
             else:
                 print('No comb_data from option 4 available')
                 print('Continue with GUI to select comb_data '
-                      '("sptDataCombinedMovies.mat" or similar)')
+                      '("sptData_combined_movies.pkl" or similar)')
                 comb_data = MC_diffusion_distribution_analysis_sptPALM(condition_to_select)
         
         # case 8: # Run everything until anaDDA

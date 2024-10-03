@@ -27,10 +27,10 @@ def MC_diffusion_distribution_analysis_sptPALM(condition_to_select, comb_data=No
     input_parameter = set_parameters_sptPALM()
     filename = []
     
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    print("\n  SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!!!")    
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
-
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # print("\n  SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!!!")    
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
+    filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
     with open(filename, 'rb') as f:
         comb_data = pickle.load(f)
     
@@ -62,11 +62,15 @@ def MC_diffusion_distribution_analysis_sptPALM(condition_to_select, comb_data=No
     [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(sorted_tracks, input_parameter, max(input_parameter['track_lengths']));
     
     # Plot experimental data
-    # plot_diff_histograms_tracklength_resolved(D_track_length_matrix, input_parameter)
+    plot_diff_histograms_tracklength_resolved(D_track_length_matrix, input_parameter)
  
-    
     # Set parameters for simulation
     sim_input = set_parameters_simulation()
+    
+    # TO DO: fact check size of track_lengths array
+    # breakpoint()
+    # len(sim_input['track_lengths'] == len(input_parameter['track_lengths']))
+    
     
     # Initiate the simulation
     particle_data, sim_input = initiate_simulation(sim_input)

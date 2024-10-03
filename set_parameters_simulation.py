@@ -13,16 +13,16 @@ def set_parameters_simulation():
     print('\nRun set_parameters_simulation.py')
     sim_input = {
     # Number of species and particles per species
-    '#_species': 1,  # number of species
-    '#_particles_per_species': [50000, 5000],  # particles per species
+    '#_species': 2,  # number of species
+    '#_particles_per_species': [40000, 960000],  # particles per species
     
     # Cell dimensions (in µm)
     'radius_cell': 0.5,  # (µm) radius of the cap, edefault: 0.5
     'length_cell': 2.0,    # (µm) length of the cylindrical part, default: 2.0
     
     # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
-    'track_lengths': np.arange(1, 9),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
-    'mean_track_length': 3,  # Mean track length for exponential distribution, default 3
+    'track_lengths': np.arange(1, 8),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+    'mean_track_length': 10,  # Mean track length for exponential distribution, default 3
     
     # Simulation parameters
     'confined_diffusion': True,  # Confine diffusion within a cell
@@ -39,7 +39,6 @@ def set_parameters_simulation():
     'plot_diff_hist_min': 0.004,  # Diffusion coefficient histogram min (µm^2/s), default: 0.004
     'plot_diff_hist_max': 10.0,  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
     'binwidth': 0.1,  # Bin width for histogram, default 0.1
-    'multiplicator': 1,  # Multiplicator to scale diffusion coefficients, default 20
     'species_to_select': 0, # For fitting, only one specis can be selected, set here which one, default:0
     
     # Error handling values
@@ -60,27 +59,28 @@ def set_parameters_simulation():
     four linear (!) states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kCD, kDC]
     """
     
-    # # Example species setup
-    # species = {
-    #     '#_states': 1,
-    #     'diff_quot': [0],  # Diffusion coefficients for each state (µm^2/s)
-    #     'rates': [0],     # Transition rates between states (1/s)
-    # }
-    # sim_input['species'].append(species)
+    # Example species setup
+    species = {
+        '#_states': 1,
+        'diff_quot': [0],  # Diffusion coefficients for each state (µm^2/s)
+        'rates': [0],     # Transition rates between states (1/s)
+    }
+    sim_input['species'].append(species)
     
     # Following part can be copied for every species to be simulated
+    # sim_input['avoidFloat0']
     species= {
         '#_states': 2,
-        'diff_quot': np.array([0, 2.7]),  # Diffusion coefficients for each state (µm^2/s)
+        'diff_quot': np.array([sim_input['avoidFloat0'], 2.8]),  # Diffusion coefficients for each state (µm^2/s)
         # two states: sim_input.species(ii).rates = [kAB, kBA]
-        'rates': np.array([58, 173])}   # Transition rates between states (1/s)
+        'rates': np.array([155, 137])}   # Transition rates between states (1/s)
         # For fitting purposes
-    species['diff_quot_init_guess'] = species['diff_quot'] * sim_input['multiplicator']    
-    species['diff_quot_lb_ub'] = np.array([[np.nan, 0],
-                                            [np.nan, 10]]) * sim_input['multiplicator']
+    species['diff_quot_init_guess'] = species['diff_quot']   
+    species['diff_quot_lb_ub'] = np.array([[0, 1.], #was np.nan
+                                            [2*sim_input['avoidFloat0'], 5.]])  #was np.nan
     species['rates_init_guess'] = species['rates']  # Initial guess for rates: fitting
-    species['rates_lb_ub'] = np.array([[1, 1],
-                                      [200, 200]])  # Lower and upper bounds for rates
+    species['rates_lb_ub'] = np.array([[10.0, 10.0],
+                                      [200.0, 500.0]])  # Lower and upper bounds for rates
     sim_input['species'].append(species)
  
 

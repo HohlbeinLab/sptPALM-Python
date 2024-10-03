@@ -98,9 +98,9 @@ def combine_analysed_data_sptPALM(data=None):
 
             tmp_ParaNr = comb_data['condition_files'][ff][jj]  # current movie ID
             tmp_scta_table = pd.concat(
-                [tmp_scta_table, data['movies'][tmp_ParaNr]['scta_table']])  # append cellwise data
+                [tmp_scta_table, data['movies'][tmp_ParaNr]['scta_table']], ignore_index=True)  # append cellwise data
             tmp_dcoef_table = pd.concat(
-                [tmp_dcoef_table, data['movies'][tmp_ParaNr]['diff_coeffs_filtered_list']])  # append diffcoefficients
+                [tmp_dcoef_table, data['movies'][tmp_ParaNr]['diff_coeffs_filtered_list']], ignore_index=True)  # append diffcoefficients
             
             # --- append tracks of condition for anaDDA:
             # A. Use all localisations in valid cells; not filtered for 'DiffHistSteps' and 'numberTracksPerCell'
@@ -112,7 +112,7 @@ def combine_analysed_data_sptPALM(data=None):
             # breakpoint()
             tmp_tracks.loc[:, 'frame'] += tmp_max_frame  # update frame_id for continuous assignments
             
-            tmp_tracks_table = pd.concat([tmp_tracks_table, tmp_tracks])  # append diffcoefficients
+            tmp_tracks_table = pd.concat([tmp_tracks_table, tmp_tracks], ignore_index=True)  # append diffcoefficients
             
             tmp_max_track_id = max(tmp_tracks_table['track_id'])  # tmp_id for shifting track_id
             tmp_max_frame = max(tmp_tracks_table['frame'])  # tmp_id for shifting frame_id

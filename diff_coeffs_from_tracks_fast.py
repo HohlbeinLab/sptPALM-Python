@@ -24,8 +24,8 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input, truncation):
     tracks_data['D_coeff'] = -1.0
     tracks_data['frametime'] = sim_input['frametime']
     
-    start = time.time()
-    
+    start = time.time() 
+
     # For each tracklength in sim_input
     for i, track_len in enumerate(sim_input['track_lengths']):
         # Find all tracks with a certain number of localisations per track

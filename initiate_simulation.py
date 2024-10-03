@@ -119,10 +119,10 @@ def handle_two_states_init(ii, sim_input, particle_data, loc_species):
     kAB, kBA = sim_input['species'][ii]['rates']
     probA = kBA / (kBA + kAB)
     probB = kAB / (kBA + kAB)
-    print(f"    kAB (1/s): {kAB}")
-    print(f"    kBA (1/s): {kBA}")
-    print(f"    probA: {probA}, probB: {probB}")
-    print(f"    probA + probB = {probA + probB}")
+    print(f"    kAB (1/s): {round(kAB,2)}")
+    print(f"    kBA (1/s): {round(kBA,2)}")
+    print(f"    probA: {round(probA,2)}, probB: {round(probB,2)}")
+    print(f"    probA + probB = {round(probA + probB,2)}")
     tempRand = np.random.rand(sim_input['total_number_particles'], 2)
 
     tempStateA = np.array(loc_species)[tempRand[loc_species, 0] <= probA]
@@ -146,11 +146,11 @@ def handle_three_states_init(ii, sim_input, particle_data, loc_species):
     probB = (kAC * kCB + kAB * (kCA + kCB)) / temp
     probC = (kAB * kBC + kAC * (kBA + kBC)) / temp
     
-    print(f"    kAB (1/s): {kAB}, kAC (1/s): {kAC}")
-    print(f"    kBA (1/s): {kBA}, kBC (1/s): {kBC}")
-    print(f"    kCA (1/s): {kCA}, kCB (1/s): {kCB}")
-    print(f"    probA: {probA}, probB: {probB}, probC: {probC}")
-    print(f"    probA + probB + probC = {probA + probB + probC}")
+    print(f"    kAB (1/s): {round(kAB,2)}, kAC (1/s): {round(kAC,2)}")
+    print(f"    kBA (1/s): {round(kBA,2)}, kBC (1/s): {round(kBC,2)}")
+    print(f"    kCA (1/s): {round(kCA,2)}, kCB (1/s): {round(kCB,2)}")
+    print(f"    probA: {round(probA,2)}, probB: {round(probB,2)}, probC: {round(probC,2)}")
+    print(f"    probA + probB + probC = {round(probA + probB + probC,2)}")
     
     tempRand = np.random.rand(sim_input['total_number_particles'], 3)
 
@@ -199,12 +199,12 @@ def handle_four_states_init(ii, sim_input, particle_data, loc_species):
     probC = (kAB * kBC * kDC) / temp
     probD = (kAB * kBC * kCD) / temp
     
-    print(f"    kAB (1/s): {kAB}")
-    print(f"    kBA (1/s): {kBA}, kBC (1/s): {kBC}")
-    print(f"    kCB (1/s): {kCB}, kCD (1/s): {kCD}")
-    print(f"    kDC (1/s): {kDC}")
-    print(f"    probA: {probA}, probB: {probB}, probC: {probC}, probD: {probD}")
-    print(f"    probA + probB + probC + probD = {probA + probB + probC + probD}")
+    print(f"    kAB (1/s): {round(kAB,2)}")
+    print(f"    kBA (1/s): {round(kBA,2)}, kBC (1/s): {round(kBC,2)}")
+    print(f"    kCB (1/s): {round(kCB,2)}, kCD (1/s): {round(kCD,2)}")
+    print(f"    kDC (1/s): {round(kDC,2)}")
+    print(f"    probA: {round(probA,2)}, probB: {round(probB,2)}, probC: {round(probC,2)}, probD: {round(probD,2)}")
+    print(f"    probA + probB + probC + probD = {round(probA + probB + probC + probD,2)}")
 
     tempRand = np.random.rand(sim_input['totalNumberParticles'], 3)
 
