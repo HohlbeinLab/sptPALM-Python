@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 This work is licensed under the CC BY 4.0 License.
 You are free to share and adapt this work, even for commercial purposes,

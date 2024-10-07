@@ -29,11 +29,12 @@ from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
 from helper_functions import yes_no_input, string_input_with_default
 
 
-def analyse_movies_sptPALM():
+def analyse_movies_sptPALM(import_parameter = None):
     print('\nRun analyse_movies_sptPALM.py')
     
     # 1.1 Define input parameters
-    input_parameter = set_parameters_sptPALM()
+    if import_parameter is None:
+        input_parameter = set_parameters_sptPALM()
    
 # # #TEMPORARILY DISABLED, GUI version: (to avoid pausing execution of the analysis}
 #     input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
@@ -133,17 +134,12 @@ def analyse_movies_sptPALM():
         data['movies'][ii] = para
 
     # 3. Save entire DATA dictionary
-
     data['input_parameter'] = input_parameter
     with open(temp_path + para['fn_movies'], 'wb') as f:
         pickle.dump(data, f)
     print(f"Analysis of individual movie(s) saved as pickle file: {para['fn_movies']}")
-    
-    ## To open the data:
-    # with open(temp_path + para['fn_combined_data'] + '.pkl', 'rb') as f:
-    #     data_loaded = pickle.load(f)
         
-    return data, input_parameter, para
+    return data
 
 
 
