@@ -19,14 +19,16 @@ from tkinter.simpledialog import askstring
 import os
 import pickle
 from set_parameters_sptPALM import set_parameters_sptPALM
+from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 from helper_functions import string_input_with_default
 
-def combine_analysed_data_sptPALM(data=None):
+def combine_analysed_data_sptPALM(data=None, para=None):
     
     print('\nRun combine_analysed_data_sptPALM.py')
 
     # loaded more as a dummy here: define input parameters
     input_parameter = set_parameters_sptPALM()
+    input_parameter = set_parameters_sptPALM_GUI(input_parameter)
     filename = []
     
     # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
@@ -60,9 +62,9 @@ def combine_analysed_data_sptPALM(data=None):
     #                           f"Enter new name for saving {input_parameter['fn_combined_movies']} or press OK/Enter", 
     #                           initialvalue=input_parameter['fn_combined_movies'])
     
-    # CMD Version: Allow savename to be changed (default: 'sptData_combined_movies.pkl')
-    fn_output_default = data['input_parameter']['fn_combined_movies']
-    data['input_parameter']['fn_combined_movies'] = string_input_with_default("  Rename filename or press OK/Enter", fn_output_default)
+    # # CMD Version: Allow savename to be changed (default: 'sptData_combined_movies.pkl')
+    # fn_output_default = data['input_parameter']['fn_combined_movies']
+    # data['input_parameter']['fn_combined_movies'] = string_input_with_default("  Rename filename or press OK/Enter", fn_output_default)
 
 
     comb_data = {}

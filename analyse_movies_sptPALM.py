@@ -19,6 +19,7 @@ import os
 import pickle
 
 from set_parameters_sptPALM import set_parameters_sptPALM
+from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 from load_localisations_from_csv import load_localisations_from_csv
 from apply_cell_segmentation_sptPALM import apply_cell_segmentation_sptPALM
 from tracking_sptPALM import tracking_sptPALM
@@ -28,22 +29,24 @@ from single_cell_analysis_sptPALM import single_cell_analysis_sptPALM
 from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
 from helper_functions import yes_no_input, string_input_with_default
 
-
-def analyse_movies_sptPALM(import_parameter = None):
+def analyse_movies_sptPALM(input_parameter = None):
     print('\nRun analyse_movies_sptPALM.py')
     
     # 1.1 Define input parameters
-    if import_parameter is None:
+    if input_parameter is None:
+        print("  re-run set_parameters_sptPALM.py + GUI")
         input_parameter = set_parameters_sptPALM()
-   
-# # #TEMPORARILY DISABLED, GUI version: (to avoid pausing execution of the analysis}
-#     input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
-#                               f"Enter new name for saving {input_parameter['fn_movies']} or press OK/Enter", 
-#                               initialvalue=input_parameter['fn_movies'])
-    #  CMD version
-    fn_output_default = input_parameter['fn_movies']
-    print('  Rename data structure to be saved later?')
-    input_parameter['fn_movies'] = string_input_with_default("  Enter new string or press enter", fn_output_default)
+        input_parameter = set_parameters_sptPALM_GUI()
+    
+    # # TEMPORARILY DISABLED, GUI version: (to avoid pausing execution of the analysis}
+    # input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
+    #                           f"Enter new name for saving {input_parameter['fn_movies']} or press OK/Enter", 
+    #                           initialvalue=input_parameter['fn_movies'])
+    
+    # #  CMD version
+    # fn_output_default = input_parameter['fn_movies']
+    # print('  Rename data structure to be saved later?')
+    # input_parameter['fn_movies'] = string_input_with_default("  Enter new string or press enter", fn_output_default)
 
     # Fall-back to GUI if no list of ThunderSTORM.csv files 
     # '*_thunder_.csv' are specified in define_input_parameters.py

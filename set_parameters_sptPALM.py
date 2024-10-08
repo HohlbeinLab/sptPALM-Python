@@ -14,7 +14,6 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 
 # Function defining all the input parameters and data to be analyzed
 def set_parameters_sptPALM():
-    print('\nRun set_parameters_sptPALM.py')
     input_parameter = {
         'data_dir': '', # Directory where the data is found (selection via GUI or pre-defined, see below) 
         'default_output_dir': 'output_python/', # Initialise new directory to which analysed data is saved        
@@ -52,12 +51,6 @@ def set_parameters_sptPALM():
         'number_tracks_per_cell_min': 1, # Minimum number of tracks for each cell, default: 1
         'number_tracks_per_cell_max': 10000, # Maximum number of tracks for each cell, default: 10000
 
-        # (OPTIONAL) settings for visualisation of tracks SCTA: Single-cell tracking analysis
-        'scta_vis_cells': False, # Visualize individual cells True/False, default: False
-        'scta_plot_cell_window': 15, # Radius in pixels for plotting individual cells and their tracks
-        'scta_vis_interactive': False, # Interactively cycle through cells True/False, default: False
-        'scta_vis_rangemax': 0.3, # Color-coding in the range of [0:plot_DiffHist_max)], default: 0.4
-
         # Histograms for diffusion analysis
         'plot_diff_hist_min': 4E-3, # Plot and histogram from um^2/s to um^2/s, default: 4E-3
         'plot_diff_hist_max': 10, # Plot and histogram from um^2/s to um^2/s, default: 10
@@ -70,6 +63,13 @@ def set_parameters_sptPALM():
         'plot_frame_number': True, # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
         'dpi': 150, # DPI setting for plotting figures, default: 300
         'cmap_applied': 'gist_ncar', ##was: 'nipy_spectral', tab20c, 
+        
+        # (OPTIONAL) settings for visualisation of tracks SCTA: Single-cell tracking analysis
+        'scta_vis_cells': False, # Visualize individual cells True/False, default: False
+        'scta_plot_cell_window': 15, # Radius in pixels for plotting individual cells and their tracks
+        'scta_vis_interactive': False, # Interactively cycle through cells True/False, default: False
+        'scta_vis_rangemax': 0.3, # Color-coding in the range of [0:plot_DiffHist_max)], default: 0.4
+
     }
 
     # # Directory containing your data
@@ -97,35 +97,6 @@ def set_parameters_sptPALM():
     # input_parameter['condition_names'].append('Cond_2')
     # input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
 
-    # # Directory containing your data (make sure you end with a '/' or '\')
-    # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
-
-    # # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
-    # input_parameter['fn_locs'] = [
-    #     '230208_Cas12aScrambled_EM620_LASER1_1_MMStack_Pos0.ome_MLE_thunder.csv',
-    #     '230208_Cas12aScrambled_EM620_LASER1_2_MMStack_Pos0.ome_MLE_thunder.csv',
-    #     '230131_Cas12aTargeting-0.15_EM620_LASER2_1_MMStack_Pos0.ome_MLE_thunder.csv',
-    #     '230131_Cas12aTargeting-0.15_EM620_LASER2_2_MMStack_Pos0.ome_MLE_thunder.csv',
-    # ]
-    # #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
-    # #filename is also used to locate the segmented image and corresponding csv-table!)
-    # input_parameter['fn_proc_brightfield'] = [
-    #     '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
-    #     '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
-    #     '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
-    #     '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
-    # ]
-
-    # # Name and assign your measurement conditions/files
-    # #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
-    # input_parameter['condition_names'].append('Cas12a_scrambled')
-    # input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
-    
-    # # DO NOT REMOVE THE FOLLOWING LINES!
-    # # Copy or uncomment the following lines if necessary
-    # input_parameter['condition_names'].append('Cas12a_targetting')
-    # input_parameter['condition_files'].append([2,3])  # refers to the order of files defined above
-
     # Directory containing your data (make sure you end with a '/' or '\')
     input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
 
@@ -133,18 +104,47 @@ def set_parameters_sptPALM():
     input_parameter['fn_locs'] = [
         '230208_Cas12aScrambled_EM620_LASER1_1_MMStack_Pos0.ome_MLE_thunder.csv',
         '230208_Cas12aScrambled_EM620_LASER1_2_MMStack_Pos0.ome_MLE_thunder.csv',
+        '230131_Cas12aTargeting-0.15_EM620_LASER2_1_MMStack_Pos0.ome_MLE_thunder.csv',
+        '230131_Cas12aTargeting-0.15_EM620_LASER2_2_MMStack_Pos0.ome_MLE_thunder.csv',
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
     input_parameter['fn_proc_brightfield'] = [
         '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
         '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
+        '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
+        '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
     ]
 
     # Name and assign your measurement conditions/files
     #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
     input_parameter['condition_names'].append('Cas12a_scrambled')
     input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
+    
+    # DO NOT REMOVE THE FOLLOWING LINES!
+    # Copy or uncomment the following lines if necessary
+    input_parameter['condition_names'].append('Cas12a_targetting')
+    input_parameter['condition_files'].append([2,3])  # refers to the order of files defined above
+
+    # # Directory containing your data (make sure you end with a '/' or '\')
+    # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
+
+    # # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
+    # input_parameter['fn_locs'] = [
+    #     '230208_Cas12aScrambled_EM620_LASER1_1_MMStack_Pos0.ome_MLE_thunder.csv',
+    #     '230208_Cas12aScrambled_EM620_LASER1_2_MMStack_Pos0.ome_MLE_thunder.csv',
+    # ]
+    # #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
+    # #filename is also used to locate the segmented image and corresponding csv-table!)
+    # input_parameter['fn_proc_brightfield'] = [
+    #     '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
+    #     '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
+    # ]
+
+    # # Name and assign your measurement conditions/files
+    # #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
+    # input_parameter['condition_names'].append('Cas12a_scrambled')
+    # input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
     
 
     # Histogramming of diffusion coefficients per copynumber
@@ -155,7 +155,7 @@ def set_parameters_sptPALM():
     return input_parameter
 
 
-# FOR LATER TO LOAD AND SAVE
+# MAYBE FOR LATER TO LOAD AND SAVE
 # Prompt: https://chatgpt.com/g/g-SAbpLF1Ec-matlab-to-python/c/66f97248-8d68-8001-9b0c-04150a1b27d6
 # import json
 

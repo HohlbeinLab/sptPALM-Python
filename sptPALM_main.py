@@ -31,11 +31,12 @@ while True:
     print('-')
     PROMPT = """Choose and press Enter
     0: Exit
-    1: Analyse individual movies
-    2: Combine individually analysed movies
-    3: Plot combined data
-    4: Monte-Carlo DDA
-    5: Auxillary functions
+    1: Set parameters GUI
+    2: Analyse individual movies
+    3: Combine individually analysed movies
+    4: Plot combined data
+    5: Monte-Carlo DDA
+    6: Auxillary functions
     \n"""
     # Check prompt
     try:
@@ -48,8 +49,12 @@ while True:
         case 0:
             print('Exit!')
             break
-        
-        case 1:  # sptPALM_analyse_Movies
+        case 1:
+            input_parameter = set_parameters_sptPALM()
+            input_parameter = set_parameters_sptPALM_GUI(input_parameter)    
+            print(input_parameter)
+            # print(input_parameter['track_lengths'])       
+        case 2:  # sptPALM_analyse_Movies
             if input_parameter:
                 print("No 'input_parameter' available, selecting defaults from set_parameters_sptPLAM.py.")
                 data = analyse_movies_sptPALM(input_parameter)
@@ -58,7 +63,7 @@ while True:
                 data = analyse_movies_sptPALM()
             print("'data' now available in memory\n")
         
-        case 2:  # sptPALM_combineData
+        case 3:  # sptPALM_combineData
             if data:
                 comb_data = combine_analysed_data_sptPALM(data)
             else:
@@ -67,7 +72,7 @@ while True:
                 comb_data = combine_analysed_data_sptPALM()
             print("Combined data 'comb_data' now available in memory\n")
             
-        case 3:  # sptPALM_PlotCombinedData
+        case 4:  # sptPALM_PlotCombinedData
             print('Run splot_combined_data_sptPALM(comb_data)')
             if comb_data:
                 comb_data = plot_combined_data_sptPALM(comb_data)
@@ -77,7 +82,7 @@ while True:
                       "from 'sptData_combined_movies.pkl' or similar")
                 comb_data = plot_combined_data_sptPALM()
           
-        case 4:  # MCDDA
+        case 5:  # MCDDA
             condition_to_select = 0
             if comb_data:
                 condition = 0
@@ -88,13 +93,13 @@ while True:
                       "'sptData_combined_movies.pkl' or similar")
                 comb_data = MC_diffusion_distribution_analysis_sptPALM(condition_to_select)
         
-        case 5:  # Combine_ThunderSTORM_csv_files
+        case 6:  # Combine_ThunderSTORM_csv_files
             while True:
                 print('--')
                 SUB_PROMPT = """    Choose and press Enter
        0: Go back to main prompt
        1: Combine ThunderSTORM *.csv files 
-       2: Run set_parameters_sptPALM_GUI.py\n"""
+       2: Empty\n"""
                # Check prompt
                 try:
                     sub_prompt_input = int(input(SUB_PROMPT))
@@ -110,10 +115,7 @@ while True:
                         print('Run Combine_ThunderSTORM_csv_files')
                         combine_thunderstorm_csv_files()
                     case 2:
-                        print('Run set_parameters_sptPALM_GUI.py')
-                        input_parameter = set_parameters_sptPALM()
-                        input_parameter = set_parameters_sptPALM_GUI(input_parameter)    
-                        print(input_parameter)
+                        print('Do nothing....')
                     case _:
                        print("Invalid option, please choose a valid number.")
                        continue
