@@ -18,6 +18,7 @@ from set_parameters_sptPALM import set_parameters_sptPALM
 def set_parameters_sptPALM_GUI(para = None):
     print('\nRun set_parameters_sptPALM_GUI.py')
     if para is None:
+        print(" re-run set_parameters_sptPALM")
         para = set_parameters_sptPALM()
       
     # Function to create the GUI
@@ -37,18 +38,23 @@ def set_parameters_sptPALM_GUI(para = None):
         nonlocal para
         # Collect all parameters from the GUI
         para = {
+            # File and directory selection
             'data_dir': data_dir_entry.get(),
             'default_output_dir': default_output_dir_entry.get(),
             'fn_locs': list(map(str.strip, fn_locs_entry.get().split(','))),
             'fn_proc_brightfield': list(map(str.strip, fn_proc_brightfield_entry.get().split(','))),
-            'fn_csv_handle': fn_csv_handle_entry.get(),
-            'fn_dict_handle': fn_dict_handle_entry.get(),
-            'fn_diffs_handle': fn_diffs_handle_entry.get(),
-            'fn_movies': fn_movies_entry.get(),            'fn_combined_movies': fn_combined_movies_entry.get(),
             
             'condition_names': list(map(str.strip, condition_names_entry.get().split(','))),
             'condition_files': list(map(int,condition_files_entry.get().split(','))),
+            # 'copynumber_intervals': list(map(int, copynumber_intervals.get().split(','))),
+           
+            'fn_csv_handle': fn_csv_handle_entry.get(),
+            'fn_dict_handle': fn_dict_handle_entry.get(),
+            'fn_diffs_handle': fn_diffs_handle_entry.get(),
+            'fn_movies': fn_movies_entry.get(),    
+            'fn_combined_movies': fn_combined_movies_entry.get(),
             
+            # Pixelsize and segmentation
             'pixelsize': float(pixelsize_entry.get()),
             'cellarea_pixels_min': int(cellarea_min_entry.get()),
             'cellarea_pixels_max': int(cellarea_max_entry.get()),
@@ -90,10 +96,10 @@ def set_parameters_sptPALM_GUI(para = None):
     
     # Create two separate container frames for left and right columns
     left_frame = tk.Frame(root)
-    left_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")  # Left half
+    left_frame.grid(row=1, column=0, padx=0, pady=0, sticky="nsew")  # Left half
 
     right_frame = tk.Frame(root)
-    right_frame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")  # Right half
+    right_frame.grid(row=1, column=1, padx=0, pady=0, sticky="nsew")  # Right half
     
     """
     # Frame for File Selection and Directory Input
@@ -129,7 +135,7 @@ def set_parameters_sptPALM_GUI(para = None):
     fn_proc_brightfield_entry.insert(0, ', '.join(map(str, para['fn_proc_brightfield'])))
     tk.Button(file_frame, text="Browse...", command=browse_files).grid(row=2, column=2)
 
-    # Condition names
+    # Name of conditions
     tk.Label(file_frame, text="Name of conditions", width = width_text_labels,
              anchor="w").grid(row=3, column=0, sticky=tk.W)
     condition_names_entry = tk.Entry(file_frame, width=width_text_fileIO)
@@ -145,42 +151,42 @@ def set_parameters_sptPALM_GUI(para = None):
     # condition_files_entry.insert(0, para['condition_files'])
     condition_files_entry.insert(0, ', '.join(map(str, para['condition_files'])))
     
-    # Default output Directory
+    # Handle: output directory
     tk.Label(file_frame, text="Handle: output directory", width = width_text_labels,
              anchor="w").grid(row=5, column=0, sticky=tk.W)
     default_output_dir_entry = tk.Entry(file_frame, width=width_text_fileIO)
     default_output_dir_entry.grid(row=5, column=1)
     default_output_dir_entry.insert(0, para['default_output_dir'])
 
-    # CSV File Handle
+    # Handle: CSV File 
     tk.Label(file_frame, text="Handle: csv files", width = width_text_labels,
              anchor="w").grid(row=6, column=0, sticky=tk.W)
     fn_csv_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
     fn_csv_handle_entry.grid(row=6, column=1)
     fn_csv_handle_entry.insert(0, para['fn_csv_handle'])
 
-    # fn_dict_handle Handle
+    # Handle: fn_dict_handle 
     tk.Label(file_frame, text="Handle: dictionary ", width = width_text_labels,
              anchor="w").grid(row=7, column=0, sticky=tk.W)
     fn_dict_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
     fn_dict_handle_entry.grid(row=7, column=1)
     fn_dict_handle_entry.insert(0, para['fn_dict_handle'])
 
-    # fn_dict_handle Handle
+    # Handle: fn_diffs_handle 
     tk.Label(file_frame, text="Handle: diffusion coeff. ", width = width_text_labels,
              anchor="w").grid(row=8, column=0, sticky=tk.W)
     fn_diffs_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
     fn_diffs_handle_entry.grid(row=8, column=1)
     fn_diffs_handle_entry.insert(0, para['fn_diffs_handle'])
 
-    # fn_movies Handle    
+    # Handle: fn_movies     
     tk.Label(file_frame, text="Handle: movies", width = width_text_labels,
              anchor="w").grid(row=9, column=0, sticky=tk.W)
     fn_movies_entry = tk.Entry(file_frame, width=width_text_fileIO)
     fn_movies_entry.grid(row=9, column=1)
     fn_movies_entry.insert(0, para['fn_movies'])
 
-    # fn_combined_movies Handle    
+    # Handle: fn_combined_movies     
     tk.Label(file_frame, text="Handle: combined-movies", width = width_text_labels,
              anchor="w").grid(row=10, column=0, sticky=tk.W)
     fn_combined_movies_entry = tk.Entry(file_frame, width=width_text_fileIO)
@@ -191,20 +197,20 @@ def set_parameters_sptPALM_GUI(para = None):
     # Frame for Segmentation inputs
     """
 
-    segmentation_frame = tk.LabelFrame(left_frame, text="Segmentation", padx=10, pady=10)
+    segmentation_frame = tk.LabelFrame(left_frame, text="Pixelsize and segmentation", padx=10, pady=10)
     segmentation_frame.grid(row=1, column=0, padx=10, pady=10, sticky="new")
    
+    # Pixelsize
+    tk.Label(segmentation_frame, text="Pixel size (µm)", width = width_text_labels,
+             anchor="w").grid(row=0, column=0, sticky=tk.W)
+    pixelsize_entry = tk.Entry(segmentation_frame, width=width_text_box)
+    pixelsize_entry.grid(row=0, column=1)
+    pixelsize_entry.insert(1, para['pixelsize'])
+
     # Use Segmentations
     use_segmentations_var = tk.BooleanVar(value = para['use_segmentations'])
     tk.Checkbutton(segmentation_frame, text="Use segmentations", variable=use_segmentations_var,
-                   width = width_text_labels, anchor="w").grid(row=0, column=0, sticky=tk.W)
-
-    # Pixelsize
-    tk.Label(segmentation_frame, text="Pixel size (µm)", width = width_text_labels,
-             anchor="w").grid(row=0, column=2, sticky=tk.W)
-    pixelsize_entry = tk.Entry(segmentation_frame, width=width_text_box)
-    pixelsize_entry.grid(row=0, column=3)
-    pixelsize_entry.insert(1, para['pixelsize'])
+                   width = width_text_labels, anchor="w").grid(row=0, column=2, sticky=tk.W)
 
     # Cell area (min/max)
     tk.Label(segmentation_frame, text="Min. cell area (pixels)", width = width_text_labels,
@@ -218,41 +224,56 @@ def set_parameters_sptPALM_GUI(para = None):
     cellarea_max_entry = tk.Entry(segmentation_frame, width=width_text_box)
     cellarea_max_entry.grid(row=1, column=3)
     cellarea_max_entry.insert(0, para['cellarea_pixels_max'])
+    
+    # Minimum number of steps per track
+    tk.Label(segmentation_frame, text="Min. number tracks/cell", width = width_text_labels,
+             anchor="w").grid(row=2, column=0, sticky=tk.W)
+    number_tracks_per_cell_min_entry = tk.Entry(segmentation_frame, width=width_text_box)
+    number_tracks_per_cell_min_entry.grid(row=2,  column=1)
+    number_tracks_per_cell_min_entry.insert(0, para['number_tracks_per_cell_min'])
+    
+    # Maximum number of steps per track
+    tk.Label(segmentation_frame, text="Max. number tracks/cell", width = width_text_labels,
+             anchor="w").grid(row=2, column=2, sticky=tk.W)
+    number_tracks_per_cell_max_entry = tk.Entry(segmentation_frame, width=width_text_box)
+    number_tracks_per_cell_max_entry.grid(row=2, column=3)
+    number_tracks_per_cell_max_entry.insert(0, para['number_tracks_per_cell_max'])
 
     """
     # Frame for Tracking inputs 
     """
   
-    tracking_frame = tk.LabelFrame(left_frame, text="Tracking", padx=10, pady=10)
+    tracking_frame = tk.LabelFrame(left_frame, text="Tracking and diffusion analysis",
+                                   padx=10, pady=10)
     tracking_frame.grid(row=2, column=0, padx=10, pady=10, sticky="new")
 
-    # Track steplength
-    tk.Label(tracking_frame, text="Max. steplength (µm)", width = width_text_labels,
-             anchor="w").grid(row=0, column=0, sticky=tk.W)
-    track_steplength_entry = tk.Entry(tracking_frame, width=width_text_box)
-    track_steplength_entry.grid(row=0, column=1)
-    track_steplength_entry.insert(0, para['track_steplength_max'])
-
-    # Track memory
-    tk.Label(tracking_frame, text="Track memory (frames)", width = width_text_labels,
-             anchor="w").grid(row=0, column=2, sticky=tk.W)
-    track_memory_entry = tk.Entry(tracking_frame, width=width_text_box)
-    track_memory_entry.grid(row=0, column=3)
-    track_memory_entry.insert(0, para['track_memory'])
-    
     # Frame time (sec)
     tk.Label(tracking_frame, text="Frame time (sec)", width = width_text_labels,
-             anchor="w").grid(row=1, column=0, sticky=tk.W)
+             anchor="w").grid(row=0, column=0, sticky=tk.W)
     frametime_entry = tk.Entry(tracking_frame, width=width_text_box)
-    frametime_entry.grid(row=1, column=1)
+    frametime_entry.grid(row=0, column=1)
     frametime_entry.insert(0, para['frametime'])   
       
     # Localisation error
     tk.Label(tracking_frame, text="Loc. error (µm)", width = width_text_labels,
-             anchor="w").grid(row=1, column=2, sticky=tk.W)
+             anchor="w").grid(row=0, column=2, sticky=tk.W)
     loc_error_entry = tk.Entry(tracking_frame, width=width_text_box)
-    loc_error_entry.grid(row=1, column=3)
+    loc_error_entry.grid(row=0, column=3)
     loc_error_entry.insert(0, para['loc_error'])
+
+    # Track steplength
+    tk.Label(tracking_frame, text="Max. steplength (µm)", width = width_text_labels,
+             anchor="w").grid(row=1, column=0, sticky=tk.W)
+    track_steplength_entry = tk.Entry(tracking_frame, width=width_text_box)
+    track_steplength_entry.grid(row=1, column=1)
+    track_steplength_entry.insert(0, para['track_steplength_max'])
+
+    # Track memory
+    tk.Label(tracking_frame, text="Track memory (frames)", width = width_text_labels,
+             anchor="w").grid(row=1, column=2, sticky=tk.W)
+    track_memory_entry = tk.Entry(tracking_frame, width=width_text_box)
+    track_memory_entry.grid(row=1, column=3)
+    track_memory_entry.insert(0, para['track_memory'])
 
     # Minimum number of steps per track
     tk.Label(tracking_frame, text="Min. number steps", width = width_text_labels,
@@ -267,27 +288,14 @@ def set_parameters_sptPALM_GUI(para = None):
     diff_hist_steps_max_entry = tk.Entry(tracking_frame, width=width_text_box)
     diff_hist_steps_max_entry.grid(row=2, column=3)
     diff_hist_steps_max_entry.insert(0, para['diff_hist_steps_max'])    
-    
+ 
     # Track lengths
     tk.Label(tracking_frame, text="Track lenghts (frames)", width = width_text_labels,
              anchor="w").grid(row=3, column=0, sticky=tk.W)
     track_lengths_entry = tk.Entry(tracking_frame, width=width_text_box)
-    track_lengths_entry.grid(row=3, column=1)
+    track_lengths_entry.grid(row=4, column=1)
     track_lengths_entry.insert(0, ', '.join(map(str, para['track_lengths'])))   
-            
-    # Minimum number of steps per track
-    tk.Label(tracking_frame, text="Min. number tracks/cell", width = width_text_labels,
-             anchor="w").grid(row=4, column=0, sticky=tk.W)
-    number_tracks_per_cell_min_entry = tk.Entry(tracking_frame, width=width_text_box)
-    number_tracks_per_cell_min_entry.grid(row=4,  column=1)
-    number_tracks_per_cell_min_entry.insert(0, para['number_tracks_per_cell_min'])
-    
-    # Maximum number of steps per track
-    tk.Label(tracking_frame, text="Max. number tracks/cell", width = width_text_labels,
-             anchor="w").grid(row=4, column=2, sticky=tk.W)
-    number_tracks_per_cell_max_entry = tk.Entry(tracking_frame, width=width_text_box)
-    number_tracks_per_cell_max_entry.grid(row=4, column=3)
-    number_tracks_per_cell_max_entry.insert(0, para['number_tracks_per_cell_max'])             
+                        
               
     """
     # Frame for plotting
@@ -302,6 +310,7 @@ def set_parameters_sptPALM_GUI(para = None):
     diff_hist_min_entry.grid(row=0, column=1)
     diff_hist_min_entry.insert(0, para['plot_diff_hist_min'])  
 
+    # plot_diff_hist_max
     tk.Label(plotting_frame, text="D. hist. max (µm^2/s)", width = width_text_labels,
              anchor="w").grid(row=0, column=2, sticky=tk.W)
     diff_hist_max_entry = tk.Entry(plotting_frame, width=width_text_box)
@@ -321,20 +330,20 @@ def set_parameters_sptPALM_GUI(para = None):
     fontsize_entry = tk.Entry(plotting_frame, width=width_text_box)
     fontsize_entry.grid(row=1, column=3)
     fontsize_entry.insert(0, para['fontsize'])   
+  
+    # dpi
+    tk.Label(plotting_frame, text="Resolution figus (dpi)", width = width_text_labels,
+             anchor="w").grid(row=2, column=0, sticky=tk.W)
+    dpi_entry = tk.Entry(plotting_frame, width=width_text_box)
+    dpi_entry.grid(row=2, column=1)
+    dpi_entry.insert(0, para['dpi']) 
     
     # linewidth
     tk.Label(plotting_frame, text="Line width (px)", width = width_text_labels,
-             anchor="w").grid(row=2, column=0, sticky=tk.W)
-    linewidth_entry = tk.Entry(plotting_frame, width=width_text_box)
-    linewidth_entry.grid(row=2, column=1)
-    linewidth_entry.insert(0, para['linewidth'])  
-    
-    # dpi
-    tk.Label(plotting_frame, text="Resolution figus (dpi)", width = width_text_labels,
              anchor="w").grid(row=2, column=2, sticky=tk.W)
-    dpi_entry = tk.Entry(plotting_frame, width=width_text_box)
-    dpi_entry.grid(row=2, column=3)
-    dpi_entry.insert(0, para['dpi'])  
+    linewidth_entry = tk.Entry(plotting_frame, width=width_text_box)
+    linewidth_entry.grid(row=2, column=3)
+    linewidth_entry.insert(0, para['linewidth'])  
     
     # Plot frame numbers next to tracks
     use_plot_frame_number_var = tk.BooleanVar(value=para['plot_frame_number'])
@@ -389,11 +398,11 @@ def set_parameters_sptPALM_GUI(para = None):
 #############################
     # Save and Exit buttons
 #############################
-    button_frame = tk.Frame(root)
-    button_frame.grid(row=4, column=0, pady=10)
+    button_frame = tk.Frame(right_frame)
+    button_frame.grid(row=4, column=1, pady=10)
 
     tk.Button(button_frame, text="Save and Exit",
-              command=save_params_exit).grid(row=0, column=2, padx=5, columnspan=2)
+              command=save_params_exit).grid(row=0, column=0, padx=5)
 
     root.mainloop()
 

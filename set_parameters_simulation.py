@@ -26,7 +26,8 @@ def set_parameters_simulation():
     'length_cell': 2.0,    # (µm) length of the cylindrical part, default: 2.0
     
     # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
-    'track_lengths': np.arange(1, 8),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+    'tracklength_locs_min': 2,  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+    'tracklength_locs_max': 8,  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
     'mean_track_length': 10,  # Mean track length for exponential distribution, default 3
     
     # Simulation parameters
@@ -55,6 +56,10 @@ def set_parameters_simulation():
    #Plotting stuff
    'dpi': 150, # DPI setting for plotting figures, default: 300
    }
+    
+    sim_input['track_lengths'] = np.arange(sim_input['tracklength_locs_min']-1,
+                                            sim_input['tracklength_locs_max'])
+    
     """
     sim_input.species(ii).diff_quot = [A, B, ...]; 
     Possibilities for states

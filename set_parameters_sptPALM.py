@@ -27,22 +27,19 @@ def set_parameters_sptPALM():
         
         'condition_names': [], # Initialise, further defined below
         'condition_files': [], # Initialise, further defined below
-        'copynumber_intervals': [], # Initialise, further definied below
-
-        'pixelsize': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
+        # 'copynumber_intervals': [[1, 100], [101, 200], [201, 300], [301, 400]], # Initialise, further definied below
 
         # Segmentation of cells allows linking localisations to individual cells
+        'pixelsize': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
+        'use_segmentations': True, # Account for segmentations = False, default: True
         'cellarea_pixels_min': 50,  # Filter cells for minum area (area is given in number of pixels), default: 50
         'cellarea_pixels_max': 500, # Filter cells for area (area is given in number of pixels), default: 500
-        'use_segmentations': True, # Account for segmentations = False, default: True
 
-        # Tracking parameters
-        'track_steplength_max': 0.5, # Tracking window (um), default: 0.8 um
-        'track_memory': 0, # Tracking memory in frames, default: 1
-
-        # Diffusion analysis
+        # Tracking and diffusion analysis
         'frametime': 0.01, # Frametime in seconds, default: 0.01
         'loc_error': 0.035, # Localization error (um), default: 0.03
+        'track_steplength_max': 0.5, # Tracking window (um), default: 0.8 um
+        'track_memory': 0, # Tracking memory in frames, default: 1
         'diff_hist_steps_min': 3, # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
         'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, default: 100
         'track_lengths': [1,2,3,4],  # Track lengths (2 to 8 frames) tracklength of 1 is two locs
@@ -116,15 +113,20 @@ def set_parameters_sptPALM():
         '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
     ]
 
-    # Name and assign your measurement conditions/files
-    #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
-    input_parameter['condition_names'].append('Cas12a_scrambled')
-    input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
+    input_parameter['condition_names'] = ['Cas12a_scrambled', 'Cas12a_targetting']
+    input_parameter['condition_files'] = [[0,1],[2,3]]  # refers to the order of files defined above
+
+    # # Name and assign your measurement conditions/files
+    # #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
+    # input_parameter['condition_names'].append('Cas12a_scrambled')
+    # input_parameter['condition_files'].append([0,1])  # refers to the order of files defined above
     
-    # DO NOT REMOVE THE FOLLOWING LINES!
-    # Copy or uncomment the following lines if necessary
-    input_parameter['condition_names'].append('Cas12a_targetting')
-    input_parameter['condition_files'].append([2,3])  # refers to the order of files defined above
+    # # DO NOT REMOVE THE FOLLOWING LINES!
+    # # Copy or uncomment the following lines if necessary
+    # input_parameter['condition_names'].append('Cas12a_targetting')
+    # input_parameter['condition_files'].append([2,3])  # refers to the order of files defined above
+
+
 
     # # Directory containing your data (make sure you end with a '/' or '\')
     # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
@@ -148,9 +150,9 @@ def set_parameters_sptPALM():
     
 
     # Histogramming of diffusion coefficients per copynumber
-    INTERVAL = 100
-    for i in range(1, 6):
-        input_parameter['copynumber_intervals'].append([(i-1)*INTERVAL+1, i*INTERVAL])
+    # INTERVAL = 100
+    # for i in range(1, 6):
+    #     input_parameter['copynumber_intervals'].append([(i-1)*INTERVAL+1, i*INTERVAL])
 
     return input_parameter
 
