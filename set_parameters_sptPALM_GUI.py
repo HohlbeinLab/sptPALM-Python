@@ -293,7 +293,7 @@ def set_parameters_sptPALM_GUI(para = None):
     tk.Label(tracking_frame, text="Track lenghts (frames)", width = width_text_labels,
              anchor="w").grid(row=3, column=0, sticky=tk.W)
     track_lengths_entry = tk.Entry(tracking_frame, width=width_text_box)
-    track_lengths_entry.grid(row=4, column=1)
+    track_lengths_entry.grid(row=3, column=1)
     track_lengths_entry.insert(0, ', '.join(map(str, para['track_lengths'])))   
                         
               
