@@ -52,8 +52,12 @@ while True:
         case 1:
             input_parameter = set_parameters_sptPALM()
             input_parameter = set_parameters_sptPALM_GUI(input_parameter)    
-            print(input_parameter)
-            # print(input_parameter['track_lengths'])       
+            # Display analysis parameters
+            print('  Show input_parameter')
+            # Iterate through the dictionary and print each key-value pair on a new line
+            for key, value in input_parameter.items():
+                print(f"    .{key}: {value}")
+    
         case 2:  # sptPALM_analyse_Movies
             if input_parameter:
                 print("No 'input_parameter' available, selecting defaults from set_parameters_sptPLAM.py.")

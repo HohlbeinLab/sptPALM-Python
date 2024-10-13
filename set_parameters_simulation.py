@@ -94,20 +94,20 @@ def set_parameters_simulation():
     sim_input['species'].append(species)
  
 
-    # # Following part can be copied for every species to be simulated
-    # species = {
-    #     '#_states': 3,
-    #     'diff_quot': np.array([0, 0, 2.2]),  # Diffusion coefficients for each state (µm^2/s)
-    #     # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
-    #     'rates': np.array([120, 270, 250, 143, 0, 0])}   # Transition rates between states (1/s)
-    #     # For fitting purposes
-    # species['diff_quot_init_guess'] = species['diff_quot'] * sim_input['multiplicator']
-    # species['diff_quot_lb_ub'] =  np.array([[np.nan, 0, 2],
-    #                                         [np.nan, 2, 10]]) * sim_input['multiplicator']       
-    # species['rates_init_guess'] = species['rates']  # Initial guess for rates
-    # species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, np.nan, np.nan],
-    #                                   [1000, 1000, 1000, 1000, np.nan, np.nan]])  # Lower and upper bounds for rates
-    # sim_input['species'].append(species)
+    # Following part can be copied for every species to be simulated
+    species = {
+        '#_states': 3,
+        'diff_quot': np.array([0, 0, 2.2]),  # Diffusion coefficients for each state (µm^2/s)
+        # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
+        'rates': np.array([120, 270, 250, 143, 0, 0])}   # Transition rates between states (1/s)
+        # For fitting purposes
+    species['diff_quot_init_guess'] = species['diff_quot'] * sim_input['multiplicator']
+    species['diff_quot_lb_ub'] =  np.array([[np.nan, 0, 2],
+                                            [np.nan, 2, 10]]) * sim_input['multiplicator']       
+    species['rates_init_guess'] = species['rates']  # Initial guess for rates
+    species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, np.nan, np.nan],
+                                      [1000, 1000, 1000, 1000, np.nan, np.nan]])  # Lower and upper bounds for rates
+    sim_input['species'].append(species)
     
     # # Following part can be copied for every species to be simulated
     # species = {

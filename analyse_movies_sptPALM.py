@@ -127,7 +127,7 @@ def analyse_movies_sptPALM(input_parameter = None):
             para = single_cell_analysis_sptPALM(para)
             para = plot_single_cell_analysis_sptPALM(para)
 
-        # 2.8 Save current analysis as Matlab workspace
+        # 2.8 Save current analysis
         with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:
             pickle.dump(para, f)
         print(f"  Parameter dictionary for current movie {ii} out of {len(input_parameter['fn_locs'])} movies(s) was saved as pickle file")
