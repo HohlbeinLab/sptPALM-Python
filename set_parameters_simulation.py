@@ -101,9 +101,9 @@ def set_parameters_simulation():
         # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
         'rates': np.array([120, 270, 250, 143, 0, 0])}   # Transition rates between states (1/s)
         # For fitting purposes
-    species['diff_quot_init_guess'] = species['diff_quot'] * sim_input['multiplicator']
+    species['diff_quot_init_guess'] = species['diff_quot']
     species['diff_quot_lb_ub'] =  np.array([[np.nan, 0, 2],
-                                            [np.nan, 2, 10]]) * sim_input['multiplicator']       
+                                            [np.nan, 2, 10]])
     species['rates_init_guess'] = species['rates']  # Initial guess for rates
     species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, np.nan, np.nan],
                                       [1000, 1000, 1000, 1000, np.nan, np.nan]])  # Lower and upper bounds for rates
@@ -116,9 +116,9 @@ def set_parameters_simulation():
     #     # four linear states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kCD, kDC];
     #     'rates': np.array([100, 400, 125, 40, 10, 10])}   # Transition rates between states (1/s)
     #     # For fitting purposes
-    # species['diff_quot_init_guess'] = species['diff_quot'] * sim_input['multiplicator']
+    # species['diff_quot_init_guess'] = species['diff_quot'] 
     # species['diff_quot_lb_ub'] =  np.array([[np.nan, 0, 2],
-    #                                        [np.nan, 2, 10]]) * sim_input['multiplicator']       
+    #                                        [np.nan, 2, 10]])  
     # species['rates_init_Guess'] = species['rates']  # Initial guess for rates
     # species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, 1, 1],
     #                                  [1000, 1000, 1000, 1000, 1000, 1000]])  # Lower and upper bounds for rates

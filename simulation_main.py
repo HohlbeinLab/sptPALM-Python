@@ -25,13 +25,13 @@ sim_input = set_parameters_simulation();
 
 set_parameters_simulation_GUI(sim_input)
     
-breakpoint()
+# breakpoint()
    
-# Function for setting all starting positions, starting states etc
-[particleData, sim_input] = initiate_simulation(sim_input);
+# # Function for setting all starting positions, starting states etc
+# [particleData, sim_input] = initiate_simulation(sim_input);
 
-# Function for moving particles and checking for state changes
-[particleData, tracks] = diffusion_simulation(sim_input, particleData);
+# # Function for moving particles and checking for state changes
+# [particleData, tracks] = diffusion_simulation(sim_input, particleData);
 
 # # Function to calculate diffusion coefficients for different track lengths
 # sorted_tracks = tracks.sort_values(by=['track_id', 'frame']) 

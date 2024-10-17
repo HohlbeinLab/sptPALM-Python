@@ -534,13 +534,13 @@ def set_parameters_sptPALM_GUI(para = None):
   
     # Plot frame numbers next to tracks
     scta_vis_cells_var = tk.BooleanVar(value=para['scta_vis_cells'])
-    tk.Checkbutton(plotting_frame, text="Show individual cells", variable=use_plot_frame_number_var,
+    tk.Checkbutton(plotting_frame, text="Show individual cells", variable=scta_vis_cells_var,
                    width = width_text_labels, anchor="w").grid(row=row_index, column=2, sticky=tk.W)
 
     row_index+=1
     # Plot frame numbers next to tracks
     scta_vis_interactive_var = tk.BooleanVar(value=para['scta_vis_interactive'])
-    tk.Checkbutton(plotting_frame, text="Cycle through cells", variable=use_plot_frame_number_var,
+    tk.Checkbutton(plotting_frame, text="Cycle through cells", variable=scta_vis_interactive_var,
                    width = width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
 
     row_index+=1

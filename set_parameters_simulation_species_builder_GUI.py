@@ -24,14 +24,14 @@ class SpeciesManager:
         self.species_list = []
 
         # Define headers for the table
-        headers = ["Number of states\n currently 1, 2, 3, or 4 ",
-                   "diff_quot (µm^2/s)\n separate by ','",
-                   "rates ((s^-1)\n 1: [0], 2: [kAB, kBA],\n 3: [kAB, kBA, kBC, kCB, kAC, kCA],"
-                   "\n 4(lin): [kAB, kBA, kBC, kCB, kCD, kDC]",
-                   "Fiting: diff_quot_init_guess",
-                   "Fitting: rates_init_guess \n structure: see rates",
-                   "Fitting: diff_quot_lb_ub \n [diff_quot_min][diff_quot_max]",
-                   "Fitting: rates_lb_ub \n [rates_min][rates_max]", '+']
+        headers = ["Number of states\n \n 1:A \n 2:A,B \n 3:A,B,C \n 4:A,B,C,D linear ",
+                   "diff_quot (µm^2/s)\n separate by ',' \n 2 \n 0.01,2.8 \n 0,0.1,2 \n 0,0.1,1.1,2",
+                   "rates (s^-1)\n separate by ',' 0 \n 155, 137 \n kAB, kBA, kBC, kCB, kAC, kCA",
+                   "\n kAB, kBA, kBC, kCB, kCD, kDC",
+                   "Fiting: diff_quot_init_guess \n structure: see Diffq \n 0.001, 2.4 \n \n",
+                   "Fitting: rates_init_guess \n structure: see rates \n [0, 1.], [0.002, 5.] \n \n",
+                   "Fitting: diff_quot_lb_ub \n [diff_quot_min][diff_quot_max] \n 100, 100 \n \n",
+                   "Fitting: rates_lb_ub \n [rates_min][rates_max] \n [10, 10], [200, 500] \n \n", '+']
 
         # Create header labels
         for i, header in enumerate(headers):
@@ -122,9 +122,7 @@ class SpeciesManager:
         print(sim_input)  # For debugging purposes
 
 # Example sim_input structure
-sim_input = {
-    'species': [
-        {
+sim_input = {'species': [ {
             '#_states': 2,
             'diff_quot': np.array([0.001, 2.8]),
             'rates': np.array([155, 137]),
@@ -132,11 +130,7 @@ sim_input = {
             'diff_quot_lb_ub': np.array([[0, 1.], [0.002, 5.]]),
             'rates_init_guess': np.array([155, 137]),
             'rates_lb_ub': np.array([[10, 10], [200, 500]])
-        }
-    ],
-    'avoidFloat0': 0.001,
-    'multiplicator': 1.5
-}
+        } ] }
 
 # Create the main window and run the app
 root = tk.Tk()
