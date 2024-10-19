@@ -15,11 +15,13 @@ from tkinter import filedialog
 from set_parameters_simulation import set_parameters_simulation
 import pickle
 from pathlib import Path
+from tkinter import messagebox
+import numpy as np
 
-def set_parameters_simulation_GUI(sim_input = None):
+def set_parameters_simulation_combined_GUI(sim_input = None):
 
 
-    print('\nRun set_parameters_simulation_GUI.py')
+    print('\nRun set_parameters_simulation_combined_GUI.py')
     if sim_input is None:
         print(" re-run set_parameters_simulation")
         sim_input = set_parameters_simulation()
@@ -355,6 +357,15 @@ def set_parameters_simulation_GUI(sim_input = None):
     avoidFloat0_entry.insert(0, sim_input['avoidFloat0']) 
 
 
+
+    # Create the SpeciesManager frame and add it to the right_frame, at the bottom
+    
+    species_frame = tk.LabelFrame(root, text="Species", padx=10, pady=10)
+    species_frame.grid(row=5, column=0, padx=10, pady=10, columnspan=2)
+    
+    species_manager = SpeciesManager(species_frame, sim_input)
+    species_manager.grid(row=5, column=0, padx=10, pady=10,  columnspan=2)
+
 #############################
     # Load, Save, and Exit buttons
 #############################
@@ -369,64 +380,32 @@ def set_parameters_simulation_GUI(sim_input = None):
 
     tk.Button(button_frame, text="Exit",
               command=exit_GUI).grid(row=0, column=4, padx=5)
+
     root.mainloop()
-
-
-    # Adding a new frame for species management within the main GUI window
-    species_frame = tk.Frame(root)
-    species_frame.pack(fill='both', expand=True)
-
-    # Initialize the SpeciesManager class within this frame
-    species_manager = SpeciesManager(species_frame, sim_input)
-
-
-
 
     # Return collected parameters after window closes
     return sim_input
 
-
-
-
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-This work is licensed under the CC BY 4.0 License.
-You are free to share and adapt this work, even for commercial purposes,
-as long as you provide appropriate credit to the original creator.
-
-Original Creator: Johannes Hohlbein (Wageningen University & Research)
-Date of Creation: September, 2024
-
-Full license details can be found at https://creativecommons.org/licenses/by/4.0/
-"""
-import tkinter as tk
-from tkinter import messagebox
-import numpy as np
-
-class SpeciesManager:
-    def __init__(self, root, sim_input):
-        self.root = root
-        self.root.title("Species Manager")
-
-        # Extract any existing species data from sim_input
+class SpeciesManager(tk.Frame):  # Inherit from tk.Frame
+    def __init__(self, parent, sim_input):
+        super().__init__(parent)  # Initialize the frame
         self.sim_input = sim_input
         self.species_list = []
 
-        # Define headers for the table
+        # Define headers for the table, including the new Delete column
         headers = ["Number of states\n \n 1:A \n 2:A,B \n 3:A,B,C \n 4:A,B,C,D linear ",
                    "diff_quot (µm^2/s)\n separate by ',' \n 2 \n 0.01,2.8 \n 0,0.1,2 \n 0,0.1,1.1,2",
-                   "rates (s^-1)\n separate by ',' 0 \n 155, 137 \n kAB, kBA, kBC, kCB, kAC, kCA",
+                   "rates (s^-1)\n separate by ',' 0 \n 155, 137 \n kAB, kBA, kBC, kCB, kAC, kCA"
                    "\n kAB, kBA, kBC, kCB, kCD, kDC",
                    "Fiting: diff_quot_init_guess \n structure: see Diffq \n 0.001, 2.4 \n \n",
                    "Fitting: rates_init_guess \n structure: see rates \n [0, 1.], [0.002, 5.] \n \n",
                    "Fitting: diff_quot_lb_ub \n [diff_quot_min][diff_quot_max] \n 100, 100 \n \n",
-                   "Fitting: rates_lb_ub \n [rates_min][rates_max] \n [10, 10], [200, 500] \n \n", '+']
+                   "Fitting: rates_lb_ub \n [rates_min][rates_max] \n [10, 10], [200, 500] \n \n", 
+                   'Add', "Delete"]  # Added Delete column
 
         # Create header labels
         for i, header in enumerate(headers):
-            tk.Label(root, text=header).grid(row=0, column=i)
+            tk.Label(self, text=header).grid(row=0, column=i)
 
         # If there are existing species, prepopulate rows with their data
         for species in self.sim_input.get('species', []):
@@ -436,8 +415,8 @@ class SpeciesManager:
         self.add_row()
 
         # Save button to collect all the species and update sim_input
-        self.save_button = tk.Button(root, text="Save", command=self.save_species)
-        self.save_button.grid(row=len(self.species_list) + 2, column=0, columnspan=7)
+        self.save_button = tk.Button(self, text="Save", command=self.save_species)
+        self.save_button.grid(row=len(self.species_list) + 2, column=0, columnspan=8)  # Adjusted colspan for the new column
 
     def add_row(self, species=None):
         """
@@ -446,13 +425,13 @@ class SpeciesManager:
         row_entries = {}
 
         # Create entry fields for each species parameter
-        num_states = tk.Entry(self.root)
-        diff_quot = tk.Entry(self.root)
-        rates = tk.Entry(self.root)
-        diff_quot_init_guess = tk.Entry(self.root)
-        rates_init_guess = tk.Entry(self.root)
-        diff_quot_lb_ub = tk.Entry(self.root)
-        rates_lb_ub = tk.Entry(self.root)
+        num_states = tk.Entry(self)
+        diff_quot = tk.Entry(self)
+        rates = tk.Entry(self)
+        diff_quot_init_guess = tk.Entry(self)
+        rates_init_guess = tk.Entry(self)
+        diff_quot_lb_ub = tk.Entry(self)
+        rates_lb_ub = tk.Entry(self)
 
         if species:
             # Prepopulate the fields with species data
@@ -475,8 +454,12 @@ class SpeciesManager:
         rates_lb_ub.grid(row=row, column=6)
 
         # Add "+" button to add more rows
-        add_button = tk.Button(self.root, text="+", command=self.add_row)
+        add_button = tk.Button(self, text="+", command=self.add_row)
         add_button.grid(row=row, column=7)
+
+        # Add "Delete" button to remove the row
+        delete_button = tk.Button(self, text="Delete", command=lambda r=row: self.delete_row(r))
+        delete_button.grid(row=row, column=8)
 
         # Store the entry widgets in a list for retrieval later
         row_entries['#_states'] = num_states
@@ -489,6 +472,23 @@ class SpeciesManager:
 
         # Append to species list for later data retrieval
         self.species_list.append(row_entries)
+
+    def delete_row(self, row):
+        """
+        Delete the specified row both from the grid and from the species_list.
+        """
+        # Remove the row from the species list
+        if row - 1 < len(self.species_list):
+            del self.species_list[row - 1]
+
+        # Clear the row from the grid
+        for widget in self.grid_slaves(row=row):
+            widget.grid_forget()
+
+        # Re-arrange the rows below this one by moving them up
+        for i in range(row, len(self.species_list) + 1):
+            for widget in self.grid_slaves(row=i):
+                widget.grid(row=i - 1)
 
     def save_species(self):
         """
@@ -511,6 +511,21 @@ class SpeciesManager:
         # Display a message box to confirm saving
         messagebox.showinfo("Saved", "Species data saved successfully!")
         print(sim_input)  # For debugging purposes
+
+# # Example sim_input structure
+# sim_input = {'species': [ {
+#             '#_states': 2,
+#             'diff_quot': np.array([0.001, 2.8]),
+#             'rates': np.array([155, 137]),
+#             'diff_quot_init_guess': np.array([0.001, 2.8]),
+#             'diff_quot_lb_ub': np.array([[0, 1.], [0.002, 5.]]),
+#             'rates_init_guess': np.array([155, 137]),
+#             'rates_lb_ub': np.array([[10, 10], [200, 500]])
+#         } ] }
+
+#         # Display a message box to confirm saving
+#         messagebox.showinfo("Saved", "Species data saved successfully!")
+#         print(sim_input)  # For debugging purposes
 
 # # Example sim_input structure
 # sim_input = {'species': [ {
