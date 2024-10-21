@@ -15,13 +15,9 @@ from tkinter import filedialog
 from set_parameters_simulation import set_parameters_simulation
 import pickle
 from pathlib import Path
-from tkinter import messagebox
-import numpy as np
 
-def set_parameters_simulation_combined_GUI(sim_input = None):
-
-
-    print('\nRun set_parameters_simulation_combined_GUI.py')
+def set_parameters_simulation_GUI(sim_input = None):
+    print('\nRun set_parameters_simulation_GUI.py')
     if sim_input is None:
         print(" re-run set_parameters_simulation")
         sim_input = set_parameters_simulation()
@@ -357,15 +353,6 @@ def set_parameters_simulation_combined_GUI(sim_input = None):
     avoidFloat0_entry.insert(0, sim_input['avoidFloat0']) 
 
 
-
-    # Create the SpeciesManager frame and add it to the right_frame, at the bottom
-    
-    species_frame = tk.LabelFrame(root, text="Species", padx=10, pady=10)
-    species_frame.grid(row=5, column=0, padx=10, pady=10, columnspan=2)
-    
-    species_manager = SpeciesManager(species_frame, sim_input)
-    species_manager.grid(row=5, column=0, padx=10, pady=10,  columnspan=2)
-
 #############################
     # Load, Save, and Exit buttons
 #############################
@@ -380,166 +367,10 @@ def set_parameters_simulation_combined_GUI(sim_input = None):
 
     tk.Button(button_frame, text="Exit",
               command=exit_GUI).grid(row=0, column=4, padx=5)
-
     root.mainloop()
 
     # Return collected parameters after window closes
     return sim_input
 
-class SpeciesManager(tk.Frame):  # Inherit from tk.Frame
-    def __init__(self, parent, sim_input):
-        super().__init__(parent)  # Initialize the frame
-        self.sim_input = sim_input
-        self.species_list = []
 
-        # Define headers for the table, including the new Delete column
-        headers = ["Number of states\n \n 1:A \n 2:A,B \n 3:A,B,C \n 4:A,B,C,D linear ",
-                   "diff_quot (µm^2/s)\n separate by ',' \n 2 \n 0.01,2.8 \n 0,0.1,2 \n 0,0.1,1.1,2",
-                   "rates (s^-1)\n separate by ',' 0 \n 155, 137 \n kAB, kBA, kBC, kCB, kAC, kCA"
-                   "\n kAB, kBA, kBC, kCB, kCD, kDC",
-                   "Fiting: diff_quot_init_guess \n structure: see Diffq \n 0.001, 2.4 \n \n",
-                   "Fitting: rates_init_guess \n structure: see rates \n [0, 1.], [0.002, 5.] \n \n",
-                   "Fitting: diff_quot_lb_ub \n [diff_quot_min][diff_quot_max] \n 100, 100 \n \n",
-                   "Fitting: rates_lb_ub \n [rates_min][rates_max] \n [10, 10], [200, 500] \n \n", 
-                   'Add', "Delete"]  # Added Delete column
-
-        # Create header labels
-        for i, header in enumerate(headers):
-            tk.Label(self, text=header).grid(row=0, column=i)
-
-        # If there are existing species, prepopulate rows with their data
-        for species in self.sim_input.get('species', []):
-            self.add_row(species)
-
-        # Add an empty row for adding new species
-        self.add_row()
-
-        # Save button to collect all the species and update sim_input
-        self.save_button = tk.Button(self, text="Save", command=self.save_species)
-        self.save_button.grid(row=len(self.species_list) + 2, column=0, columnspan=8)  # Adjusted colspan for the new column
-
-    def add_row(self, species=None):
-        """
-        Add a row of species data. If species data is provided, prepopulate the fields.
-        """
-        row_entries = {}
-
-        # Create entry fields for each species parameter
-        num_states = tk.Entry(self)
-        diff_quot = tk.Entry(self)
-        rates = tk.Entry(self)
-        diff_quot_init_guess = tk.Entry(self)
-        rates_init_guess = tk.Entry(self)
-        diff_quot_lb_ub = tk.Entry(self)
-        rates_lb_ub = tk.Entry(self)
-
-        if species:
-            # Prepopulate the fields with species data
-            num_states.insert(0, str(species.get('#_states', '')))
-            diff_quot.insert(0, ', '.join(map(str, species.get('diff_quot', []))))
-            rates.insert(0, ', '.join(map(str, species.get('rates', []))))
-            diff_quot_init_guess.insert(0, ', '.join(map(str, species.get('diff_quot_init_guess', []))))
-            rates_init_guess.insert(0, ', '.join(map(str, species.get('rates_init_guess', []))))
-            diff_quot_lb_ub.insert(0, ', '.join(map(str, species.get('diff_quot_lb_ub', []))))
-            rates_lb_ub.insert(0, ', '.join(map(str, species.get('rates_lb_ub'))))
-
-        # Place each entry widget into the grid
-        row = len(self.species_list) + 1
-        num_states.grid(row=row, column=0)
-        diff_quot.grid(row=row, column=1)
-        rates.grid(row=row, column=2)
-        diff_quot_init_guess.grid(row=row, column=3)
-        rates_init_guess.grid(row=row, column=4)
-        diff_quot_lb_ub.grid(row=row, column=5)
-        rates_lb_ub.grid(row=row, column=6)
-
-        # Add "+" button to add more rows
-        add_button = tk.Button(self, text="+", command=self.add_row)
-        add_button.grid(row=row, column=7)
-
-        # Add "Delete" button to remove the row
-        delete_button = tk.Button(self, text="Delete", command=lambda r=row: self.delete_row(r))
-        delete_button.grid(row=row, column=8)
-
-        # Store the entry widgets in a list for retrieval later
-        row_entries['#_states'] = num_states
-        row_entries['diff_quot'] = diff_quot
-        row_entries['rates'] = rates
-        row_entries['diff_quot_init_guess'] = diff_quot_init_guess
-        row_entries['rates_init_guess'] = rates_init_guess
-        row_entries['diff_quot_lb_ub'] = diff_quot_lb_ub
-        row_entries['rates_lb_ub'] = rates_lb_ub
-
-        # Append to species list for later data retrieval
-        self.species_list.append(row_entries)
-
-    def delete_row(self, row):
-        """
-        Delete the specified row both from the grid and from the species_list.
-        """
-        # Remove the row from the species list
-        if row - 1 < len(self.species_list):
-            del self.species_list[row - 1]
-
-        # Clear the row from the grid
-        for widget in self.grid_slaves(row=row):
-            widget.grid_forget()
-
-        # Re-arrange the rows below this one by moving them up
-        for i in range(row, len(self.species_list) + 1):
-            for widget in self.grid_slaves(row=i):
-                widget.grid(row=i - 1)
-
-    def save_species(self):
-        """
-        Save all species data into sim_input.
-        """
-        sim_input = {'species': []}
-
-        for row in self.species_list:
-            species = {
-                '#_states': int(row['#_states'].get()),  # Get the value from Entry
-                'diff_quot': np.array([float(x) for x in row['diff_quot'].get().split(',')]),  # Split and convert to float
-                'rates': np.array([float(x) for x in row['rates'].get().split(',')]),  # Split and convert to float
-                'diff_quot_init_guess': np.array([float(x) for x in row['diff_quot_init_guess'].get().split(',')]),
-                'rates_init_guess': np.array([float(x) for x in row['rates_init_guess'].get().split(',')]),
-                'diff_quot_lb_ub': np.array([list(map(float, x.split())) for x in row['diff_quot_lb_ub'].get().split(',')]),
-                'rates_lb_ub': np.array([list(map(float, x.split())) for x in row['rates_lb_ub'].get().split(',')])
-            }
-            sim_input['species'].append(species)
-
-        # Display a message box to confirm saving
-        messagebox.showinfo("Saved", "Species data saved successfully!")
-        print(sim_input)  # For debugging purposes
-
-# # Example sim_input structure
-# sim_input = {'species': [ {
-#             '#_states': 2,
-#             'diff_quot': np.array([0.001, 2.8]),
-#             'rates': np.array([155, 137]),
-#             'diff_quot_init_guess': np.array([0.001, 2.8]),
-#             'diff_quot_lb_ub': np.array([[0, 1.], [0.002, 5.]]),
-#             'rates_init_guess': np.array([155, 137]),
-#             'rates_lb_ub': np.array([[10, 10], [200, 500]])
-#         } ] }
-
-#         # Display a message box to confirm saving
-#         messagebox.showinfo("Saved", "Species data saved successfully!")
-#         print(sim_input)  # For debugging purposes
-
-# # Example sim_input structure
-# sim_input = {'species': [ {
-#             '#_states': 2,
-#             'diff_quot': np.array([0.001, 2.8]),
-#             'rates': np.array([155, 137]),
-#             'diff_quot_init_guess': np.array([0.001, 2.8]),
-#             'diff_quot_lb_ub': np.array([[0, 1.], [0.002, 5.]]),
-#             'rates_init_guess': np.array([155, 137]),
-#             'rates_lb_ub': np.array([[10, 10], [200, 500]])
-#         } ] }
-
-# # Create the main window and run the app
-# root = tk.Tk()
-# app = SpeciesManager(root, sim_input)
-# root.mainloop()
 

@@ -20,7 +20,7 @@ import threading
 from set_parameters_simulation import set_parameters_simulation
 import ast  # Safely parse the string back to a list of lists
 
-def set_parameters_simulation_GUI(sim_input=None):
+def set_parameters_simulation_combined_GUI(sim_input=None):
 
     print('\nRun set_parameters_simulation_combined_GUI.py')
     if sim_input is None:
@@ -105,8 +105,7 @@ def set_parameters_simulation_GUI(sim_input=None):
         species_manager.load_species_data(new_sim_input['species'])
 
     # Collect all parameters from the GUI
-    
-    def transfer_params():
+    def save_params():
         nonlocal sim_input
         sim_input = {
             # Number of species and particles per species
@@ -149,12 +148,8 @@ def set_parameters_simulation_GUI(sim_input=None):
             #Plotting stuff
             'dpi': dpi_entry.get(), # DPI setting for plotting figures, default: 300
             
-         } 
-        print("sim_input transfered")
-        return sim_input
-    
-    def save_params():
-        transfer_params()
+         }
+        
         current_directory = Path.cwd()
         save_file_path = filedialog.asksaveasfilename(
             defaultextension=".pkl",
@@ -226,10 +221,11 @@ def set_parameters_simulation_GUI(sim_input=None):
             return np.nan
         return structure
 
+
+
     def exit_GUI():
-        transfer_params()
-        root.quit()
-        # root.destroy()
+        # root.quit()
+        root.destroy()
 
     root = tk.Tk()
     # Disable window resizing in both horizontal and vertical directions
@@ -425,8 +421,6 @@ def set_parameters_simulation_GUI(sim_input=None):
     root.mainloop()
     
     # Return collected parameters after window closes
-    
-    print("here")
     return sim_input
 
 class SpeciesManager(tk.Frame):
