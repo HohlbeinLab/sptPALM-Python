@@ -38,18 +38,11 @@ def set_parameters_simulation_GUI(sim_input=None):
 
             # Schedule the UI update to happen in the main thread
             root.after(0, update_ui, new_sim_input)  # Use 'after' to update Tkinter UI from the main thread
-
         else:
             raise ValueError("No file selected!")
 
     def update_ui(new_sim_input):
         """Update the UI with the parameters from the loaded file."""
-        number_species_entry.delete(0, tk.END)
-        number_species_entry.insert(0, new_sim_input['#_species'])
-
-        number_particles_per_species_entry.delete(0, tk.END)
-        number_particles_per_species_entry.insert(0, ','.join(map(str, new_sim_input['#_particles_per_species'])))
-
         radius_cell_entry.delete(0, tk.END)
         radius_cell_entry.insert(0, new_sim_input['radius_cell'])
 
@@ -101,19 +94,12 @@ def set_parameters_simulation_GUI(sim_input=None):
         dpi_entry.insert(0, new_sim_input['dpi'])
 
         # Update species in the SpeciesManager
-        # breakpoint()
         species_manager.load_species_data(new_sim_input['species'])
 
     # Collect all parameters from the GUI
-    
     def transfer_params():
         nonlocal sim_input
         sim_input = {
-            # Number of species and particles per species
-            '#_species': number_species_entry.get(),  # number of species
-            '#_particles_per_species': list(map(int,
-                                                number_particles_per_species_entry.get().split(','))),  # particles per species
-            
             # Cell dimensions (in µm)
             'radius_cell': radius_cell_entry.get(),  # (µm) radius of the cap, edefault: 0.5
             'length_cell': length_cell_entry.get(),    # (µm) length of the cylindrical part, default: 2.0
@@ -150,6 +136,7 @@ def set_parameters_simulation_GUI(sim_input=None):
             'dpi': dpi_entry.get(), # DPI setting for plotting figures, default: 300
             
          } 
+        sim_input['#_species'] = len(sim_input['species'])
         print("sim_input transfered")
         return sim_input
     
@@ -177,6 +164,7 @@ def set_parameters_simulation_GUI(sim_input=None):
             if is_row_complete(row):  # Check if the row has all required values
                 species = {
                     '#_states': int(row['#_states'].get()),
+                    '#_particles': int(row['#_particles'].get()),
                     'diff_quot': [safe_float(x) for x in row['diff_quot'].get().split(',')],
                     'rates': [safe_float(x) for x in row['rates'].get().split(',')],
                     'diff_quot_init_guess': [safe_float(x) for x in row['diff_quot_init_guess'].get().split(',')],
@@ -235,7 +223,7 @@ def set_parameters_simulation_GUI(sim_input=None):
     # Disable window resizing in both horizontal and vertical directions
     root.resizable(False, False)
 
-    root.title("SPT-PALM simulation GUI (defaults imported from set_parameter_simulation.py)")
+    root.title("sptPALM simulation GUI (defaults imported from set_parameter_simulation.py)")
 
     root.grid_columnconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
@@ -246,7 +234,7 @@ def set_parameters_simulation_GUI(sim_input=None):
     right_frame = tk.Frame(root)
     right_frame.grid(row=1, column=1, padx=0, pady=0, sticky="nsew")
 
-    width_text_labels = 20
+    width_text_labels = 22
     width_text_box = 8
     row_index = 0
 
@@ -256,21 +244,7 @@ def set_parameters_simulation_GUI(sim_input=None):
     sim_frame = tk.LabelFrame(left_frame, text="Parameters for simulation", padx=0, pady=0)
     sim_frame.grid(row=0, column=0, padx=10, pady=10, sticky="ne")
 
-    # Number of species
-    tk.Label(sim_frame, text="Number of species:", width=width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    number_species_entry = tk.Entry(sim_frame, width=width_text_box)
-    number_species_entry.grid(row=row_index, column=1)
-    number_species_entry.insert(0, sim_input['#_species'])
-
-    # Number particles per species"
-    row_index += 1
-    tk.Label(sim_frame, text="Number particles per species", width=width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    number_particles_per_species_entry = tk.Entry(sim_frame, width=(2*width_text_box)+width_text_labels+2)
-    number_particles_per_species_entry.grid(row=row_index, column=1, columnspan=3)
-    number_particles_per_species_entry.insert(0, ', '.join(map(str, sim_input['#_particles_per_species'])))
-
     # Radius of cell (µm)
-    row_index += 1
     tk.Label(sim_frame, text="Radius of cell (µm)", width=width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     radius_cell_entry = tk.Entry(sim_frame, width=width_text_box)
     radius_cell_entry.grid(row=row_index, column=1)
@@ -437,6 +411,7 @@ class SpeciesManager(tk.Frame):
         
         # Define headers for the table
         headers = ["# of states\n per species\n 1:           A \n 2:       A,B \n 3:    A,B,C \n 4: A,B,C,D",
+                   "# particles\n \n \n \n ",
                     "DiffQ (µm^2/s)\n separate by ',' \n 2 \n 0.01,2.8 \n 0,0.1,2 \n 0,0.1,1.1,2",
                     "Rates (s^-1)\n separate by ',' \n 0 \n 155, 137 \n AB,BA,BC,CB,AC,CA"
                     "\n AB,BA,BC,CB,CD,DC",
@@ -458,6 +433,7 @@ class SpeciesManager(tk.Frame):
 
         row_entries = {}
         num_states = tk.Entry(self, width=7)
+        num_particles = tk.Entry(self, width=7)
         diff_quot = tk.Entry(self, width = 10)
         rates = tk.Entry(self, width = 16)
         diff_quot_init_guess = tk.Entry(self, width = 10)
@@ -471,6 +447,7 @@ class SpeciesManager(tk.Frame):
 
         if species:
             num_states.insert(0, str(species.get('#_states', '')))
+            num_particles.insert(0, str(species.get('#_particles', '')))
             diff_quot.insert(0, ', '.join(map(str, species.get('diff_quot', []))))
             rates.insert(0, ', '.join(map(str, species.get('rates', []))))
             diff_quot_init_guess.insert(0, ', '.join(map(str, species.get('diff_quot_init_guess', []))))
@@ -480,20 +457,22 @@ class SpeciesManager(tk.Frame):
 
         row = len(self.species_list) + 1
         num_states.grid(row=row, column=0)
-        diff_quot.grid(row=row, column=1)
-        rates.grid(row=row, column=2)
-        diff_quot_init_guess.grid(row=row, column=3)
-        rates_init_guess.grid(row=row, column=4)
-        diff_quot_lb_ub.grid(row=row, column=5)
-        rates_lb_ub.grid(row=row, column=6)
+        num_particles.grid(row=row, column=1)
+        diff_quot.grid(row=row, column=2)
+        rates.grid(row=row, column=3)
+        diff_quot_init_guess.grid(row=row, column=4)
+        rates_init_guess.grid(row=row, column=5)
+        diff_quot_lb_ub.grid(row=row, column=6)
+        rates_lb_ub.grid(row=row, column=7)
 
         add_button = tk.Button(self, text="+", command=self.add_row)
-        add_button.grid(row=row, column=7)
+        add_button.grid(row=row, column=8)
 
         delete_button = tk.Button(self, text="-", command=lambda r=row: self.delete_row(r))
-        delete_button.grid(row=row, column=8)
+        delete_button.grid(row=row, column=9)
 
         row_entries['#_states'] = num_states
+        row_entries['#_particles'] = num_particles
         row_entries['diff_quot'] = diff_quot
         row_entries['rates'] = rates
         row_entries['diff_quot_init_guess'] = diff_quot_init_guess

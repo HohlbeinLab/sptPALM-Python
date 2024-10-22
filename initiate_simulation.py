@@ -17,8 +17,12 @@ import pandas as pd
 def initiate_simulation(sim_input):
     print('\nRun initiate_simulation.py')
     # Calculate some parameters from the input
-    sim_input['total_number_particles'] = np.sum(sim_input['#_particles_per_species'][:sim_input['#_species']])
+    sim_input['total_number_particles'] = 0
+    for ii in range(sim_input['#_species']):
+        sim_input['total_number_particles'] +=  sim_input['species'][ii]['#_particles']
+    
     print(f"  We simulate a total of {sim_input['total_number_particles']} particles")
+    sim_input['#_species'] = len(sim_input['species'])
     
     sim_input['total_length_cell'] = 2 * sim_input['radius_cell'] + sim_input['length_cell']
 
@@ -40,7 +44,7 @@ def initiate_simulation(sim_input):
 
     for ii in range(sim_input['#_species']):
         start_idx = temp_counter
-        end_idx = temp_counter + sim_input['#_particles_per_species'][ii]
+        end_idx = temp_counter + sim_input['species'][ii]['#_particles']
         particle_data.loc[start_idx:end_idx, 'species'] = ii
         temp_counter = end_idx
 
