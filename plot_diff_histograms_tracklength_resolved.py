@@ -13,10 +13,25 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # note that 'plot_input' can be either 'sim_input' or 
-def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, plot_input):
+def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, plot_input, D=None):
     print("\nRun plot_diff_histograms_tracklength_resolved.py")
+    
+    # More classical view
+    plot_diff_histograms_conventional(D_track_length_matrix, plot_input)
+    
+    #Ridgeplot with seaborn
+    plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input)
+    
+    breakpoint()
+    # Ridgeplot KDE with seaborn
+    plot_diff_histograms_KDE(D, plot_input)
+   
+    
+    
+def plot_diff_histograms_conventional(D_track_length_matrix, plot_input):
     # Create the bin edges using logarithmic values
     edges = D_track_length_matrix['Bins']
     
@@ -26,7 +41,6 @@ def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, plot_input)
     
     # Loop through the track lengths and create histograms
     for ii, tra_len in enumerate(plot_input['track_lengths']):
-        # breakpoint()
         # Create a subplot for each track length
         ax = plt.subplot(int(np.ceil(len(plot_input['track_lengths']) / 2)), 2, ii + 1)
         
@@ -53,45 +67,100 @@ def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, plot_input)
     plt.show()
  
     
-   
-"""
-    Older option to plot the histograms from the dataframe D with all diffusion coefficients
-"""
+def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input): 
+    sns.set_style('white', rc={
+        'xtick.bottom': True,
+        'ytick.left': False,
+    })
+    # Assuming D_track_length_matrix is your DataFrame
+    x_values = D_track_length_matrix.iloc[:, 0]  # The first column as x-values (bin edges or midpoints)
+    y_columns = D_track_length_matrix.columns[1:]  # The next 7 columns as histogrammed y-values
     
-    # # Create the bin edges using logarithmic values
-    # edges = np.arange(np.log10(plot_input['plot_diff_hist_min']), 
-    #                   np.log10(plot_input['plot_diff_hist_max']) + plot_input['binwidth'], 
-    #                   plot_input['binwidth'])
+    # Normalize each column (y-values)
+    normalized_data = D_track_length_matrix.iloc[:, 1:].div(D_track_length_matrix.iloc[:, 1:].sum(axis=0), axis=1)
     
-    # # Initialize the figure
-    # fig_handle = plt.figure(figsize=(8, 8))
-    # plt.suptitle('Histogram of diffusion coefficients per track length')
+    # Set up the figure and axes
+    plt.figure(figsize=(4, 6))
     
-    # # Loop through the track lengths and create histograms
-    # for ii, tra_len in enumerate(plot_input['track_lengths']):
+    # Create a color palette
+    palette = sns.color_palette("viridis", len(y_columns))
+    
+    # Adjust this value to control the amount of vertical overlap between curves
+    vertical_offset = 0.1  # Smaller offset for partial overlap
+    
+    # Loop through the 7 columns and plot each with vertical offset, normalized, and fill area
+    for i, column in enumerate(reversed(y_columns)):
+        # Get the normalized column data
+        y_values = normalized_data[column]
+        
+        # Plot the filled area under the curve, applying vertical offset for partial overlap
+        plt.fill_between(x_values, y_values + i * vertical_offset, i * vertical_offset, 
+                         color=palette[i], alpha=0.6, label=column)
+        
+        # Label each curve
+        plt.text(0.01, i * vertical_offset + 0.04, f"steps per track: {column}", va='center') #np.median(x_values)
+    
+    # Set log scale on the x-axis
+    plt.xscale('log')
+    
+    # Remove the frame (spines)
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
+    plt.gca().spines['left'].set_visible(False)
+    
+    plt.yticks([])
+    
+    # # Customize x-axis ticks (size, width, length, color, and direction)
+    # plt.tick_params(axis='x', which='major', labelsize=12, width=1, length=6, color='black', labelcolor='black', direction='out')  # Force ticks pointing outwards
+    
+    # # Optionally, customize minor ticks if you have them
+    # plt.tick_params(axis='x', which='minor', labelsize=10, width=0.5, length=4, color='black', labelcolor='black', direction='out')
+    
+    # Adjust y-limits to ensure the curves don't go off the plot
+    plt.ylim(0, len(y_columns) * vertical_offset + 0.1)
+    plt.xlim(np.min(x_values), np.max(x_values))
+    
+    # Add labels and styling
+    plt.title("Histograms of diffusion coefficients for different track lengths")
+    plt.xlabel("Diffusion coefficient (µm^2/s)")
+    plt.ylabel("")  # No y-axis label for aesthetic purposes
+    
+    
+    plt.tight_layout()
+    
+    # Show the plot
+    plt.show()  
 
-    #     # Create a subplot for each track length
-    #     ax = plt.subplot(int(np.ceil(len(plot_input['track_lengths']) / 2)), 2, ii + 1)
-        
-    #     if ii < max(plot_input['track_lengths']):
-    #         ax.set_title(f'D distribution for track length {plot_input["track_lengths"][ii]} steps')
-    #     else:
-    #         ax.set_title(f'D distribution for track lengths > {plot_input["track_lengths"][ii]} steps')
-        
-    #     ax.set_xscale('log')  # Set the x-axis scale to logarithmic
-    #     ax.set_xlabel('Diffusion coefficient (µm^2/s)')
-    #     ax.set_ylabel('#')
-        
-    #     # Filter the data for the current track length (ii)
-    #     data_for_hist = D.loc[ D.loc[:, '#_locs'] == plot_input['track_lengths'][ii], 'D_coeff']
-        
-    #     # Plot the histogram
-    #     ax.hist(data_for_hist, bins=10 ** edges, alpha=0.4, density=False)  # 'count' corresponds to `density=False`
-        
-    #     # Set the limits of the x-axis
-    #     ax.set_xlim([plot_input['plot_diff_hist_min'], plot_input['plot_diff_hist_max']])
-    
-    # # Show the plot
-    # plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
-    # plt.show()
+
+def plot_diff_histograms_KDE(D, plot_input):
+    """
+        Older option to plot the histograms from the dataframe D with all diffusion coefficients
+    """
+
+    # Set up the figure and axes
+    plt.figure(figsize=(10, 8))
+
+    # Create a color palette
+    palette = sns.color_palette("coolwarm", len(plot_input['track_lengths']))
+  
+    for ii, tra_len in enumerate(reversed(plot_input['track_lengths'])):
+
+        data_for_hist = D.loc[ D.loc[:, '#_locs'] == plot_input['track_lengths'][ii], 'D_coeff']
+        # Shift the y-values to stack the KDE plots vertically
+        sns.kdeplot(
+            # x=x_values, 
+            data_for_hist, 
+            fill=True, 
+            color=palette[ii], 
+        alpha=0.6, 
+        bw_adjust=0.7
+        ).set_label(tra_len)
+
+    # Offset the y-axis by adding ii to the density plots (y-offset)
+    plt.text(data_for_hist.mean(), 1, tra_len, va='center')  # Label each ridge
+
+    # plt.xscale('log')
+    # Show the plot
+    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
+    plt.show()
 

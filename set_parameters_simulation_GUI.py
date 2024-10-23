@@ -101,41 +101,45 @@ def set_parameters_simulation_GUI(sim_input=None):
         nonlocal sim_input
         sim_input = {
             # Cell dimensions (in µm)
-            'radius_cell': radius_cell_entry.get(),  # (µm) radius of the cap, edefault: 0.5
-            'length_cell': length_cell_entry.get(),    # (µm) length of the cylindrical part, default: 2.0
+            'radius_cell': float(radius_cell_entry.get()),  # (µm) radius of the cap, edefault: 0.5
+            'length_cell': float(length_cell_entry.get()),    # (µm) length of the cylindrical part, default: 2.0
             
             # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
-            'tracklength_locs_min': tracklength_locs_min_entry.get(),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
-            'tracklength_locs_max': tracklength_locs_max_entry.get(),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
-            'mean_track_length': mean_track_length_entry.get(),  # Mean track length for exponential distribution, default 3
+            'tracklength_locs_min': float(tracklength_locs_min_entry.get()),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+            'tracklength_locs_max': float(tracklength_locs_max_entry.get()),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+            'mean_track_length': float(mean_track_length_entry.get()),  # Mean track length for exponential distribution, default 3
             
             # Simulation parameters
-            'confined_diffusion': confined_diffusion_var.get(),  # Confine diffusion within a cell
-            'loc_error': loc_error_entry.get(),  # (µm) Localization error (in µm), default: 0.035
-            'correct_diff_calc_loc_error': correct_diff_calc_loc_error_var.get(),  # Match anaDDA settings, default: False
+            'confined_diffusion': bool(confined_diffusion_var.get()),  # Confine diffusion within a cell
+            'loc_error': float(loc_error_entry.get()),  # (µm) Localization error (in µm), default: 0.035
+            'correct_diff_calc_loc_error': bool(correct_diff_calc_loc_error_var.get()),  # Match anaDDA settings, default: False
             
             # Timing parameters
-            'steptime': steptime_entry.get(),  # (s) step time in seconds, default: 0.001
-            'frametime': frametime_entry.get(),  # (s) frame time in seconds, default: 0.02
+            'steptime': float(steptime_entry.get()),  # (s) step time in seconds, default: 0.001
+            'frametime': float(frametime_entry.get()),  # (s) frame time in seconds, default: 0.02
             
             # Fitting and plotting options
-            'perform_fitting': perform_fitting_var.get(),  # Whether to perform fitting or not
-            'display_figures': display_figures_var.get(),  # Display figures
+            'perform_fitting': float(perform_fitting_var.get()),  # Whether to perform fitting or not
+            'display_figures': float(display_figures_var.get()),  # Display figures
             'plot_diff_hist_min': float(diff_hist_min_entry.get()),  # Diffusion coefficient histogram min (µm^2/s), default: 0.004
             'plot_diff_hist_max': float(diff_hist_max_entry.get()),  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
             'binwidth': float(binwidth_entry.get()),   # Bin width for histogram, default 0.1
-            'species_to_select': species_to_select_entry.get(), # For fitting, only one species can be selected, set here which one, default:0
+            'species_to_select': float(species_to_select_entry.get()), # For fitting, only one species can be selected, set here which one, default:0
             
             # Error handling values
-            'avoidFloat0': avoidFloat0_entry.get(),  # To avoid rates being exactly zero, default: 1e-09
+            'avoidFloat0': float(avoidFloat0_entry.get()),  # To avoid rates being exactly zero, default: 1e-09
            
             # Here we extract raw values from the species manager:
             'species': extract_species_data(species_manager.return_species_list()),
         
             #Plotting stuff
-            'dpi': dpi_entry.get(), # DPI setting for plotting figures, default: 300
+            'dpi': float(dpi_entry.get()), # DPI setting for plotting figures, default: 300
             
          } 
+        # Make sure that the track lengths are defined    
+        sim_input['track_lengths'] = np.arange(sim_input['tracklength_locs_min']-1,
+                                                    sim_input['tracklength_locs_max'])
+    
         sim_input['#_species'] = len(sim_input['species'])
         print("sim_input transfered")
         return sim_input
@@ -174,7 +178,7 @@ def set_parameters_simulation_GUI(sim_input=None):
                 }
                 species_data.append(species)
             else:
-                print(f"Skipping incomplete row(s)!")
+                print("Skipping incomplete row(s)!")
         return species_data
     
     def is_row_complete(row):
@@ -217,6 +221,7 @@ def set_parameters_simulation_GUI(sim_input=None):
     def exit_GUI():
         transfer_params()
         root.quit()
+        return sim_input
         # root.destroy()
 
     root = tk.Tk()
@@ -399,8 +404,6 @@ def set_parameters_simulation_GUI(sim_input=None):
     root.mainloop()
     
     # Return collected parameters after window closes
-    
-    print("here")
     return sim_input
 
 class SpeciesManager(tk.Frame):

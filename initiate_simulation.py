@@ -25,7 +25,6 @@ def initiate_simulation(sim_input):
     sim_input['#_species'] = len(sim_input['species'])
     
     sim_input['total_length_cell'] = 2 * sim_input['radius_cell'] + sim_input['length_cell']
-
     sim_input['total_duration_simulation'] = len(sim_input['track_lengths']) * sim_input['frametime']
     sim_input['steps_simulation'] = sim_input['total_duration_simulation'] / sim_input['steptime']
     print(f"  We simulate a total of {int(sim_input['steps_simulation'])} steps")

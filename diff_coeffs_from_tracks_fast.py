@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 import time
 
-def diff_coeffs_from_tracks_fast(tracks, sim_input, truncation):
+def diff_coeffs_from_tracks_fast(tracks, sim_input):
     print("\nRun diff_coeffs_from_tracks_simulation.py")
     # Initialize
     tracks_data = tracks.copy()
@@ -45,19 +45,13 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input, truncation):
     rounded_time = round(end-start, 2)
     print(f"  Time for MSD calculation: {rounded_time} seconds")
 
-    """
-        Following part is currently commented out. Probably specific ro anaDDA
-    """
-    # Correct for localization error if specified track data is co
-    # if sim_input['correct_diff_calc_loc_error']:
-    #     loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
-    #                                             len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
-    #     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
-    # else:
-    #     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime'])
- 
-    loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
+
+    # Correct for localization error if specified (option in anaDDA does require to switch that off)
+    if sim_input['correct_diff_calc_loc_error']:
+        loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
                                                 len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
+    else:
+        loc_error_correction = 0
     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
 
     D = tracks_data.copy()
@@ -69,8 +63,7 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input, truncation):
 
     D_track_length_matrix = pd.DataFrame(np.zeros((len(edges),
                                                    len(sim_input['track_lengths']) + 1)),
-                                         columns=['Bins'] + list(sim_input['track_lengths']))
-   
+                                         columns=['Bins'] + list(sim_input['track_lengths']))  
     D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
     
     for i, track_len in enumerate(sim_input['track_lengths']):
@@ -82,7 +75,7 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input, truncation):
 
     return D, D_track_length_matrix
 
-# Optimized function using np.diff and reshaping
+
 # Generalized function to calculate differences between two columns in groups of rows
 def calculate_MSD(df, col_name1, col_name2, group_size):
     
