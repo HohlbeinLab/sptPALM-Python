@@ -189,7 +189,6 @@ def set_parameters_sptPALM_GUI(para = None):
             'loc_error': float(loc_error_entry.get()),
             'diff_hist_steps_min': int(diff_hist_steps_min_entry.get()),
             'diff_hist_steps_max': int(diff_hist_steps_max_entry.get()),
-            # 'track_lengths': list(map(int, track_lengths_entry.get().split(','))),
             'tracklength_locs_min': int(tracklength_locs_min_entry.get()),
             'tracklength_locs_max': int(tracklength_locs_max_entry.get()),
             

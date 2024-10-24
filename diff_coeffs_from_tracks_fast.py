@@ -47,30 +47,41 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input):
 
 
     # Correct for localization error if specified (option in anaDDA does require to switch that off)
+    #what is the best correction here? Michelet 2010 reduced localization error? 
     if sim_input['correct_diff_calc_loc_error']:
         loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
                                                 len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
     else:
+        print('log error connection = 0')
         loc_error_correction = 0
+
     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
 
     D = tracks_data.copy()
 
     # Create the histogram of diffusion coefficients as a function of track lengths
-    edges = np.arange(np.log10(sim_input['plot_diff_hist_min']),
+    if sim_input['plot_option'] == 'logarithmic':
+        edges = np.arange(np.log10(sim_input['plot_diff_hist_min']),
                       np.log10(sim_input['plot_diff_hist_max']) + sim_input['binwidth'],
                       sim_input['binwidth'])
+    else:
+        edges = np.arange(0, sim_input['plot_diff_hist_max'] + sim_input['binwidth'],
+                      sim_input['binwidth'])      
 
     D_track_length_matrix = pd.DataFrame(np.zeros((len(edges),
                                                    len(sim_input['track_lengths']) + 1)),
                                          columns=['Bins'] + list(sim_input['track_lengths']))  
-    D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
+ 
+    if sim_input['plot_option'] == 'logarithmic':
+        D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
+    else:
+        D_track_length_matrix.loc[:, 'Bins'] = edges
     
     for i, track_len in enumerate(sim_input['track_lengths']):
         # Use idx_track_ids to prevent counting diffusion coefficients several times
         idx = tracklength_counts.index[tracklength_counts[:] == track_len + 1].tolist()
         if idx:
-            hist, _ = np.histogram(D.loc[idx, 'D_coeff'], bins=10 ** edges)
+            hist, _ = np.histogram(D.loc[idx, 'D_coeff'], D_track_length_matrix.loc[:, 'Bins'])
             D_track_length_matrix.loc[D_track_length_matrix.index[:-1], track_len] = hist
 
     return D, D_track_length_matrix

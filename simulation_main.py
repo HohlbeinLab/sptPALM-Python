@@ -31,6 +31,7 @@ sim_input = set_parameters_simulation();
 # set_parameters_simulation_GUI(sim_input)
 # sim_input = set_parameters_simulation_GUI(sim_input)
 
+
 # Function for setting all starting positions, starting states etc
 [particleData, sim_input] = initiate_simulation(sim_input);
 

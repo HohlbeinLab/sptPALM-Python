@@ -83,6 +83,8 @@ def set_parameters_simulation_GUI(sim_input=None):
 
         binwidth_entry.delete(0, tk.END)
         binwidth_entry.insert(0, new_sim_input['binwidth'])
+        
+        plot_option_var.set(new_sim_input['plot_option'])
 
         species_to_select_entry.delete(0, tk.END)
         species_to_select_entry.insert(0, new_sim_input['species_to_select'])
@@ -125,6 +127,7 @@ def set_parameters_simulation_GUI(sim_input=None):
             'plot_diff_hist_max': float(diff_hist_max_entry.get()),  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
             'binwidth': float(binwidth_entry.get()),   # Bin width for histogram, default 0.1
             'species_to_select': float(species_to_select_entry.get()), # For fitting, only one species can be selected, set here which one, default:0
+            'plot_option': plot_option_var.get(),# wether to plot D_histograms logarithmic or linear
             
             # Error handling values
             'avoidFloat0': float(avoidFloat0_entry.get()),  # To avoid rates being exactly zero, default: 1e-09
@@ -366,7 +369,16 @@ def set_parameters_simulation_GUI(sim_input=None):
     binwidth_entry.grid(row=row_index, column=1)
     binwidth_entry.insert(0, sim_input['binwidth'])  
 
+    # Dropdown Menu for plotting option selection
+    tk.Label(plotting_frame, text="Plot option (log or lin)", width = width_text_labels,
+             anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+    plot_option_var = tk.StringVar()
+    plot_option_var.set(sim_input['plot_option'])  # Default option
+    plot_option_entry = tk.OptionMenu(plotting_frame, plot_option_var, "linear", "logarithmic")
+    plot_option_entry.grid(row=row_index, column=3, sticky=tk.W)
+
     # dpi
+    row_index+=1
     tk.Label(plotting_frame, text="Resolution figus (dpi)", width = width_text_labels,
               anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     dpi_entry = tk.Entry(plotting_frame, width=width_text_box)
