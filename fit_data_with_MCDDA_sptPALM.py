@@ -13,7 +13,7 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit, least_squares
+from scipy.optimize import least_squares
 from scipy.stats import chi2
 from initiate_simulation import initiate_simulation
 from diffusion_simulation import diffusion_simulation
@@ -43,6 +43,7 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     fig.suptitle('Histogram of diffusion coefficients per track length')
 
     # Initial guesses and bounds
+    breakpoint()
     start_values_fitting = np.concatenate([sim_input['species'][ii]['diff_quot_init_guess'], sim_input['species'][ii]['rates_init_guess']])
     lower_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][0], sim_input['species'][ii]['rates_lb_ub'][0]])
     upper_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][1], sim_input['species'][ii]['rates_lb_ub'][1]])
@@ -70,7 +71,7 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     
         # Calculate diffusion coefficients and flatten the matrix
         sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
-        _, D_track_length_matrix = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input, max(sim_input['track_lengths']) + 1)
+        _, D_track_length_matrix = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input)
     
         # Normalize and linearize the matrix
         D_track_length_matrix.loc[:, list(sim_input['track_lengths'])] /= np.sum(D_track_length_matrix.loc[:, list(sim_input['track_lengths'])], axis=0)
@@ -88,14 +89,6 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     experimental_data = D_track_length_matrix_normalized.values.ravel()
     if sim_input['perform_fitting']:
         
-        
-        # res = curve_fit(lambda x, *params: fitFunc_1D(x, params, sim_input),
-        #                     np.arange(len(experimental_data)),
-        #                     experimental_data,  
-        #                     p0 = start_values_fitting,
-        #                     method = 'dogbox', # options trf, dogbox
-        #                     bounds=(lower_bounds, upper_bounds),
-        #                     ) 
         res = least_squares(residuals, 
                             start_values_fitting,
                             method = 'dogbox', # options trf, dogbox
@@ -119,7 +112,6 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
         out_final_fit = fitFunc(shiftX, sim_input)
    
     # Plot histograms for each track length
-    # for i, ax in enumerate(axs.flat):
     for i, ax in enumerate(axs.flat):
 
         if i < len(sim_input['track_lengths']):

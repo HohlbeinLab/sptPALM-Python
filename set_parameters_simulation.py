@@ -19,42 +19,41 @@ def set_parameters_simulation():
     sim_input = {
     # Number of species and particles per species
     '#_species': [],  # number of species
-    '#_particles_per_species': [],  # particles per species
     
     # Cell dimensions (in µm)
-    'radius_cell': 0.5,  # (µm) radius of the cap, edefault: 0.5
-    'length_cell': 2.0,    # (µm) length of the cylindrical part, default: 2.0
+    'radius_cell': float(0.5),  # (µm) radius of the cap, edefault: 0.5
+    'length_cell': float(2.0),    # (µm) length of the cylindrical part, default: 2.0
     
     # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
-    'tracklength_locs_min': 2,  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
-    'tracklength_locs_max': 8,  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
-    'mean_track_length': 5,  # Mean track length for exponential distribution, default 3
+    'tracklength_locs_min': int(2),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+    'tracklength_locs_max': int(8),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+    'mean_track_length': float(4),  # Mean track length for exponential distribution, default 3
     
     # Simulation parameters
     'confined_diffusion': True,  # Confine diffusion within a cell
-    'loc_error': 0.035,  # (µm) Localization error (in µm), default: 0.035
+    'loc_error': float(0.035),  # (µm) Localization error (in µm), default: 0.035
     'correct_diff_calc_loc_error': True,  # Match anaDDA settings, default: False
     
     # Timing parameters
-    'steptime': 0.001,  # (s) step time in seconds, default: 0.001
-    'frametime': 0.01,  # (s) frame time in seconds, default: 0.02
+    'steptime': float(0.001),  # (s) step time in seconds, default: 0.001
+    'frametime': float(0.01),  # (s) frame time in seconds, default: 0.02
     
     # Fitting and plotting options
     'perform_fitting': True,  # Whether to perform fitting or not
     'display_figures': False,  # Display figures/video
-    'plot_diff_hist_min': 0.004,  # Diffusion coefficient histogram min (µm^2/s), default: 0.004
-    'plot_diff_hist_max': 10.0,  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
-    'binwidth': 0.1,  # Bin width for histogram, default 0.1
-    'species_to_select': 0, # For fitting, only one specis can be selected, set here which one, default:0
+    'plot_diff_hist_min': float(0.004),  # Diffusion coefficient histogram min (µm^2/s), default: 0.004
+    'plot_diff_hist_max': float(10.0),  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
+    'binwidth': float(0.1),  # Bin width for histogram, default 0.1
+    'species_to_select': int(0), # For fitting, only one specis can be selected, set here which one, default:0
     'plot_option': 'logarithmic', # 'logarithmic', # How to plot x-axes either logarithmic or linear
     # Error handling values
-    'avoidFloat0': 1e-09,  # To avoid rates being exactly zero, default: 1e-09
+    'avoidFloat0': float(1e-09),  # To avoid rates being exactly zero, default: 1e-09
    
     # Species-specific parameters
     'species': [], #defined below
    
    #Plotting stuff
-   'dpi': 150, # DPI setting for plotting figures, default: 300
+   'dpi': int(150), # DPI setting for plotting figures, default: 300
    }
     
     sim_input['track_lengths'] = np.arange(sim_input['tracklength_locs_min']-1,
@@ -85,38 +84,40 @@ def set_parameters_simulation():
     # sim_input['species'].append(species)
     
     # Following part can be copied for every species to be simulated
-    # species= {
-    #     '#_states': 2,
-    #     '#_particles': 250000,
-    #     'diff_quot': np.array([sim_input['avoidFloat0'], 2]),  # Diffusion coefficients for each state (µm^2/s)
-    #     # two states: sim_input.species(ii).rates = [kAB, kBA]
-    #     'rates': np.array([40, 60])}   # Transition rates between states (1/s)
-    #     # For fitting purposes
-    # species['diff_quot_init_guess'] = species['diff_quot']   
-    # species['diff_quot_lb_ub'] = np.array([[0, 1.], #was np.nan
-    #                                         [2*sim_input['avoidFloat0'], 5.]])  #was np.nan
-    # species['rates_init_guess'] = species['rates']  # Initial guess for rates: fitting
-    # species['rates_lb_ub'] = np.array([[10.0, 10.0],
-    #                                   [200.0, 500.0]])  # Lower and upper bounds for rates
-    # sim_input['species'].append(species)
+    species= {
+        '#_states': 2,
+        '#_particles': 250000,
+        'diff_quot': np.array([sim_input['avoidFloat0'], 2]),  # Diffusion coefficients for each state (µm^2/s)
+        # two states: sim_input.species(ii).rates = [kAB, kBA]
+        'rates': np.array([40.0, 60.0])}   # Transition rates between states (1/s)
+        # For fitting purposes
+    species['diff_quot_init_guess'] = np.array([sim_input['avoidFloat0'], 1]) 
+    species['diff_quot_lb_ub'] = np.array([[0, 1.], #was np.nan
+                                            [2*sim_input['avoidFloat0'], 5.]])  #was np.nan
+    species['rates_init_guess'] = np.array([30.0, 80.0])  # Initial guess for rates: fitting
+    species['rates_lb_ub'] = np.array([[10.0, 10.0],
+                                      [200.0, 500.0]])  # Lower and upper bounds for rates
+    sim_input['species'].append(species)
  
 
+
     # # Following part can be copied for every species to be simulated
-    species = {
-        '#_states': 3,
-        '#_particles': 500000,
-        'diff_quot': np.array([0, 0, 2.2]),  # Diffusion coefficients for each state (µm^2/s)
-        # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
-        # 'rates': np.array([140, 250, 270, 120, 0, 0])}   # Cas12a non-target Transition rates between states (1/s)
-        'rates': np.array([160, 190, 100, 70, 0, 0])}   # Cas9 non-target Transition rates between states (1/s)
-        # For fitting purposes
-    species['diff_quot_init_guess'] = species['diff_quot']
-    species['diff_quot_lb_ub'] =  np.array([[np.nan, 0, 2],
-                                            [np.nan, 2, 10]])
-    species['rates_init_guess'] = species['rates']  # Initial guess for rates
-    species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, np.nan, np.nan],
-                                      [1000, 1000, 1000, 1000, np.nan, np.nan]])  # Lower and upper bounds for rates
-    sim_input['species'].append(species)
+    # species = {
+    #     '#_states': 3,
+    #     '#_particles': 1000000,
+    #     'diff_quot': np.array([0, 0, 2.2]),  # Diffusion coefficients for each state (µm^2/s)
+    #     # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
+    #     # 'rates': np.array([140, 250, 270, 120, 0, 0])}   # Cas12a non-target Transition rates between states (1/s)
+    #     # 'rates': np.array([160,192,100,70, 0, 0])}   # Cas9 non-target Transition rates between states (1/s)
+    #     'rates': np.array([120,397,260,95, 0, 0])}   # impCAs12a non-target Transition rates between states (1/s)
+    #     # For fitting purposes
+    # species['diff_quot_init_guess'] = species['diff_quot']
+    # species['diff_quot_lb_ub'] =  np.array([[np.nan, 0, 2],
+    #                                         [np.nan, 2, 10]])
+    # species['rates_init_guess'] = species['rates']  # Initial guess for rates
+    # species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, np.nan, np.nan],
+    #                                   [1000, 1000, 1000, 1000, np.nan, np.nan]])  # Lower and upper bounds for rates
+    # sim_input['species'].append(species)
     
     # # Following part can be copied for every species to be simulated
     # species = {
@@ -133,9 +134,7 @@ def set_parameters_simulation():
     # species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, 1, 1],
     #                                   [1000, 1000, 1000, 1000, 1000, 1000]])  # Lower and upper bounds for rates
     # sim_input['species'].append(species)
-  
-    
-  
+   
 
     sim_input['#_species'] = len(sim_input['species'])
     # # Error checking for consistency

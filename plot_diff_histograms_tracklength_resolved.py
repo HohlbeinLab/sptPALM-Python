@@ -23,14 +23,12 @@ def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, plot_input,
     plot_diff_histograms_conventional(D_track_length_matrix, plot_input)
     
     #Ridgeplot with seaborn
-    plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input)
+    plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input, D)
     
     # breakpoint()
     # Ridgeplot KDE with seaborn
     # plot_diff_histograms_KDE(D, plot_input)
-   
-    
-    
+      
 def plot_diff_histograms_conventional(D_track_length_matrix, plot_input):
     # Create the bin edges using logarithmic values
     edges = D_track_length_matrix['Bins']
@@ -69,7 +67,7 @@ def plot_diff_histograms_conventional(D_track_length_matrix, plot_input):
     plt.show()
  
     
-def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input): 
+def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input, D): 
     sns.set_style('white', rc={
         'xtick.bottom': True,
         'ytick.left': False,
@@ -88,10 +86,12 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input):
     palette = sns.color_palette("viridis", len(y_columns))
     
     # Adjust this value to control the amount of vertical overlap between curves
-    vertical_offset = 0.1  # Smaller offset for partial overlap
+    vertical_offset = 0.04  # Smaller offset for partial overlap, 0.1 is  a goog value
     
     # Loop through the 7 columns and plot each with vertical offset, normalized, and fill area
     for i, column in enumerate(reversed(y_columns)):
+        # print(i, column, plot_input['track_lengths'][i])
+        
         # Get the normalized column data
         y_values = normalized_data[column]
         
@@ -101,10 +101,13 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input):
         
         # Label each curve
         if plot_input['plot_option']=='logarithmic':
-            plt.text(0.01, i * vertical_offset + 0.04,
-                     f"steps per track: {column}", va='center') #np.median(x_values)
+            plt.text(0.005, i * vertical_offset + 0.5*vertical_offset,
+                     f"steps per track: {column}", va='center') 
+            D_avg = np.mean(D.loc[ D.loc[:, '#_locs'] == column+1, 'D_coeff'])
+            plt.text(1, i * vertical_offset + 0.5*vertical_offset,
+                     f"D_avg: {round(D_avg,2)} µm$^2$/s", va='center') 
         else:
-            plt.text(4, i * vertical_offset + 0.04,
+            plt.text(4, i * vertical_offset + 0.5*vertical_offset,
                      f"steps per track: {column}", va='center') #np.median(x_values)
     # Set log scale on the x-axis
     
@@ -118,18 +121,16 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input):
     
     plt.yticks([])
     
-    # Customize x-axis ticks (size, width, length, color, and direction)
-    plt.tick_params(axis='x', which='major', width=1, length=6, color='black', labelcolor='black', direction='out')  # Force ticks pointing outwards
-    
-    # Optionally, customize minor ticks if you have them
-    plt.tick_params(axis='x', which='minor', width=0.5, length=4, color='black', labelcolor='black', direction='out')
+    # # Customize x-axis ticks (size, width, length, color, and direction)
+    # plt.tick_params(axis='x', which='major', width=1, length=6, color='black', labelcolor='black', direction='out')  # Force ticks pointing outwards
+    # plt.tick_params(axis='x', which='minor', width=0.5, length=4, color='black', labelcolor='black', direction='out')
     
     # Adjust y-limits to ensure the curves don't go off the plot
-    plt.ylim(0, len(y_columns) * vertical_offset + 0.1)
+    plt.ylim(0, len(y_columns) * vertical_offset + vertical_offset)
     plt.xlim(np.min(x_values), np.max(x_values))
     
     # Add labels and styling
-    # plt.title("Histograms of diffusion coefficients for different track lengths")
+    plt.title("Distribution of diff. coeffs. for different track lengths")
     plt.xlabel("Diffusion coefficient (µm$^2$/s)")
     plt.ylabel("")  # No y-axis label for aesthetic purposes
      
@@ -145,7 +146,7 @@ def plot_diff_histograms_KDE(D, plot_input):
     """
 
     # Set up the figure and axes
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(4, 5))
 
     # Create a color palette
     palette = sns.color_palette("coolwarm", len(plot_input['track_lengths']))
@@ -166,7 +167,7 @@ def plot_diff_histograms_KDE(D, plot_input):
     # Offset the y-axis by adding ii to the density plots (y-offset)
     plt.text(data_for_hist.mean(), 1, tra_len, va='center')  # Label each ridge
 
-    # plt.xscale('log')
+    plt.xscale('log')
     # Show the plot
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
     plt.show()

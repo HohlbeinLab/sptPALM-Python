@@ -25,8 +25,8 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input):
     # Map these counts back to the DataFrame as a new column '#_loc'
     tracks_data['#_locs'] = tracks_data['track_id'].map(tracklength_counts)
     # Some more additions
-    tracks_data['MSD'] = -1.0
-    tracks_data['D_coeff'] = -1.0
+    tracks_data['MSD'] = np.nan
+    tracks_data['D_coeff'] = np.nan
     tracks_data['frametime'] = sim_input['frametime']
     
     start = time.time() 

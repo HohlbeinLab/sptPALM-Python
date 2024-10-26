@@ -107,8 +107,8 @@ def set_parameters_simulation_GUI(sim_input=None):
             'length_cell': float(length_cell_entry.get()),    # (µm) length of the cylindrical part, default: 2.0
             
             # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
-            'tracklength_locs_min': float(tracklength_locs_min_entry.get()),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
-            'tracklength_locs_max': float(tracklength_locs_max_entry.get()),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+            'tracklength_locs_min': int(tracklength_locs_min_entry.get()),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+            'tracklength_locs_max': int(tracklength_locs_max_entry.get()),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
             'mean_track_length': float(mean_track_length_entry.get()),  # Mean track length for exponential distribution, default 3
             
             # Simulation parameters
@@ -121,8 +121,8 @@ def set_parameters_simulation_GUI(sim_input=None):
             'frametime': float(frametime_entry.get()),  # (s) frame time in seconds, default: 0.02
             
             # Fitting and plotting options
-            'perform_fitting': float(perform_fitting_var.get()),  # Whether to perform fitting or not
-            'display_figures': float(display_figures_var.get()),  # Display figures
+            'perform_fitting': bool(perform_fitting_var.get()),  # Whether to perform fitting or not
+            'display_figures': bool(display_figures_var.get()),  # Display figures
             'plot_diff_hist_min': float(diff_hist_min_entry.get()),  # Diffusion coefficient histogram min (µm^2/s), default: 0.004
             'plot_diff_hist_max': float(diff_hist_max_entry.get()),  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
             'binwidth': float(binwidth_entry.get()),   # Bin width for histogram, default 0.1
@@ -136,7 +136,7 @@ def set_parameters_simulation_GUI(sim_input=None):
             'species': extract_species_data(species_manager.return_species_list()),
         
             #Plotting stuff
-            'dpi': float(dpi_entry.get()), # DPI setting for plotting figures, default: 300
+            'dpi': int(dpi_entry.get()), # DPI setting for plotting figures, default: 300
             
          } 
         # Make sure that the track lengths are defined    
@@ -172,12 +172,12 @@ def set_parameters_simulation_GUI(sim_input=None):
                 species = {
                     '#_states': int(row['#_states'].get()),
                     '#_particles': int(row['#_particles'].get()),
-                    'diff_quot': [safe_float(x) for x in row['diff_quot'].get().split(',')],
-                    'rates': [safe_float(x) for x in row['rates'].get().split(',')],
-                    'diff_quot_init_guess': [safe_float(x) for x in row['diff_quot_init_guess'].get().split(',')],
-                    'rates_init_guess': [safe_float(x) for x in row['rates_init_guess'].get().split(',')],
-                    'diff_quot_lb_ub': safe_literal_eval_with_nan(row['diff_quot_lb_ub'].get()),
-                    'rates_lb_ub': safe_literal_eval_with_nan(row['rates_lb_ub'].get())
+                    'diff_quot': np.array([safe_float(x) for x in row['diff_quot'].get().split(',')]),
+                    'rates': np.array([safe_float(x) for x in row['rates'].get().split(',')]),
+                    'diff_quot_init_guess': np.array([safe_float(x) for x in row['diff_quot_init_guess'].get().split(',')]),
+                    'rates_init_guess': np.array([safe_float(x) for x in row['rates_init_guess'].get().split(',')]),
+                    'diff_quot_lb_ub': np.array(safe_literal_eval_with_nan(row['diff_quot_lb_ub'].get())),
+                    'rates_lb_ub': np.array(safe_literal_eval_with_nan(row['rates_lb_ub'].get()))
                 }
                 species_data.append(species)
             else:
