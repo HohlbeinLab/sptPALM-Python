@@ -26,7 +26,7 @@ def set_parameters_simulation():
     
     # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
     'tracklength_locs_min': int(2),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
-    'tracklength_locs_max': int(8),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+    'tracklength_locs_max': int(7),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
     'mean_track_length': float(4),  # Mean track length for exponential distribution, default 3
     
     # Simulation parameters
@@ -114,12 +114,12 @@ def set_parameters_simulation():
     # # Following part can be copied for every species to be simulated
     # species= {
     #     '#_states': 2,
-    #     '#_particles': 50000,
+    #     '#_particles': 250000,
     #     'diff_quot': np.array([sim_input['avoidFloat0'], 2]),  # Diffusion coefficients for each state (µm^2/s)
     #     # two states: sim_input.species(ii).rates = [kAB, kBA]
     #     'rates': np.array([40.0, 60.0])}   # Transition rates between states (1/s)
     #     # For fitting purposes
-    # species['diff_quot_init_guess'] = np.array([sim_input['avoidFloat0'], 2]) 
+    # species['diff_quot_init_guess'] = np.array([0, 2]) 
     # species['diff_quot_lb_ub'] = np.array([[0, 1.], #was np.nan
     #                                         [2*sim_input['avoidFloat0'], 5.]])  #was np.nan
     # species['rates_init_guess'] = np.array([20.0, 100.0])  # Initial guess for rates: fitting
@@ -129,25 +129,23 @@ def set_parameters_simulation():
 
 
 
-
-
-
     # Following part can be copied for every species to be simulated
     species = {
         '#_states': 3,
-        '#_particles': 100000,
+        '#_particles': 200000,
         'diff_quot': np.array([0, 0, 2.2]),  # Diffusion coefficients for each state (µm^2/s)
         # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
-        # 'rates': np.array([140, 250, 270, 120, 0, 0])}   # Cas12a non-target Transition rates between states (1/s)
+        # 'rates': np.array([143, 253, 272, 120, 0, 0])}   # Cas12a non-target Transition rates between states (1/s)
         # 'rates': np.array([160,192,100,70, 0, 0])}   # Cas9 non-target Transition rates between states (1/s)
-        'rates': np.array([120,397,260,95, 0, 0])}   # impCAs12a non-target Transition rates between states (1/s)
-        # For fitting purposes
+         'rates': np.array([120,397,260,95, 0.0, 0.0])}   # impCas12a non-target Transition rates between states (1/s)
+    # For fitting purposes
     species['diff_quot_init_guess'] = species['diff_quot']
-    species['diff_quot_lb_ub'] =  np.array([[np.nan, 0, 2],
-                                            [np.nan, 2, 10]])
-    species['rates_init_guess'] = species['rates']  # Initial guess for rates
-    species['rates_lb_ub'] =  np.array([[1, 1, 1, 1, np.nan, np.nan],
-                                      [1000, 1000, 1000, 1000, np.nan, np.nan]])  # Lower and upper bounds for rates
+    species['diff_quot_lb_ub'] =  np.array([[0, 0, 1],
+                                            [sim_input['avoidFloat0'], sim_input['avoidFloat0'], 5]])
+    # species['rates_init_guess'] = species['rates']  # Initial guess for rates
+    species['rates_init_guess'] = np.array([100,  200,  150 , 50 , 0.0, 0.0]) #species['rates']  # Initial guess for rates
+    species['rates_lb_ub'] =  np.array([[10, 10, 10, 10, 0 , 0],
+                                      [500, 500, 500, 500, sim_input['avoidFloat0'], sim_input['avoidFloat0']]])  # Lower and upper bounds for rates
     sim_input['species'].append(species)
     
     # # Following part can be copied for every species to be simulated
@@ -168,9 +166,6 @@ def set_parameters_simulation():
    
 
     sim_input['#_species'] = len(sim_input['species'])
-    # # Error checking for consistency
-    # if sim_input['#_species'] > len(sim_input['species']):
-    #     raise ValueError("Number of species is larger than parameters provided for each species!")
     
     if sim_input['steptime'] >= sim_input['frametime']:
         raise ValueError("Careful! sim_input['steptime'] >= sim_input['frametime']!")
@@ -180,6 +175,9 @@ def set_parameters_simulation():
     
     if sim_input['length_cell'] < 0:
         raise ValueError("Careful! sim_input['length_cell'] < 0!")
+
+    if sim_input['tracklength_locs_min'] < 2:
+        raise ValueError("Careful! sim_input['tracklength_locs_min'] has to be 2 or highter !")
     
     # Check whether each species has a diffusion coefficient for every state
     for ii in range(sim_input['#_species']):

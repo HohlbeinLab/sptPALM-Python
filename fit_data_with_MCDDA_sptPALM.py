@@ -13,11 +13,13 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 from scipy.optimize import least_squares
 from scipy.stats import chi2
 from initiate_simulation import initiate_simulation
 from diffusion_simulation import diffusion_simulation
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
+
 
 def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     print("\nRun diff_coeffs_from_tracks_fast.py")
@@ -39,7 +41,12 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     edges = D_track_length_matrix['Bins']
 
     # Plotting setup
-    fig, axs = plt.subplots(nrows=(len(sim_input['track_lengths'])) // 2, ncols=2, figsize=(10, 10))
+
+
+    nrwos_temp = math.ceil(len(sim_input['track_lengths']) / 2.0)
+    # ncols_temp = 2 if len(sim_input['track_lengths']) > 1 else 1
+    
+    fig, axs = plt.subplots(nrows = nrwos_temp, ncols=2, figsize=(10, 10))
     fig.suptitle('Histogram of diffusion coefficients per track length')
 
     # Initial guesses and bounds
@@ -56,12 +63,12 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
         ignoring xdata here for now.
         """
         ii = sim_input['species_to_select'] 
-    
+   
         if sim_input['species'][ii]['#_states'] == 2:
-            sim_input['species'][ii]['diff_quot'] = np.array(params[0:2]) #/ sim_input['multiplicator']
+            sim_input['species'][ii]['diff_quot'] = np.array(params[0:2]) 
             sim_input['species'][ii]['rates'] = params[2:4]
-        elif sim_input['species'][ii]['#_states'] == 3:
-            sim_input['species'][ii]['diff_quot'] = np.array(params[0:3]) #/ sim_input['multiplicator']
+        elif sim_input['species'][ii]['#_states'] >= 3:
+            sim_input['species'][ii]['diff_quot'] = np.array(params[0:3]) 
             sim_input['species'][ii]['rates'] = params[3:9]
         
         # Run the simulation
@@ -98,35 +105,35 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
                             diff_step = [0.1, 0.5, 25, 25],
                             # max_nfev = 10,
                             verbose=2) #,callback=callback_func
-        if sim_input['species'][ii]['#_states'] == 3:
-             res = least_squares(residuals, 
+        if sim_input['species'][ii]['#_states'] >= 3:
+            res = least_squares(residuals, 
                              start_values_fitting,
                              method = 'dogbox', # options trf, dogbox
                              bounds=(lower_bounds, upper_bounds),
                              args=(sim_input,experimental_data),
                              loss = 'linear', # cauchy: crap; soft_l1
-                             x_scale = [1,1,1,0.1, 0.1, 0.1, 0.1, 0.2, 0.1],
-                             diff_step = [0.1, 0,1, 0.5, 25, 25, 25, 25, 25, 25],
+                             x_scale = [1,1,1,0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                             diff_step = [0.1, 0.1, 0.5, 25, 25, 25, 25, 25, 25],
                              # max_nfev = 10,
                              verbose=2) #,callback=callback_func       
 
-
-
         shiftX = res.x
 
-        # Calculate 95% confidence interval (using jacobian and residuals)
-        residuals = res.fun
-        _, s, VT = np.linalg.svd(res.jac, full_matrices=False)
-        threshold = np.finfo(float).eps * max(res.jac.shape) * s[0]
-        s = s[s > threshold]
-        pcov = np.dot(VT.T / s**2, VT)
-        confidenceInterval = np.sqrt(np.diag(pcov)) * chi2.ppf(0.95, df=len(residuals))
+        # # Calculate 95% confidence interval (using jacobian and residuals)
+        # residuals = res.fun
+        # _, s, VT = np.linalg.svd(res.jac, full_matrices=False)
+        # threshold = np.finfo(float).eps * max(res.jac.shape) * s[0]
+        # s = s[s > threshold]
+        # pcov = np.dot(VT.T / s**2, VT)
+        # confidenceInterval = np.sqrt(np.diag(pcov)) * chi2.ppf(0.95, df=len(residuals))
         out_final_fit = fitFunc(shiftX, sim_input)
    
     # Plot histograms for each track length
     # breakpoint()
     sum_of_squares=0
-    for i, ax in enumerate(axs.flat):
+    # for i, ax in enumerate(axs.flat):
+    for i, ax in enumerate(sim_input['track_lengths']):
+        ax = axs.flat[i]
         print(f"i: {i}, sim_input['track_lengths'][i]: {sim_input['track_lengths'][i]}")
         if i < len(sim_input['track_lengths']):
             ax.set_title(f"D distribution for track length {sim_input['track_lengths'][i]} steps")
@@ -184,7 +191,7 @@ def fitFunc(start_values_fitting, sim_input):
         sim_input['species'][ii]['diff_quot'] = np.array(start_values_fitting[0:2]) #/ sim_input['multiplicator']
         sim_input['species'][ii]['rates'] = start_values_fitting[2:4]
     # sim_input.species(ii).rates = [0,kAB,kAC; kBA,0,kBC; kCA,kCB,0];
-    elif sim_input['species'][ii]['#_states'] == 3:
+    elif sim_input['species'][ii]['#_states'] >= 3:
         sim_input['species'][ii]['diff_quot'] = np.array(start_values_fitting[0:3]) #/ sim_input['multiplicator']
         sim_input['species'][ii]['rates'] = start_values_fitting[3:9]
     

@@ -16,7 +16,8 @@ import pandas as pd
 import time
 
 def diff_coeffs_from_tracks_fast(tracks, sim_input):
-    print("\nRun diff_coeffs_from_tracks_simulation.py")
+    print("\nRun diff_coeffs_from_tracks_fast.py")
+
     # Initialize
     tracks_data = tracks.copy()
     # Count occurrences of each unique track_ids

@@ -89,22 +89,28 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input, D):
     vertical_offset = 0.04  # Smaller offset for partial overlap, 0.1 is  a goog value
     
     # Loop through the 7 columns and plot each with vertical offset, normalized, and fill area
-    for i, column in enumerate(reversed(y_columns)):
-        # print(i, column, plot_input['track_lengths'][i])
+
+    # for i, column in enumerate(reversed(y_columns)):
+    for i, column in enumerate(y_columns):
+        print(i, column, plot_input['track_lengths'][i])
         
         # Get the normalized column data
         y_values = normalized_data[column]
         
-        # Plot the filled area under the curve, applying vertical offset for partial overlap
-        plt.fill_between(x_values, y_values + i * vertical_offset, i * vertical_offset, 
-                         color=palette[i], alpha=0.6, label=column)
+
         
+        # Plot the filled area under the curve, applying vertical offset for partial overlap
+        plt.fill_between(x_values, y_values + (len(y_columns)-1-i) * vertical_offset, (len(y_columns)-1-i) * vertical_offset, 
+                         color=palette[len(y_columns)-1-i], alpha=0.6, label=column)
+        # plt.fill_between(x_values, y_values + i * vertical_offset, i * vertical_offset, 
+        #                  color=palette[i], alpha=0.6, label=column)
+         
         # Label each curve
         if plot_input['plot_option']=='logarithmic':
-            plt.text(0.005, i * vertical_offset + 0.5*vertical_offset,
+            plt.text(0.005, (len(y_columns)-1-i) * vertical_offset + 0.5*vertical_offset,
                      f"steps per track: {column}", va='center') 
             D_avg = np.mean(D.loc[ D.loc[:, '#_locs'] == column+1, 'D_coeff'])
-            plt.text(1, i * vertical_offset + 0.5*vertical_offset,
+            plt.text(1, (len(y_columns)-1-i) * vertical_offset + 0.5*vertical_offset,
                      f"D_avg: {round(D_avg,2)} µm$^2$/s", va='center') 
         else:
             plt.text(4, i * vertical_offset + 0.5*vertical_offset,
@@ -139,7 +145,7 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input, D):
     # Show the plot
     plt.show()  
 
-
+    
 def plot_diff_histograms_KDE(D, plot_input):
     """
         Older option to plot the histograms from the dataframe D with all diffusion coefficients
