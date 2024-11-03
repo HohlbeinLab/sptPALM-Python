@@ -26,7 +26,7 @@ print("\nRun simulation_main.py!")
 sim_input = set_parameters_simulation();
 
 # set_parameters_simulation_GUI(sim_input)
-sim_input = set_parameters_simulation_GUI(sim_input)
+#sim_input = set_parameters_simulation_GUI(sim_input)
 
 # Function for setting all starting positions, starting states etc
 [particleData, sim_input] = initiate_simulation(sim_input);
@@ -36,13 +36,11 @@ sim_input = set_parameters_simulation_GUI(sim_input)
 
 # Function to calculate diffusion coefficients for different track lengths
 sorted_tracks = tracks.sort_values(by=['track_id', 'frame']) 
-
 [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input);
 
 # Function for plotting the data
 plot_diff_histograms_tracklength_resolved(D_track_length_matrix, sim_input, D)
 
-breakpoint()
 # Fit the experimental data
 fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input)
 

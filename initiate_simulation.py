@@ -88,7 +88,7 @@ def initiate_simulation(sim_input):
         for idx, dq in enumerate(diff_quot):
             print(f"    State {idx}:")
             print(f"      stepsize per frame (µm): {round(np.sqrt(2 * dq * sim_input['frametime']),2)}")
-            print(f"      stepssize per step (µm): {round(np.sqrt(2 * dq * sim_input['steptime']),2)}")
+            print(f"      stepsize per step (µm): {round(np.sqrt(2 * dq * sim_input['steptime']),2)}")
         
         numberStates = sim_input['species'][ii]['#_states']
         if numberStates == 1:
