@@ -1,5 +1,5 @@
 //// Macro for cell segmentation in ImageL/Fiji
-//JH 28.01.2021, latest update: 27-10-2022: now allows to select different images to peerform segmentation
+//JH 28.01.2021, latest update: 21-11-2024: now allows to select different images to peerform segmentation
 //note, this macro requires some macros/functions that come with an SCF installation
 //to install SCF: => ImageJ/Fiji => Help => Update... => Manage Update sites => tick the box for SCF MPI CBG and restart ImageJ/Fiji
 
@@ -51,7 +51,7 @@ for (i = 0; i < files.length; i++) {
 //run("Interactive H_Watershed")
 
 //OPTION B: if good seed values are known, run
-	hMin = 47.0;		// values are ~40-55
+	hMin = 47.0;		// values are ~40-55 // standard 47
 	thresh = 0.0;
 	peakFlooding = 100.0;
 	run("H_Watershed", "impin=["+getTitle()+"] hmin="+hMin+" thresh="+thresh+" peakflooding="+peakFlooding + " displaystyle=Image outputmask=false allowsplitting=true");

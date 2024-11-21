@@ -24,20 +24,20 @@ from tkinter.simpledialog import askstring
 import matplotlib.pyplot as plt
 
 # Assuming Para1 is a dictionary-like object
-def plot_combined_data_sptPALM(comb_data=None):
+def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
 
     print('\nRun plot_combined_data_sptPALM.py')
     # loaded more as a dummy here: define input parameters
     # Best to use only 
-    input_parameter = set_parameters_sptPALM()
+    # input_parameter = set_parameters_sptPALM()
     
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
-    with open(filename, 'rb') as f:
-        comb_data = pickle.load(f)
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     comb_data = pickle.load(f)
     
     # 1.1 Check whether DATA was passed to the function
-    if comb_data is None:
+    if not comb_data:
         # Use Tkinter for file dialog
         Tk().withdraw()  # Close root window
         starting_directory = os.path.join(input_parameter['data_dir'],
@@ -50,14 +50,10 @@ def plot_combined_data_sptPALM(comb_data=None):
                 comb_data = pickle.load(f)
         else:
             raise ValueError("No file selected!")
-    else:
-        print('  Careful, there might be no data available to proceed!')
     
     # Figure A: plot stack plot with diffusion coefficients)
     plot_stacked_diff_histo(comb_data)
 
-    # Figure B: cell by cell specific plots
-    
     
     return comb_data    
  
@@ -81,9 +77,7 @@ def plot_stacked_diff_histo(comb_data):
         # Create subplot in the specified grid
         temp = (len(comb_data['input_parameter']['copynumber_intervals']), 1, jj + 1)
         ax = plt.subplot(*temp)
-        axes.append(ax)
-    
-        
+        axes.append(ax)    
     
 # Histogram could be plotted better nexto each other without shading, 
 # see here:  https://matplotlib.org/stable/gallery/statistics/histogram_multihist.html#sphx-glr-gallery-statistics-histogram-multihist-py

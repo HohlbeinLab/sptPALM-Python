@@ -38,7 +38,7 @@ def set_parameters_sptPALM():
         # Tracking and diffusion analysis
         'frametime': 0.01, # Frametime in seconds, default: 0.01
         'loc_error': 0.035, # Localization error (um), default: 0.03
-        'track_steplength_max': 0.5, # Tracking window (um), default: 0.8 um
+        'track_steplength_max': 0.8, # Tracking window (um), default: 0.8 um or 0.5 um
         'track_memory': 0, # Tracking memory in frames, default: 1
         'diff_hist_steps_min': 3, # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
         'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, default: 100
@@ -46,7 +46,6 @@ def set_parameters_sptPALM():
         # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
         'tracklength_locs_min': 2,  # 
         'tracklength_locs_max': 8,  # 
-
 
         # Cell by cell analysis
         'number_tracks_per_cell_min': 1, # Minimum number of tracks for each cell, default: 1
@@ -73,56 +72,51 @@ def set_parameters_sptPALM():
 
     }
 
-    # # Directory containing your data
-    # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
-
-    # # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
-    # input_parameter['fn_locs'] = [
-    #     '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-    #     # 'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
-    #     # 'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
-    # ]
-    # #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
-    # #filename is also used to locate the segmented image and corresponding csv-table!)
-    # input_parameter['fn_proc_brightfield'] = [
-    #     '9NTFixTL_2_1_MMStack_Pos0.ome_procBrightfield.tif'
-    # ]
-
-    # # Name and assign your measurement conditions/files
-    # #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
-    input_parameter['condition_names'] = ['Cond 1']
-    input_parameter['condition_files'] = [[0]]  # refers to the order of files defined above
-    
-    # DO NOT REMOVE THE FOLLOWING LINES!
-    # Directory containing your data (make sure you end with a '/' or '\')
-    input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
+    # Directory containing your data
+    input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
 
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [
-        '230208_Cas12aScrambled_EM620_LASER1_1_MMStack_Pos0.ome_MLE_thunder.csv',
-        '230208_Cas12aScrambled_EM620_LASER1_2_MMStack_Pos0.ome_MLE_thunder.csv',
-        '230131_Cas12aTargeting-0.15_EM620_LASER2_1_MMStack_Pos0.ome_MLE_thunder.csv',
-        '230131_Cas12aTargeting-0.15_EM620_LASER2_2_MMStack_Pos0.ome_MLE_thunder.csv',
+        '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+        # 'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+        # 'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
     input_parameter['fn_proc_brightfield'] = [
-        '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
-        '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
-        '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
-        '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
+        '9NTFixTL_2_1_MMStack_Pos0.ome_procBrightfield.tif'
     ]
 
-    input_parameter['condition_names'] = ['Cas12a_scrambled', 'Cas12a_targetting']
-    input_parameter['condition_files'] = [[0,1],[2,3]]  # refers to the order of files defined above
+    # Name and assign your measurement conditions/files
+    #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
+    input_parameter['condition_names'] = ['Cond 1']
+    input_parameter['condition_files'] = [[0]]  # refers to the order of files defined above
+    
+   
+    
+   # # DO NOT REMOVE THE FOLLOWING LINES!
+   #  # Directory containing your data (make sure you end with a '/' or '\')
+   #  input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
 
+   #  # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
+   #  input_parameter['fn_locs'] = [
+   #      '230208_Cas12aScrambled_EM620_LASER1_1_MMStack_Pos0.ome_MLE_thunder.csv',
+   #      '230208_Cas12aScrambled_EM620_LASER1_2_MMStack_Pos0.ome_MLE_thunder.csv',
+   #      '230131_Cas12aTargeting-0.15_EM620_LASER2_1_MMStack_Pos0.ome_MLE_thunder.csv',
+   #      '230131_Cas12aTargeting-0.15_EM620_LASER2_2_MMStack_Pos0.ome_MLE_thunder.csv',
+   #  ]
+   #  #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
+   #  #filename is also used to locate the segmented image and corresponding csv-table!)
+   #  input_parameter['fn_proc_brightfield'] = [
+   #      '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
+   #      '230208_Cas12aScrambled_EM620_1_1_MMStack_Pos0.ome_procBrightfield.tif',
+   #      '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
+   #      '230131_Cas12aTargeting-0.15_EM620_2_1_MMStack_Pos0.ome_procBrightfield.tif',
+   #  ]
 
- 
+   #  input_parameter['condition_names'] = ['Cas12a_scrambled', 'Cas12a_targetting']
+   #  input_parameter['condition_files'] = [[0,1],[2,3]]  # refers to the order of files defined above
 
-    # Histogramming of diffusion coefficients per copynumber
-    # INTERVAL = 100
-    # for i in range(1, 6):
-    #     input_parameter['copynumber_intervals'].append([(i-1)*INTERVAL+1, i*INTERVAL])
 
     return input_parameter
 

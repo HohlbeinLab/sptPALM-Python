@@ -11,6 +11,7 @@ Date of Creation: September, 2024
 Full license details can be found at https://creativecommons.org/licenses/by/4.0/
 """
 import tkinter as tk
+import os
 from tkinter import filedialog
 from set_parameters_sptPALM import set_parameters_sptPALM
 from ast import literal_eval # Safely parse the string back to a list of lists
@@ -19,7 +20,7 @@ import pickle
 def set_parameters_sptPALM_GUI(para = None):
     print('\nRun set_parameters_sptPALM_GUI.py')
     if para is None:
-        print(" re-run set_parameters_sptPALM")
+        print(" Re-run set_parameters_sptPALM")
         para = set_parameters_sptPALM()
       
     # Function to create the GUI
@@ -29,11 +30,19 @@ def set_parameters_sptPALM_GUI(para = None):
             data_dir_entry.delete(0, tk.END)
             data_dir_entry.insert(0, dirname)
 
-    def browse_files():
+    def browse_files_csv():
         files = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
-        if files:
+        filenames = [os.path.basename(file) for file in files]
+        if filenames:
             fn_locs_entry.delete(0, tk.END)
-            fn_locs_entry.insert(0, ', '.join(files))
+            fn_locs_entry.insert(0, ', '.join(filenames))
+
+    def browse_files_tif():
+        files = filedialog.askopenfilenames(filetypes=[("TIF(F) files", "*.tiff *.tif")])
+        filenames = [os.path.basename(file) for file in files]
+        if filenames:
+            fn_proc_brightfield_entry.delete(0, tk.END)
+            fn_proc_brightfield_entry.insert(0, ', '.join(filenames))
 
     def load_params(): #careful, we need to overwrite all default parameters
         filename = filedialog.askopenfilename(
@@ -155,12 +164,14 @@ def set_parameters_sptPALM_GUI(para = None):
             raise ValueError("No file selected!")
 
     def exit_GUI():
+        para_function()
         root.quit()  # Exits the Tkinter event loop
         root.destroy()  # Destroys the Tkinter window
     
-    def save_params():
+    # Collect all parameters from the GUI
+    # required to fill in new variables into para after pressing "Save" or "Exit"
+    def para_function():
         nonlocal para
-        # Collect all parameters from the GUI
         para = {
             # File and directory selection
             'data_dir': data_dir_entry.get(),
@@ -209,9 +220,12 @@ def set_parameters_sptPALM_GUI(para = None):
             'dpi': int(dpi_entry.get()),
             'cmap_applied': cmap_applied_var.get()
         }
-        # # Initialize Tkinter root window
-        # root = tk.Tk()
-        # root.withdraw()  # Hide the root window
+    
+    
+    def save_params():
+        
+        # Get data from GUI
+        para_function()
         
         # Ask the user where to save the file, default filename is input_parameter.pkl
         save_file_path = filedialog.asksaveasfilename(
@@ -265,20 +279,20 @@ def set_parameters_sptPALM_GUI(para = None):
     row_index+=1
     # File Names for Localizations
     tk.Label(file_frame, text="Localization file(s) (*.csv)", width = width_text_labels,
-             anchor="w").grid(row=1, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_locs_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_locs_entry.grid(row=1, column=1)
+    fn_locs_entry.grid(row=row_index, column=1)
     fn_locs_entry.insert(0, ', '.join(map(str, para['fn_locs'])))   
-    tk.Button(file_frame, text="Browse...", command=browse_files).grid(row=1, column=2)
+    tk.Button(file_frame, text="Browse...", command=browse_files_csv).grid(row=row_index, column=2)
 
     row_index+=1
     # Brightfield Image Files
-    tk.Label(file_frame, text="Brightfield image file(s) (*.tiff)", width = width_text_labels,
-             anchor="w").grid(row=2, column=0, sticky=tk.W)
+    tk.Label(file_frame, text="Proc. brightf. file(s) (*.tiff)", width = width_text_labels,
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_proc_brightfield_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_proc_brightfield_entry.grid(row=2, column=1)
+    fn_proc_brightfield_entry.grid(row=row_index, column=1)
     fn_proc_brightfield_entry.insert(0, ', '.join(map(str, para['fn_proc_brightfield'])))
-    tk.Button(file_frame, text="Browse...", command=browse_files).grid(row=2, column=2)
+    tk.Button(file_frame, text="Browse...", command=browse_files_tif).grid(row=row_index, column=2)
 
     row_index+=1
     # Name of conditions
@@ -473,10 +487,10 @@ def set_parameters_sptPALM_GUI(para = None):
     tracklength_locs_max_entry.grid(row=row_index, column=3)
     tracklength_locs_max_entry.insert(0, para['tracklength_locs_max'])   
                
- 
     """
     # Frame for plotting
     """
+    
     plotting_frame = tk.LabelFrame(right_frame, text="Plotting and data output", padx=10, pady=10)
     plotting_frame.grid(row=1, column=1, padx=10, pady=10, sticky="new")  # Right half
 
@@ -512,7 +526,7 @@ def set_parameters_sptPALM_GUI(para = None):
   
     row_index+=1
     # dpi
-    tk.Label(plotting_frame, text="Resolution figus (dpi)", width = width_text_labels,
+    tk.Label(plotting_frame, text="Resolution figures (dpi)", width = width_text_labels,
              anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     dpi_entry = tk.Entry(plotting_frame, width=width_text_box)
     dpi_entry.grid(row=row_index, column=1)
@@ -553,8 +567,7 @@ def set_parameters_sptPALM_GUI(para = None):
     cmap_applied_entry = tk.OptionMenu(plotting_frame, cmap_applied_var, "gist_ncar", "nipy_spectral", "tab20c")
     # cmap_dropdown.config(width=10)
     cmap_applied_entry.grid(row=row_index, column=1, sticky=tk.W)
-
-    
+   
     # Dropdown Menu for plotting diffusion histrograms Selection
     tk.Label(plotting_frame, text="Select plotting option", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)

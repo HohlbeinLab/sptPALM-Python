@@ -92,7 +92,7 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, plot_input, D):
 
     # for i, column in enumerate(reversed(y_columns)):
     for i, column in enumerate(y_columns):
-        print(i, column, plot_input['track_lengths'][i])
+        # print(i, column, plot_input['track_lengths'][i])
         
         # Get the normalized column data
         y_values = normalized_data[column]

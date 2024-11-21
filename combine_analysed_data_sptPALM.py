@@ -22,13 +22,17 @@ from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 from helper_functions import string_input_with_default
 
-def combine_analysed_data_sptPALM(data=None, para=None):
+def combine_analysed_data_sptPALM(data=None, input_parameter=None):
     
     print('\nRun combine_analysed_data_sptPALM.py')
 
-    # loaded more as a dummy here: define input parameters
-    input_parameter = set_parameters_sptPALM()
-    input_parameter = set_parameters_sptPALM_GUI(input_parameter)
+    
+    if not input_parameter:
+        # loaded more as a dummy here: define input parameters
+        input_parameter = set_parameters_sptPALM()
+        input_parameter = set_parameters_sptPALM_GUI(input_parameter)
+    
+    
     filename = []
     
     # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
@@ -37,7 +41,7 @@ def combine_analysed_data_sptPALM(data=None, para=None):
     #     data = pickle.load(f)
     
     # 1.1 Check whether DATA was passed to the function
-    if data is None:
+    if not data:
         # Use Tkinter for file dialog
         Tk().withdraw()  # Close root window
         starting_directory = os.path.join(input_parameter['data_dir'],
@@ -70,7 +74,7 @@ def combine_analysed_data_sptPALM(data=None, para=None):
     comb_data = {}
     comb_data['#_movies_loaded'] = len(data['movies'])
 
-    print(f"  ... there were in total {comb_data['#_movies_loaded']} movie(s) found in '{filename}'")
+    print(f"  ... there were in total {comb_data['#_movies_loaded']} movie(s) found")
 
     comb_data['#_conditions'] = len(data['input_parameter']['condition_names'])  # number of conditions
     comb_data['#_movies_per_condition'] = [len(movies) for movies in data['input_parameter']['condition_files']]  # movies per condition

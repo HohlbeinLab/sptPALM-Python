@@ -34,7 +34,7 @@ def analyse_movies_sptPALM(input_parameter = None):
     
     # 1.1 Define input parameters
     if input_parameter is None:
-        print("  re-run set_parameters_sptPALM.py + GUI")
+        print("  Re-run set_parameters_sptPALM.py + GUI")
         input_parameter = set_parameters_sptPALM()
         input_parameter = set_parameters_sptPALM_GUI()
     

@@ -60,24 +60,29 @@ while True:
     
         case 2:  # sptPALM_analyse_Movies
             if input_parameter:
-                print("No 'input_parameter' available, selecting defaults from set_parameters_sptPLAM.py.")
+                print(" 'input_parameter' available, continue")
                 data = analyse_movies_sptPALM(input_parameter)
             else:
-                print("'input_parameter' available, continue")
+                print(" No 'input_parameter' available, selecting defaults from set_parameters_sptPLAM.py.")
                 data = analyse_movies_sptPALM()
             print("'data' now available in memory\n")
         
         case 3:  # sptPALM_combineData
+            if not input_parameter:
+                print(" No 'input_parameter' available")
+                input_parameter = set_parameters_sptPALM()
+                input_parameter = set_parameters_sptPALM_GUI(input_parameter)   
             if data:
-                comb_data = combine_analysed_data_sptPALM(data)
+                print(" 'data' available, continue")
+                comb_data = combine_analysed_data_sptPALM(data, input_parameter)
             else:
-                print("No 'data' from option 1 available")
+                print("No 'data' from available")
                 print("Continue with GUI to select DATA from 'sptData_movies.pkl' or similar")
-                comb_data = combine_analysed_data_sptPALM()
+                comb_data = combine_analysed_data_sptPALM(None, input_parameter)
             print("Combined data 'comb_data' now available in memory\n")
             
         case 4:  # sptPALM_PlotCombinedData
-            print('Run splot_combined_data_sptPALM(comb_data)')
+            print('Run plot_combined_data_sptPALM(comb_data)')
             if comb_data:
                 comb_data = plot_combined_data_sptPALM(comb_data)
             else:

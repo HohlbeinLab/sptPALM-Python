@@ -128,7 +128,6 @@ def set_parameters_simulation():
     # sim_input['species'].append(species)
 
 
-
     # Following part can be copied for every species to be simulated
     species = {
         '#_states': 3,
