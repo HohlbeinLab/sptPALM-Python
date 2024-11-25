@@ -22,9 +22,9 @@ import ast  # Safely parse the string back to a list of lists
 
 def set_parameters_simulation_GUI(sim_input=None):
 
-    print('\nRun set_parameters_simulation_combined_GUI.py')
+    print(" Run 'set_parameters_simulation_combined_GUI.py'")
     if sim_input is None:
-        print(" re-run set_parameters_simulation")
+        print("  Run 'set_parameters_simulation.py'")
         sim_input = set_parameters_simulation()
 
     def load_params():
@@ -126,7 +126,7 @@ def set_parameters_simulation_GUI(sim_input=None):
             'plot_diff_hist_min': float(diff_hist_min_entry.get()),  # Diffusion coefficient histogram min (µm^2/s), default: 0.004
             'plot_diff_hist_max': float(diff_hist_max_entry.get()),  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
             'binwidth': float(binwidth_entry.get()),   # Bin width for histogram, default 0.1
-            'species_to_select': float(species_to_select_entry.get()), # For fitting, only one species can be selected, set here which one, default:0
+            'species_to_select': int(species_to_select_entry.get()), # For fitting, only one species can be selected, set here which one, default:0
             'plot_option': plot_option_var.get(),# wether to plot D_histograms logarithmic or linear
             
             # Error handling values
@@ -225,7 +225,7 @@ def set_parameters_simulation_GUI(sim_input=None):
         transfer_params()
         root.quit()
         return sim_input
-        # root.destroy()
+
 
     root = tk.Tk()
     # Disable window resizing in both horizontal and vertical directions

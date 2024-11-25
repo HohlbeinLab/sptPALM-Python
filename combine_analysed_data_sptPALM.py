@@ -23,26 +23,33 @@ from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 from helper_functions import string_input_with_default
 
 def combine_analysed_data_sptPALM(data=None, input_parameter=None):
-    
     print('\nRun combine_analysed_data_sptPALM.py')
-
     
+    """
+    TEMPORARY LOADING OF DATA 
+    """
+    # # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
+    # with open(filename, 'rb') as f:
+    #     input_parameter = pickle.load(f)  
+        
+    # print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")    
+    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/output_python/sptData_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     data = pickle.load(f)
+
+
     if not input_parameter:
         # loaded more as a dummy here: define input parameters
         input_parameter = set_parameters_sptPALM()
         input_parameter = set_parameters_sptPALM_GUI(input_parameter)
     
-    
     filename = []
     
-    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_movies.pkl'
-    # with open(filename, 'rb') as f:
-    #     data = pickle.load(f)
-    
-    # 1.1 Check whether DATA was passed to the function
+    # Check whether DATA was passed to the function
     if not data:
-        # Use Tkinter for file dialog
         Tk().withdraw()  # Close root window
         starting_directory = os.path.join(input_parameter['data_dir'],
                                                   input_parameter['default_output_dir'])
@@ -58,19 +65,6 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
         print('  Careful, there might be no data available to proceed!')
         
  
-    # Optional part to modify input parameters before combining data
-    # Placeholder for define_input_parameters.py functionality
-
-    # # GUI version: Allow savename to be changed (default: 'sptData_combined_movies.pkl')
-    # input_parameter['fn_combined_movies'] = askstring(f"Rename {input_parameter['fn_combined_movies']}?", 
-    #                           f"Enter new name for saving {input_parameter['fn_combined_movies']} or press OK/Enter", 
-    #                           initialvalue=input_parameter['fn_combined_movies'])
-    
-    # # CMD Version: Allow savename to be changed (default: 'sptData_combined_movies.pkl')
-    # fn_output_default = data['input_parameter']['fn_combined_movies']
-    # data['input_parameter']['fn_combined_movies'] = string_input_with_default("  Rename filename or press OK/Enter", fn_output_default)
-
-
     comb_data = {}
     comb_data['#_movies_loaded'] = len(data['movies'])
 
@@ -96,7 +90,9 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
     condi_table['condis_#_cells'] = {}
 
     for ff in range(comb_data['#_conditions']):
+
         tmp_scta_table = data['movies'][ff]['scta_table'].iloc[0:0].copy()
+        
         tmp_dcoef_table = data['movies'][ff]['diff_coeffs_filtered_list'].iloc[0:0].copy()
         tmp_tracks_table = data['movies'][ff]['tracks'].iloc[0:0].copy()
 
@@ -153,7 +149,7 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
         
     print(f"  Analysis of infividual movie(s) saved as pickle file: {data['input_parameter']['fn_combined_movies']}")
  
-    return comb_data
+    return comb_data, input_parameter
 
 
 

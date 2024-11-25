@@ -18,6 +18,7 @@ from skimage.io import imread
 import pandas as pd
 import pickle
 from set_parameters_sptPALM import set_parameters_sptPALM
+from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.simpledialog import askstring
@@ -37,6 +38,13 @@ def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
     #     comb_data = pickle.load(f)
     
     # 1.1 Check whether DATA was passed to the function
+    
+    
+    if not input_parameter:
+        # loaded more as a dummy here: define input parameters
+        input_parameter = set_parameters_sptPALM()
+        input_parameter = set_parameters_sptPALM_GUI(input_parameter)        
+    
     if not comb_data:
         # Use Tkinter for file dialog
         Tk().withdraw()  # Close root window
@@ -52,7 +60,10 @@ def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
             raise ValueError("No file selected!")
     
     # Figure A: plot stack plot with diffusion coefficients)
-    plot_stacked_diff_histo(comb_data)
+    if input_parameter['use_segmentations']:
+        plot_stacked_diff_histo(comb_data)
+    else:
+        print("Let's skip plotting cell-dependend copy number analysis if no segmentation is present...")
 
     
     return comb_data    

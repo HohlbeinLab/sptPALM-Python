@@ -21,6 +21,7 @@ from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 input_parameter = {}
 data = {}
 comb_data = {}
+sim_input = {}
 
 def combine_thunderstorm_csv_files():
     print('-2-4-')
@@ -52,55 +53,24 @@ while True:
         case 1:
             input_parameter = set_parameters_sptPALM()
             input_parameter = set_parameters_sptPALM_GUI(input_parameter)    
-            # Display analysis parameters
-            print('  Show input_parameter')
-            # Iterate through the dictionary and print each key-value pair on a new line
+            # Iterate through the dictionary and print each key-value pair on a new line          
+            print('  Show input_parameter') # Display analysis parameters
             for key, value in input_parameter.items():
                 print(f"    .{key}: {value}")
     
         case 2:  # sptPALM_analyse_Movies
-            if input_parameter:
-                print(" 'input_parameter' available, continue")
-                data = analyse_movies_sptPALM(input_parameter)
-            else:
-                print(" No 'input_parameter' available, selecting defaults from set_parameters_sptPLAM.py.")
-                data = analyse_movies_sptPALM()
+            data, input_parameter = analyse_movies_sptPALM(input_parameter)
             print("'data' now available in memory\n")
         
         case 3:  # sptPALM_combineData
-            if not input_parameter:
-                print(" No 'input_parameter' available")
-                input_parameter = set_parameters_sptPALM()
-                input_parameter = set_parameters_sptPALM_GUI(input_parameter)   
-            if data:
-                print(" 'data' available, continue")
-                comb_data = combine_analysed_data_sptPALM(data, input_parameter)
-            else:
-                print("No 'data' from available")
-                print("Continue with GUI to select DATA from 'sptData_movies.pkl' or similar")
-                comb_data = combine_analysed_data_sptPALM(None, input_parameter)
+            comb_data, input_parameter = combine_analysed_data_sptPALM(data, input_parameter)
             print("Combined data 'comb_data' now available in memory\n")
             
         case 4:  # sptPALM_PlotCombinedData
-            print('Run plot_combined_data_sptPALM(comb_data)')
-            if comb_data:
-                comb_data = plot_combined_data_sptPALM(comb_data)
-            else:
-                print("No comb_data from option 2 available")
-                print("Continue with GUI to select 'comb_data' "
-                      "from 'sptData_combined_movies.pkl' or similar")
-                comb_data = plot_combined_data_sptPALM()
+            comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
           
         case 5:  # MCDDA
-            condition_to_select = 0
-            if comb_data:
-                condition = 0
-                comb_data = MC_diffusion_distribution_analysis_sptPALM(condition_to_select, comb_data)
-            else:
-                print('No ''comb_data'' from option 3 available')
-                print("Continue with GUI to select 'comb_data' "
-                      "'sptData_combined_movies.pkl' or similar")
-                comb_data = MC_diffusion_distribution_analysis_sptPALM(condition_to_select)
+            comb_data = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
         
         case 6:  # Combine_ThunderSTORM_csv_files
             while True:

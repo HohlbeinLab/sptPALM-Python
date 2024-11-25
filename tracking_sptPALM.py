@@ -120,8 +120,9 @@ def tracking_sptPALM(para):
     print(f"  Time for tracking: {rounded_time} seconds")
     
     # Plot all tracks
-    # print(' Plot all tracks')
-    # plot_trackPy_data(tracks, para)
+    print(' Plot all tracks')
+    temp_linked = tracks.rename(columns={'track_id': 'particle'}) # naming back...
+    plot_trackPy_data(temp_linked.iloc[:50000], para) #Take only the first 50k entries
 
     # Update CSV file with track_ids
     csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
@@ -141,7 +142,7 @@ def plot_trackPy_data(linked, para):
     fig, ax = plt.subplots(2, 2, figsize=(14, 10))
     ax[0, 0].set_title('Particle Trajectories')
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,0], pos_columns=['x [µm]', 'y [µm]'])
+    tp.plot_traj(filtered, mpp=para['pixelsize'], ax=ax[0,0], pos_columns=['x [µm]', 'y [µm]'])
     ax[0, 0].set_ylabel('y (um)')
     ax[0, 0].set_xlabel('x (um)')
 
@@ -158,7 +159,7 @@ def plot_trackPy_data(linked, para):
     # ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
     ax[0, 1].set_title('Particle Trajectories')
     ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
-    tp.plot_traj(filtered, mpp=para['pixel_size'], ax=ax[0,1], pos_columns=['x [µm]', 'y [µm]'])
+    tp.plot_traj(filtered, mpp=para['pixelsize'], ax=ax[0,1], pos_columns=['x [µm]', 'y [µm]'])
     ax[0, 1].set_title('Particle Trajectories')
     ax[0, 1].set_ylabel('y (um)')
     ax[0, 1].set_xlabel('x (um)')  
@@ -170,15 +171,15 @@ def plot_trackPy_data(linked, para):
 
     # Plots and fits Mean Squared Displacement (MSD)
     ax[1, 1].set_title('Mean Squared Displacement: with fit, no drift correction')
-    ax[1, 1].set_ylabel(r'$\langle \Delta r^2 \rangle$ [mu m$^2$]')
+    ax[1, 1].set_ylabel(r'$\langle \Delta r^2 \rangle$ [µm$^2$]')
     ax[1, 1].set_xlabel('lag time $t$')
     fit = tp.utils.fit_powerlaw(msd, ax = ax[1,1])  # performs linear best fit in log space, plots]
     print(fit)
 
     plt.tight_layout()  # Adjust layout to prevent overlap
     
-    temp_path = os.path.join(para['data_pathname'], para['default_output_folder'])
-    plt.savefig(temp_path + para['fn_locs_csv'][:-4] + '_Fig02_track.png', dpi = para['dpi'])
+    temp_path =  os.path.join(para['data_dir'], para['default_output_dir'])
+    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig02_track.png', dpi = para['dpi'])
     
     plt.show()
     return ()

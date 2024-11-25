@@ -18,15 +18,20 @@ from diffusion_simulation import diffusion_simulation
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
 from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
 from fit_data_with_MCDDA_sptPALM import fit_data_with_MCDDA_sptPALM
-
+import pickle
 
 print("\nRun simulation_main.py!")
 
 # Function for setting all parameters
 sim_input = set_parameters_simulation();
 
-# set_parameters_simulation_GUI(sim_input)
-#sim_input = set_parameters_simulation_GUI(sim_input)
+# print("  TEMP! SPECIFIC FILE is being loaded: sim_input_parameter.pkl!")    
+# filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/sim_input_parameter.pkl'
+# with open(filename, 'rb') as f:
+#     sim_input = pickle.load(f)
+
+# # # set_parameters_simulation_GUI(sim_input)
+sim_input = set_parameters_simulation_GUI(sim_input)
 
 # Function for setting all starting positions, starting states etc
 [particleData, sim_input] = initiate_simulation(sim_input);

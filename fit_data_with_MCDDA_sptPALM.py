@@ -159,7 +159,10 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
                     color = 'black',
                     where = 'post')  # 'count' corresponds to `density=False`
  
-        ax.set_xscale('log')
+        if sim_input['plot_option']=='logarithmic':
+            ax.set_xscale('log')
+        
+        
         ax.set_xlim([sim_input['plot_diff_hist_min'], sim_input['plot_diff_hist_max']])
         ax.set_xlabel('Diffusion coefficient (µm^2/s)')
         ax.set_ylabel('#')

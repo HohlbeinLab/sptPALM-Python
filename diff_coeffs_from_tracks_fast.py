@@ -16,7 +16,7 @@ import pandas as pd
 import time
 
 def diff_coeffs_from_tracks_fast(tracks, sim_input):
-    print("\nRun diff_coeffs_from_tracks_fast.py")
+    print("\nRun 'diff_coeffs_from_tracks_fast.py'")
 
     # Initialize
     tracks_data = tracks.copy()
@@ -48,7 +48,7 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input):
 
 
     # Correct for localization error if specified (option in anaDDA does require to switch that off)
-    #what is the best correction here? Michelet 2010 reduced localization error? 
+    # what is the best correction here? Michelet 2010 reduced localization error? 
     if sim_input['correct_diff_calc_loc_error']:
         loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
                                                 len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']

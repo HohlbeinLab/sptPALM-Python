@@ -15,7 +15,7 @@ import numpy as np
 
 # Function defining all the input parameters and data to be analyzed
 def set_parameters_simulation():
-    print('\nRun set_parameters_simulation.py')
+    print("\n Run 'set_parameters_simulation.py'")
     sim_input = {
     # Number of species and particles per species
     '#_species': [],  # number of species

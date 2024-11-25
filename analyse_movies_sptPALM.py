@@ -17,6 +17,8 @@ from tkinter import simpledialog, filedialog
 from tkinter.simpledialog import askstring
 import os
 import pickle
+import pandas as pd
+import numpy as np
 
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
@@ -33,21 +35,11 @@ def analyse_movies_sptPALM(input_parameter = None):
     print('\nRun analyse_movies_sptPALM.py')
     
     # 1.1 Define input parameters
-    if input_parameter is None:
+    if not input_parameter:
         print("  Re-run set_parameters_sptPALM.py + GUI")
         input_parameter = set_parameters_sptPALM()
-        input_parameter = set_parameters_sptPALM_GUI()
+        input_parameter = set_parameters_sptPALM_GUI(input_parameter)
     
-    # # TEMPORARILY DISABLED, GUI version: (to avoid pausing execution of the analysis}
-    # input_parameter['fn_movies']  = askstring(f"Rename {input_parameter['fn_movies']}?", 
-    #                           f"Enter new name for saving {input_parameter['fn_movies']} or press OK/Enter", 
-    #                           initialvalue=input_parameter['fn_movies'])
-    
-    # #  CMD version
-    # fn_output_default = input_parameter['fn_movies']
-    # print('  Rename data structure to be saved later?')
-    # input_parameter['fn_movies'] = string_input_with_default("  Enter new string or press enter", fn_output_default)
-
     # Fall-back to GUI if no list of ThunderSTORM.csv files 
     # '*_thunder_.csv' are specified in define_input_parameters.py
     if not input_parameter['fn_locs']:
@@ -126,16 +118,27 @@ def analyse_movies_sptPALM(input_parameter = None):
         if input_parameter['use_segmentations']:
             para = single_cell_analysis_sptPALM(para)
             para = plot_single_cell_analysis_sptPALM(para)
-
+        else:
+            para['scta_table']= pd.DataFrame({
+                    'cell_id', 
+                    'cell_locs',
+                    'cell_area',
+                    '#tracks (filtered for #tracks per cell)',
+                    'cum. #tracks (filtered for #tracks per cell)',
+                    '#tracks (unfiltered for #tracks per cell)', 
+                    'cum. #tracks (unfiltered for #tracks per cell)',
+                    'keep_cells',
+                    'average_diff_coeff_per_cell',
+                })
+        
         # 2.8 Save current analysis
         with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:
             pickle.dump(para, f)
         print(f"  Parameter dictionary for current movie {ii} out of {len(input_parameter['fn_locs'])} movies(s) was saved as pickle file")
-        # print('\n')
         # Cell array containing all para structs
         
         data['movies'][ii] = para
-
+        
     # 3. Save entire DATA dictionary
     data['input_parameter'] = input_parameter
     with open(temp_path + para['fn_movies'], 'wb') as f:

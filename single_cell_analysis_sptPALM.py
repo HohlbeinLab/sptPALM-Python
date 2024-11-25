@@ -96,7 +96,7 @@ def single_cell_analysis_sptPALM(para):
      
             else:
                 cell_df.loc[jj,'#tracks (filtered for #tracks per cell)'] = 0
-                
+                cell_df.loc[jj, '#tracks (unfiltered for #tracks per cell)'] = 0
     
     # Extend cellTrackAnalysis_table
     cell_df['cum. #tracks (filtered for #tracks per cell)'] = np.cumsum(cell_df.loc[:,'#tracks (filtered for #tracks per cell)'])
