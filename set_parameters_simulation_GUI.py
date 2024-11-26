@@ -20,6 +20,7 @@ import threading
 from set_parameters_simulation import set_parameters_simulation
 import ast  # Safely parse the string back to a list of lists
 
+
 def set_parameters_simulation_GUI(sim_input=None):
 
     print(" Run 'set_parameters_simulation_combined_GUI.py'")
@@ -224,6 +225,9 @@ def set_parameters_simulation_GUI(sim_input=None):
     def exit_GUI():
         transfer_params()
         root.quit()
+        root.destroy()
+        root.destroy()
+        # os._exit(0)
         return sim_input
 
 

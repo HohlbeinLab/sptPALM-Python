@@ -111,41 +111,51 @@ def set_parameters_simulation():
     # sim_input['species'].append(species)
  
 
-    # # Following part can be copied for every species to be simulated
-    # species= {
-    #     '#_states': 2,
-    #     '#_particles': 250000,
-    #     'diff_quot': np.array([sim_input['avoidFloat0'], 2]),  # Diffusion coefficients for each state (µm^2/s)
-    #     # two states: sim_input.species(ii).rates = [kAB, kBA]
-    #     'rates': np.array([40.0, 60.0])}   # Transition rates between states (1/s)
-    #     # For fitting purposes
-    # species['diff_quot_init_guess'] = np.array([0, 2]) 
-    # species['diff_quot_lb_ub'] = np.array([[0, 1.], #was np.nan
-    #                                         [2*sim_input['avoidFloat0'], 5.]])  #was np.nan
-    # species['rates_init_guess'] = np.array([20.0, 100.0])  # Initial guess for rates: fitting
-    # species['rates_lb_ub'] = np.array([[10.0, 10.0],
-    #                                   [200.0, 500.0]])  # Lower and upper bounds for rates
-    # sim_input['species'].append(species)
-
-
     # Following part can be copied for every species to be simulated
-    species = {
-        '#_states': 3,
-        '#_particles': 200000,
-        'diff_quot': np.array([0, 0, 2.2]),  # Diffusion coefficients for each state (µm^2/s)
-        # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
-        # 'rates': np.array([143, 253, 272, 120, 0, 0])}   # Cas12a non-target Transition rates between states (1/s)
-        # 'rates': np.array([160,192,100,70, 0, 0])}   # Cas9 non-target Transition rates between states (1/s)
-         'rates': np.array([120,397,260,95, 0.0, 0.0])}   # impCas12a non-target Transition rates between states (1/s)
-    # For fitting purposes
-    species['diff_quot_init_guess'] = species['diff_quot']
-    species['diff_quot_lb_ub'] =  np.array([[0, 0, 1],
-                                            [sim_input['avoidFloat0'], sim_input['avoidFloat0'], 5]])
-    # species['rates_init_guess'] = species['rates']  # Initial guess for rates
-    species['rates_init_guess'] = np.array([100,  200,  150 , 50 , 0.0, 0.0]) #species['rates']  # Initial guess for rates
-    species['rates_lb_ub'] =  np.array([[10, 10, 10, 10, 0 , 0],
-                                      [500, 500, 500, 500, sim_input['avoidFloat0'], sim_input['avoidFloat0']]])  # Lower and upper bounds for rates
+    species= {
+        '#_states': 2,
+        '#_particles': 100000,
+        'diff_quot': np.array([sim_input['avoidFloat0'], 2]),  # Diffusion coefficients for each state (µm^2/s)
+        # two states: sim_input.species(ii).rates = [kAB, kBA]
+        'rates': np.array([40.0, 60.0])}   # Transition rates between states (1/s)
+        # For fitting purposes
+    species['diff_quot_init_guess'] = np.array([0, 2.2]) 
+    species['diff_quot_lb_ub'] = np.array([[0, 1.], #was np.nan
+                                            [2*sim_input['avoidFloat0'], 5.]])  #was np.nan
+    species['rates_init_guess'] = np.array([20.0, 100.0])  # Initial guess for rates: fitting
+    species['rates_lb_ub'] = np.array([[10.0, 10.0],
+                                      [200.0, 500.0]])  # Lower and upper bounds for rates
     sim_input['species'].append(species)
+
+
+
+
+
+
+
+    # # Following part can be copied for every species to be simulated
+    # species = {
+    #     '#_states': 3,
+    #     '#_particles': 200000,
+    #     'diff_quot': np.array([0, 0, 2.2]),  # Diffusion coefficients for each state (µm^2/s)
+    #     # three states: sim_input.species(ii).rates = [kAB, kBA, kBC, kCB, kAC, kCA];
+    #     # 'rates': np.array([143, 253, 272, 120, 0, 0])}   # Cas12a non-target Transition rates between states (1/s)
+    #     # 'rates': np.array([160,192,100,70, 0, 0])}   # Cas9 non-target Transition rates between states (1/s)
+    #      'rates': np.array([120,397,260,95, 0.0, 0.0])}   # impCas12a non-target Transition rates between states (1/s)
+    # # For fitting purposes
+    # species['diff_quot_init_guess'] = species['diff_quot']
+    # species['diff_quot_lb_ub'] =  np.array([[0, 0, 1],
+    #                                         [sim_input['avoidFloat0'], sim_input['avoidFloat0'], 5]])
+    # # species['rates_init_guess'] = species['rates']  # Initial guess for rates
+    # species['rates_init_guess'] = np.array([100,  200,  150 , 50 , 0.0, 0.0]) #species['rates']  # Initial guess for rates
+    # species['rates_lb_ub'] =  np.array([[10, 10, 10, 10, 0 , 0],
+    #                                   [500, 500, 500, 500, sim_input['avoidFloat0'], sim_input['avoidFloat0']]])  # Lower and upper bounds for rates
+    # sim_input['species'].append(species)
+    
+    
+    
+    
+    
     
     # # Following part can be copied for every species to be simulated
     # species = {
