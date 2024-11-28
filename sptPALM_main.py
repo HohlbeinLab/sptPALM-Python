@@ -57,21 +57,16 @@ while True:
             print('  Show input_parameter') # Display analysis parameters
             for key, value in input_parameter.items():
                 print(f"    .{key}: {value}")
-    
         case 2:  # sptPALM_analyse_Movies
-            data, input_parameter = analyse_movies_sptPALM(input_parameter)
+            [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
             print("'data' now available in memory\n")
-        
         case 3:  # sptPALM_combineData
             comb_data, input_parameter = combine_analysed_data_sptPALM(data, input_parameter)
             print("Combined data 'comb_data' now available in memory\n")
-            
         case 4:  # sptPALM_PlotCombinedData
             comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
-          
         case 5:  # MCDDA
             comb_data = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
-        
         case 6:  # Combine_ThunderSTORM_csv_files
             while True:
                 print('--')

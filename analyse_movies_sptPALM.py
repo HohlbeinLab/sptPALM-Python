@@ -145,7 +145,7 @@ def analyse_movies_sptPALM(input_parameter = None):
         pickle.dump(data, f)
     print(f"Analysis of individual movie(s) saved as pickle file: {para['fn_movies']}")
         
-    return data
+    return data, input_parameter
 
 
 

@@ -10,7 +10,8 @@ Date of Creation: September, 2024
 
 Full license details can be found at https://creativecommons.org/licenses/by/4.0/
 """
-
+import os
+import numpy as np
 
 # Function defining all the input parameters and data to be analyzed
 def set_parameters_sptPALM():
@@ -27,55 +28,54 @@ def set_parameters_sptPALM():
         
         'condition_names': [], # Initialise, further defined below
         'condition_files': [], # Initialise, further defined below
-        'condition_to_select_MCDDA': 0, # which of the later to be defined conditions should be select as data source for MCDDA, default: 0 
-        'copynumber_intervals': [[1, 100], [101, 200], [201, 300], [301, 400]], # Initialise, further definied below        
+        # 'condition_to_select_MCDDA': 0, # which of the later to be defined conditions should be select as data source for MCDDA, default: 0 
+        'copynumber_intervals': np.array([[1, 100], [101, 200], [201, 300], [301, 400]]), # Initialise, further definied below        
 
         # Segmentation of cells allows linking localisations to individual cells
-        'pixelsize': 0.119,  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
-        'use_segmentations': True, # Account for segmentations = False, default: True
-        'cellarea_pixels_min': 50,  # Filter cells for minum area (area is given in number of pixels), default: 50
-        'cellarea_pixels_max': 500, # Filter cells for area (area is given in number of pixels), default: 500
+        'pixelsize': float(0.119),  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
+        'use_segmentations': bool(True), # Account for segmentations = False, default: True
+        'cellarea_pixels_min': int(50),  # Filter cells for minum area (area is given in number of pixels), default: 50
+        'cellarea_pixels_max': int(500), # Filter cells for area (area is given in number of pixels), default: 500
 
         # Tracking and diffusion analysis
-        'frametime': 0.01, # Frametime in seconds, default: 0.01
-        'loc_error': 0.035, # Localization error (um), default: 0.03
-        'track_steplength_max': 0.8, # Tracking window (um), default: 0.8 um or 0.5 um
-        'track_memory': 0, # Tracking memory in frames, default: 1
-        'diff_hist_steps_min': 3, # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
-        'diff_hist_steps_max': 100, # Maximum number of steps for a track to be analyzed, default: 100
-        # 'track_lengths': [1,2,3,4],  # Track lengths (2 to 8 frames) tracklength of 1 is two locs
+        'frametime': float(0.01), # Frametime in seconds, default: 0.01
+        'loc_error': float(0.035), # Localization error (um), default: 0.03
+        'track_steplength_max': float(0.8), # Tracking window (um), default: 0.8 um or 0.5 um
+        'track_memory': int(0), # Tracking memory in frames, default: 1
+        'diff_hist_steps_min': int(3), # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
+        'diff_hist_steps_max': int(100), # Maximum number of steps for a track to be analyzed, default: 100
         # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
-        'tracklength_locs_min': 2,  # 
-        'tracklength_locs_max': 8,  # 
+        'tracklength_locs_min': int(2),  # 
+        'tracklength_locs_max': int(8),  # 
 
         # Cell by cell analysis
-        'number_tracks_per_cell_min': 1, # Minimum number of tracks for each cell, default: 1
-        'number_tracks_per_cell_max': 10000, # Maximum number of tracks for each cell, default: 10000
+        'number_tracks_per_cell_min': int(1), # Minimum number of tracks for each cell, default: 1
+        'number_tracks_per_cell_max': int(10000), # Maximum number of tracks for each cell, default: 10000
 
         # Histograms for diffusion analysis
-        'plot_diff_hist_min': 4E-3, # Plot and histogram from um^2/s to um^2/s, default: 4E-3
-        'plot_diff_hist_max': 10, # Plot and histogram from um^2/s to um^2/s, default: 10
-        'binwidth': 0.1, # width of bins, default: 0.1
+        'plot_diff_hist_min': float(4E-3), # Plot and histogram from um^2/s to um^2/s, default: 4E-3
+        'plot_diff_hist_max': float(10), # Plot and histogram from um^2/s to um^2/s, default: 10
+        'binwidth': float(0.1), # width of bins, default: 0.1
         
         # Parameters for plotting figures etc
-        'fontsize': 10, # Default: 10
-        'linewidth': 1, # Default: 1
+        'fontsize': int(10), # Default: 10
+        'linewidth': int(1), # Default: 1
         'plot_norm_histograms': 'probability', # Carefull: Matlab: choose either 'count' (default) | 'probability' | 'countdensity' | 'pdf' | 'cumcount' | 'cdf'
-        'plot_frame_number': True, # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
-        'dpi': 150, # DPI setting for plotting figures, default: 300
+        'plot_frame_number': bool(True), # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
+        'dpi': int(150), # DPI setting for plotting figures, default: 300
         'cmap_applied': 'gist_ncar', ##was: 'nipy_spectral', tab20c, 
         
         # (OPTIONAL) settings for visualisation of tracks SCTA: Single-cell tracking analysis
-        'scta_vis_cells': False, # Visualize individual cells True/False, default: False
-        'scta_plot_cell_window': 15, # Radius in pixels for plotting individual cells and their tracks
-        'scta_vis_interactive': False, # Interactively cycle through cells True/False, default: False
-        'scta_vis_rangemax': 0.3, # Color-coding in the range of [0:plot_DiffHist_max)], default: 0.4
+        'scta_vis_cells': bool(False), # Visualize individual cells True/False, default: False
+        'scta_plot_cell_window': int(15), # Radius in pixels for plotting individual cells and their tracks
+        'scta_vis_interactive': bool(False), # Interactively cycle through cells True/False, default: False
+        'scta_vis_rangemax': float(0.3), # Color-coding in the range of [0:plot_DiffHist_max)], default: 0.4
 
     }
 
     # Directory containing your data
     input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
-
+    input_parameter['data_dir']  = os.path.join(input_parameter['data_dir'] , '')
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [
         '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
@@ -98,7 +98,7 @@ def set_parameters_sptPALM():
    # # DO NOT REMOVE THE FOLLOWING LINES!
    #  # Directory containing your data (make sure you end with a '/' or '\')
    #  input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/'
-
+   #  input_parameter['data_dir']  = os.path.join(input_parameter['data_dir'] , '')
    #  # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
    #  input_parameter['fn_locs'] = [
    #      '230208_Cas12aScrambled_EM620_LASER1_1_MMStack_Pos0.ome_MLE_thunder.csv',

@@ -26,7 +26,7 @@ print("\nRun simulation_main.py!")
 sim_input = set_parameters_simulation();
 
 # print("  TEMP! SPECIFIC FILE is being loaded: sim_input_parameter.pkl!")    
-# filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/sim_input_parameter.pkl'
+# filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/sim_input_parameter_static.pkl'
 # with open(filename, 'rb') as f:
 #     sim_input = pickle.load(f)
 

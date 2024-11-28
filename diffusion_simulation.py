@@ -29,9 +29,9 @@ def diffusion_simulation(sim_input, particle_data):
     tracks[columns_pd] = pd.DataFrame({
         columns_pd[0]: particle_data.loc[valid_x, 'xPos'].values + loc_error_matrix[valid_x, 0],  # x-values with error
         columns_pd[1]: particle_data.loc[valid_x, 'yPos'].values + loc_error_matrix[valid_x, 1],  # y-values with error
-        columns_pd[2]: 1,  # Frame number (set to 1)
+        columns_pd[2]: 0,  # Frame number (set to 1)
         columns_pd[3]: particle_data.loc[valid_x, 'particle'].values,  # Track ID
-        columns_pd[4]: sim_input['frametime']  # Frame time (constant)
+        columns_pd[4]: sim_input['frametime']  # frame time (constant)
     })
     
     # Initialize video recording if needed
@@ -42,10 +42,11 @@ def diffusion_simulation(sim_input, particle_data):
         writer = PillowWriter(fps=5)  # Set the frame rate for GIF
         writer.setup(fig, "Diffusion.gif", dpi=200)
 
+    # Start timing of the following loop
     start = time.time()
     
     # Main simulation loop
-    for step_counter in range(1, int(max(sim_input['track_lengths']) * sim_input['frametime'] / sim_input['steptime']) + 1):
+    for step_counter in range(1, int(sim_input['steps_simulation'] + 1)):
 
         temp_xyz_steps = np.zeros((sim_input['total_number_particles'], 3))
         
@@ -71,7 +72,7 @@ def diffusion_simulation(sim_input, particle_data):
 
             # Calculate random steps in X, Y, Z direction
             temp_xyz_steps[loc_species, :] = np.sqrt(
-                2 * particle_data.loc[loc_species, 'active_diff_quot'].values[:, np.newaxis] * sim_input['steptime']
+                2 * particle_data.loc[loc_species, 'active_diff_quot'].values[:, np.newaxis] * sim_input['frametime']/sim_input['oversampling']
             ) * np.random.randn(len(loc_species), 3)
 
             # Apply boundary conditions if needed

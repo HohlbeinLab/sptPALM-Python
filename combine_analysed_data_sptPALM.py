@@ -26,7 +26,7 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
     print('\nRun combine_analysed_data_sptPALM.py')
     
     """
-    TEMPORARY LOADING OF DATA 
+    Following lines can be used for loading data bypassing the GUIs 
     """
     # # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
     # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
@@ -42,7 +42,6 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
 
 
     if not input_parameter:
-        # loaded more as a dummy here: define input parameters
         input_parameter = set_parameters_sptPALM()
         input_parameter = set_parameters_sptPALM_GUI(input_parameter)
     
@@ -62,7 +61,7 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
         else:
             raise ValueError("No file selected!")
     else:
-        print('  Careful, there might be no data available to proceed!')
+        print('  Careful, data taken from memory!')
         
  
     comb_data = {}

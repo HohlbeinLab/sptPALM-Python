@@ -59,21 +59,25 @@ def set_parameters_simulation_GUI(sim_input=None):
         mean_track_length_entry.delete(0, tk.END)
         mean_track_length_entry.insert(0, new_sim_input['mean_track_length'])
 
+        confined_diffusion_var.set(False) # Not strictly necessary
         confined_diffusion_var.set(new_sim_input['confined_diffusion'])
 
         loc_error_entry.delete(0, tk.END)
         loc_error_entry.insert(0, new_sim_input['loc_error'])
 
+        correct_diff_calc_loc_error_var.set(False) # Not strictly necessary
         correct_diff_calc_loc_error_var.set(new_sim_input['correct_diff_calc_loc_error'])
 
-        steptime_entry.delete(0, tk.END)
-        steptime_entry.insert(0, new_sim_input['steptime'])
+        oversampling_entry.delete(0, tk.END)
+        oversampling_entry.insert(0, new_sim_input['oversampling'])
 
         frametime_entry.delete(0, tk.END)
         frametime_entry.insert(0, new_sim_input['frametime'])
 
+        perform_fitting_var.set(False) # Not strictly necessary
         perform_fitting_var.set(new_sim_input['perform_fitting'])
 
+        display_figures_var.set(False) # Not strictly necessary
         display_figures_var.set(new_sim_input['display_figures'])
 
         diff_hist_min_entry.delete(0, tk.END)
@@ -85,6 +89,7 @@ def set_parameters_simulation_GUI(sim_input=None):
         binwidth_entry.delete(0, tk.END)
         binwidth_entry.insert(0, new_sim_input['binwidth'])
         
+        plot_option_var.set(False) # Not strictly necessary
         plot_option_var.set(new_sim_input['plot_option'])
 
         species_to_select_entry.delete(0, tk.END)
@@ -118,8 +123,8 @@ def set_parameters_simulation_GUI(sim_input=None):
             'correct_diff_calc_loc_error': bool(correct_diff_calc_loc_error_var.get()),  # Match anaDDA settings, default: False
             
             # Timing parameters
-            'steptime': float(steptime_entry.get()),  # (s) step time in seconds, default: 0.001
             'frametime': float(frametime_entry.get()),  # (s) frame time in seconds, default: 0.02
+            'oversampling': int(oversampling_entry.get()),  # (s) factor by whoch framtetime is oversampled
             
             # Fitting and plotting options
             'perform_fitting': bool(perform_fitting_var.get()),  # Whether to perform fitting or not
@@ -154,7 +159,7 @@ def set_parameters_simulation_GUI(sim_input=None):
         save_file_path = filedialog.asksaveasfilename(
             defaultextension=".pkl",
             initialdir=current_directory,
-            filetypes=[("Pickle files", "*.pkl")],
+            filetypes=[("pickle files", "*.pkl")],
             initialfile="sim_input_parameter.pkl",
             title="Save sim_input_parameter as"
         )
@@ -226,8 +231,6 @@ def set_parameters_simulation_GUI(sim_input=None):
         transfer_params()
         root.quit()
         root.destroy()
-        root.destroy()
-        # os._exit(0)
         return sim_input
 
 
@@ -304,18 +307,18 @@ def set_parameters_simulation_GUI(sim_input=None):
     correct_diff_calc_loc_error_var = tk.BooleanVar(value=sim_input['correct_diff_calc_loc_error'])
     tk.Checkbutton(sim_frame, text="Correct_diff_calc_loc_error", variable=correct_diff_calc_loc_error_var, width=width_text_labels, anchor="w").grid(row=row_index, column=2, sticky=tk.W, columnspan=3)
 
-    # Steptime (s)
     row_index += 1
-    tk.Label(sim_frame, text="Steptime (s)", width=width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    steptime_entry = tk.Entry(sim_frame, width=width_text_box)
-    steptime_entry.grid(row=row_index, column=1)
-    steptime_entry.insert(0, sim_input['steptime'])
-
     # Frametime (s)
-    tk.Label(sim_frame, text="Frametime (s)", width=width_text_labels, anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+    tk.Label(sim_frame, text="Frametime (s)", width=width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     frametime_entry = tk.Entry(sim_frame, width=width_text_box)
-    frametime_entry.grid(row=row_index, column=3)
+    frametime_entry.grid(row=row_index, column=1)
     frametime_entry.insert(0, sim_input['frametime'])
+
+    # Oversampling (x)
+    tk.Label(sim_frame, text="Oversampling factor", width=width_text_labels, anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+    oversampling_entry = tk.Entry(sim_frame, width=width_text_box)
+    oversampling_entry.grid(row=row_index, column=3)
+    oversampling_entry.insert(0, sim_input['oversampling'])
 
     """
     # Currently empty...

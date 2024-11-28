@@ -28,6 +28,7 @@ def set_parameters_sptPALM_GUI(para = None):
         dirname = filedialog.askdirectory()
         if dirname:
             data_dir_entry.delete(0, tk.END)
+            dirname = os.path.join(dirname, '')
             data_dir_entry.insert(0, dirname)
 
     def browse_files_csv():
@@ -69,8 +70,8 @@ def set_parameters_sptPALM_GUI(para = None):
             condition_files_entry.delete(0, tk.END)
             condition_files_entry.insert(0, ', '.join(map(str, new_para['condition_files'])))
             
-            condition_to_select_MCDDA_entry.delete(0, tk.END)
-            condition_to_select_MCDDA_entry.insert(0, new_para['condition_to_select_MCDDA'])
+            # condition_to_select_MCDDA_entry.delete(0, tk.END)
+            # condition_to_select_MCDDA_entry.insert(0, new_para['condition_to_select_MCDDA'])
     
             copynumber_intervals_entry.delete(0, tk.END)
             copynumber_intervals_entry.insert(0, ', '.join(map(str, new_para['copynumber_intervals'])))
@@ -185,7 +186,7 @@ def set_parameters_sptPALM_GUI(para = None):
             'condition_names': list(map(str.strip, condition_names_entry.get().split(','))),
             'condition_files': literal_eval(f'[{condition_files_entry.get()}]'),  # Wrap with [] to make it a valid list of lists
             'copynumber_intervals': literal_eval(f'[{copynumber_intervals_entry.get()}]'),
-            'condition_to_select_MCDDA': int(condition_to_select_MCDDA_entry.get()),
+            # 'condition_to_select_MCDDA': int(condition_to_select_MCDDA_entry.get()),
            
             'fn_csv_handle': fn_csv_handle_entry.get(),
             'fn_dict_handle': fn_dict_handle_entry.get(),
@@ -197,7 +198,7 @@ def set_parameters_sptPALM_GUI(para = None):
             'pixelsize': float(pixelsize_entry.get()),
             'cellarea_pixels_min': int(cellarea_min_entry.get()),
             'cellarea_pixels_max': int(cellarea_max_entry.get()),
-            'use_segmentations': use_segmentations_var.get(),
+            'use_segmentations': bool(use_segmentations_var.get()),
             'track_steplength_max': float(track_steplength_entry.get()),
             'track_memory': int(track_memory_entry.get()),
             'frametime': float(frametime_entry.get()),
@@ -210,17 +211,17 @@ def set_parameters_sptPALM_GUI(para = None):
             'number_tracks_per_cell_min': int(number_tracks_per_cell_min_entry.get()),
             'number_tracks_per_cell_max': int(number_tracks_per_cell_max_entry.get()),
             
-            'scta_vis_cells': scta_vis_cells_var.get(),
+            'scta_vis_cells': bool(scta_vis_cells_var.get()),
             'scta_plot_cell_window': int(scta_plot_cell_window_entry.get()),
-            'scta_vis_interactive': scta_vis_interactive_var.get(),
+            'scta_vis_interactive': bool(scta_vis_interactive_var.get()),
             'scta_vis_rangemax': float(scta_vis_rangemax_entry.get()),
             'plot_diff_hist_min': float(diff_hist_min_entry.get()),
             'plot_diff_hist_max': float(diff_hist_max_entry.get()),
             'binwidth': float(binwidth_entry.get()),
             'fontsize': int(fontsize_entry.get()),
             'linewidth': int(linewidth_entry.get()),
-            'plot_norm_histograms': plot_norm_histograms_var.get(),
-            'plot_frame_number': use_plot_frame_number_var.get(),
+            'plot_norm_histograms': bool(plot_norm_histograms_var.get()),
+            'plot_frame_number': bool(use_plot_frame_number_var.get()),
             'dpi': int(dpi_entry.get()),
             'cmap_applied': cmap_applied_var.get()
         }
@@ -303,7 +304,6 @@ def set_parameters_sptPALM_GUI(para = None):
              anchor="w").grid(row=3, column=0, sticky=tk.W)
     condition_names_entry = tk.Entry(file_frame, width=width_text_fileIO)
     condition_names_entry.grid(row=3, column=1)
-    # condition_names_entry.insert(0, para['condition_names'])
     condition_names_entry.insert(0, ', '.join(map(str, para['condition_names'])))
 
     row_index+=1
@@ -312,7 +312,6 @@ def set_parameters_sptPALM_GUI(para = None):
              anchor="w").grid(row=4, column=0, sticky=tk.W)
     condition_files_entry = tk.Entry(file_frame, width=width_text_fileIO)
     condition_files_entry.grid(row=4, column=1)
-    # condition_files_entry.insert(0, para['condition_files'])
     condition_files_entry.insert(0, ', '.join(map(str, para['condition_files'])))
 
     row_index+=1    
@@ -321,7 +320,6 @@ def set_parameters_sptPALM_GUI(para = None):
              anchor="w").grid(row=5, column=0, sticky=tk.W)
     copynumber_intervals_entry = tk.Entry(file_frame, width=width_text_fileIO)
     copynumber_intervals_entry.grid(row=5, column=1)
-    # condition_files_entry.insert(0, para['condition_files'])
     copynumber_intervals_entry.insert(0, ', '.join(map(str, para['copynumber_intervals'])))
 
     row_index+=1    
@@ -595,13 +593,13 @@ def set_parameters_sptPALM_GUI(para = None):
     scta_vis_rangemax_entry.grid(row=row_index, column=3)
     scta_vis_rangemax_entry.insert(0, para['scta_vis_rangemax'])  
     
-    row_index+=1
-    # Select condition to be transfered to MCDDA
-    tk.Label(plotting_frame, text="Condition MCDDA", width = width_text_labels, 
-             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    condition_to_select_MCDDA_entry = tk.Entry(plotting_frame, width=width_text_box)
-    condition_to_select_MCDDA_entry.grid(row=row_index, column=1)
-    condition_to_select_MCDDA_entry.insert(0, para['condition_to_select_MCDDA'])  
+    # row_index+=1
+    # # Select condition to be transfered to MCDDA
+    # tk.Label(plotting_frame, text="Condition MCDDA", width = width_text_labels, 
+    #          anchor="w").grid(row=row_index, column=0, sticky=tk.W)
+    # condition_to_select_MCDDA_entry = tk.Entry(plotting_frame, width=width_text_box)
+    # condition_to_select_MCDDA_entry.grid(row=row_index, column=1)
+    # condition_to_select_MCDDA_entry.insert(0, para['condition_to_select_MCDDA'])  
     
 #############################
     # Load, Save, and Exit buttons

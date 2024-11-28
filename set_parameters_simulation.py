@@ -35,8 +35,8 @@ def set_parameters_simulation():
     'correct_diff_calc_loc_error': True,  # Match anaDDA settings, default: False
     
     # Timing parameters
-    'steptime': float(0.001),  # (s) step time in seconds, default: 0.001
-    'frametime': float(0.01),  # (s) frame time in seconds, default: 0.02
+    'frametime': float(0.01),  # (s) frame time in seconds, default: 0.01
+    'oversampling': int(10),  # oversampling factor for the frametime
     
     # Fitting and plotting options
     'perform_fitting': True,  # Whether to perform fitting or not
@@ -176,8 +176,8 @@ def set_parameters_simulation():
 
     sim_input['#_species'] = len(sim_input['species'])
     
-    if sim_input['steptime'] >= sim_input['frametime']:
-        raise ValueError("Careful! sim_input['steptime'] >= sim_input['frametime']!")
+    if sim_input['oversampling'] < 1:
+        raise ValueError("Careful! sim_input['oversampling'] should be larger than 1")
     
     if sim_input['radius_cell'] < 0:
         raise ValueError("Careful! sim_input['radius_cell'] < 0!")

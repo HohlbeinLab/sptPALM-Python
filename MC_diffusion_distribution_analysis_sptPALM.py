@@ -30,7 +30,10 @@ from fit_data_with_MCDDA_sptPALM import fit_data_with_MCDDA_sptPALM
 def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=None, sim_input=None):
     print('\nRun MC_diffusion_distribution_analysis_sptPALM.py')
 
-    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    """
+    TEMPORARY: For bugfixing - Replace the following line with your file path if needed
+    """
+    
     print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
     filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
     with open(filename, 'rb') as f:
@@ -48,7 +51,12 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     # with open(filename, 'rb') as f:
     #     sim_input = pickle.load(f)
         
+ 
         
+    """
+    Actual start of the function
+    """    
+ 
     # Check whether 'input_parameter' was passed to the function
     if not input_parameter:
         print("  Run set_parameters_sptPALM.py + GUI")
@@ -77,7 +85,7 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
         print("Run 'set_parameters_simulation.py' + GUI")
         sim_input = set_parameters_simulation()
         sim_input = set_parameters_simulation_GUI(sim_input)    
-
+    
     print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][input_parameter['condition_to_select_MCDDA']]}\n")
     
     # Use tracks from anaDDA style of plotting tracks

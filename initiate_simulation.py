@@ -24,9 +24,11 @@ def initiate_simulation(sim_input):
     print(f"  We simulate a total of {sim_input['total_number_particles']} particles")
     sim_input['#_species'] = len(sim_input['species'])
     
-    sim_input['total_length_cell'] = 2 * sim_input['radius_cell'] + sim_input['length_cell']
-    sim_input['total_duration_simulation'] = len(sim_input['track_lengths']) * sim_input['frametime']
-    sim_input['steps_simulation'] = sim_input['total_duration_simulation'] / sim_input['steptime']
+    sim_input['total_length_cell'] = float(2 * sim_input['radius_cell'] + sim_input['length_cell'])
+    sim_input['total_duration_simulation'] = float(max(sim_input['track_lengths']) * sim_input['frametime'] )
+    sim_input['steptime'] = sim_input['frametime']/sim_input['oversampling']
+    sim_input['steps_simulation'] = int(sim_input['total_duration_simulation'] / sim_input['steptime'])
+    
     print(f"  We simulate a total of {int(sim_input['steps_simulation'])} steps")
 
     # Simulate starting positions and prepare particle_data DataFrame
@@ -88,7 +90,7 @@ def initiate_simulation(sim_input):
         for idx, dq in enumerate(diff_quot):
             print(f"    State {idx}:")
             print(f"      stepsize per frame (µm): {round(np.sqrt(2 * dq * sim_input['frametime']),2)}")
-            print(f"      stepsize per step (µm): {round(np.sqrt(2 * dq * sim_input['steptime']),2)}")
+            print(f"      stepsize per step (µm): {round(np.sqrt(2 * dq * sim_input['frametime']/sim_input['oversampling']),2)}")
         
         numberStates = sim_input['species'][ii]['#_states']
         if numberStates == 1:

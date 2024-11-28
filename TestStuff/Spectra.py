@@ -60,19 +60,19 @@ ax1.spines['bottom'].set_linewidth(LineWidth)
 plt.fill_between(No1[:, 0], No1[:, 1] / np.max(No1[:, 1]), color='gold', alpha=0.5, label="Cy3B (ab)")
 # plt.plot(No1[:, 0], No1[:, 1] / np.max(No1[:, 1]), linewidth=LineWidth, color='gold', linestyle='-')
 
-# plt.fill_between(No2[:, 0], No2[:, 1] / np.max(No2[:, 1]), color='darkorange', alpha=0.5, label="Cy3B (em)")
+plt.fill_between(No2[:, 0], No2[:, 1] / np.max(No2[:, 1]), color='darkorange', alpha=0.5, label="Cy3B (em)")
 # plt.plot(No2[:, 0], No2[:, 1] / np.max(No2[:, 1]), linewidth=LineWidth, color='darkorange')
 
-# plt.fill_between(No3[:, 0], No3[:, 1] / np.max(No3[:, 1]), color='orangered', alpha=0.5, label="ATTO647N (ab)")
+plt.fill_between(No3[:, 0], No3[:, 1] / np.max(No3[:, 1]), color='orangered', alpha=0.5, label="ATTO647N (ab)")
 # plt.plot(No3[:, 0], No3[:, 1] / np.max(No3[:, 1]), linewidth=LineWidth, color='orangered', linestyle='-')
 
-# plt.fill_between(No4[:, 0], No4[:, 1] / np.max(No4[:, 1]), color='darkred', alpha=0.5, label="ATTO647N (em)")
+plt.fill_between(No4[:, 0], No4[:, 1] / np.max(No4[:, 1]), color='darkred', alpha=0.5, label="ATTO647N (em)")
 # plt.plot(No4[:, 0], No4[:, 1] / np.max(No4[:, 1]), linewidth=LineWidth, color='darkred')
 
 # Add vertical lines
-# plt.axvline(x=Laser_1, color='green', linestyle='--', linewidth=LineWidth, label=f"Laser {Laser_1} nm")
+plt.axvline(x=Laser_1, color='green', linestyle='--', linewidth=LineWidth, label=f"Laser {Laser_1} nm")
 
-# plt.axvline(x=Laser_2, color='red', linestyle='--', linewidth=LineWidth, label=f"Laser {Laser_2} nm")
+plt.axvline(x=Laser_2, color='red', linestyle='--', linewidth=LineWidth, label=f"Laser {Laser_2} nm")
 
 # Set axis labels and limits
 plt.xlabel('Wavelength (nm)', fontsize=font_size, fontname=font_name)

@@ -25,9 +25,11 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     print("\nRun diff_coeffs_from_tracks_fast.py")
 
     # Check if fitting is supported for multiple species
-    if sim_input['#_species'] > 1:
-        raise ValueError('Careful. Fitting is currently only supported for a single species!')
-    
+    if sim_input['#_species'] > 1 and sim_input['perform_fitting']:
+        print('Careful. Fitting is currently only supported for a single species!')
+        print("Careful. 'perform_fitting' is set to False!")
+        sim_input['perform_fitting']=False
+        
     ii = sim_input['species_to_select']  # Index for species
 
     # Temporarily set displayFigures to False
@@ -41,18 +43,21 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     edges = D_track_length_matrix['Bins']
 
     # Plotting setup
-
-
-    nrwos_temp = math.ceil(len(sim_input['track_lengths']) / 2.0)
+    nrows_temp = math.ceil(len(sim_input['track_lengths']) / 2.0)
     # ncols_temp = 2 if len(sim_input['track_lengths']) > 1 else 1
     
-    fig, axs = plt.subplots(nrows = nrwos_temp, ncols=2, figsize=(10, 10))
+    fig, axs = plt.subplots(nrows = nrows_temp, ncols=2, figsize=(10, 10))
     fig.suptitle('Histogram of diffusion coefficients per track length')
 
     # Initial guesses and bounds
-    start_values_fitting = np.concatenate([sim_input['species'][ii]['diff_quot_init_guess'], sim_input['species'][ii]['rates_init_guess']])
-    lower_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][0], sim_input['species'][ii]['rates_lb_ub'][0]])
-    upper_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][1], sim_input['species'][ii]['rates_lb_ub'][1]])
+    if sim_input['species'][ii]['#_states'] == 1:
+        start_values_fitting = np.concatenate([sim_input['species'][ii]['diff_quot_init_guess']])
+        lower_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][0]])
+        upper_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][1]])  
+    else:
+        start_values_fitting = np.concatenate([sim_input['species'][ii]['diff_quot_init_guess'], sim_input['species'][ii]['rates_init_guess']])
+        lower_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][0], sim_input['species'][ii]['rates_lb_ub'][0]])
+        upper_bounds = np.concatenate([sim_input['species'][ii]['diff_quot_lb_ub'][1], sim_input['species'][ii]['rates_lb_ub'][1]])
 
     # Initial output
     out_initial_guess = fitFunc(start_values_fitting, sim_input)
@@ -64,7 +69,9 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
         """
         ii = sim_input['species_to_select'] 
    
-        if sim_input['species'][ii]['#_states'] == 2:
+        if sim_input['species'][ii]['#_states'] == 1:
+            sim_input['species'][ii]['diff_quot'] = np.array(params[0:1])
+        elif sim_input['species'][ii]['#_states'] == 2:
             sim_input['species'][ii]['diff_quot'] = np.array(params[0:2]) 
             sim_input['species'][ii]['rates'] = params[2:4]
         elif sim_input['species'][ii]['#_states'] >= 3:
@@ -78,24 +85,36 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
         # Calculate diffusion coefficients and flatten the matrix
         sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
         _, D_track_length_matrix = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input)
-    
+   
         # Normalize and linearize the matrix
         D_track_length_matrix.loc[:, list(sim_input['track_lengths'])] /= np.sum(D_track_length_matrix.loc[:, list(sim_input['track_lengths'])], axis=0)
         linearized_array = D_track_length_matrix.values.ravel()
-    
+
         return linearized_array
     
-    def residuals(params, sim_input, ground_truth):
+    def def_residuals(params, sim_input, ground_truth):
         """Residual function for least_squares"""
         simulated_data = fitFunc_1D(None, params, sim_input)  # Simulate using params
-        return simulated_data - ground_truth  # Return the difference
+        residuals = simulated_data - ground_truth  # Return the difference
+        return residuals
 
 
     # Options for curve fitting (using scipy's least_squares)
     experimental_data = D_track_length_matrix_normalized.values.ravel()
     if sim_input['perform_fitting']:
-        if sim_input['species'][ii]['#_states'] == 2:
-            res = least_squares(residuals, 
+        if sim_input['species'][ii]['#_states'] == 1:
+            res = least_squares(def_residuals, 
+                             start_values_fitting,
+                             method = 'dogbox', # options trf, dogbox
+                             bounds=(lower_bounds, upper_bounds),
+                             args=(sim_input,experimental_data),
+                             loss = 'linear', # cauchy: crap; soft_l1
+                             x_scale = [1],
+                             diff_step = [0.5],
+                             # max_nfev = 10,
+                             verbose=2)     
+        elif sim_input['species'][ii]['#_states'] == 2:
+           res = least_squares(def_residuals, 
                             start_values_fitting,
                             method = 'dogbox', # options trf, dogbox
                             bounds=(lower_bounds, upper_bounds),
@@ -105,8 +124,8 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
                             diff_step = [0.1, 0.5, 25, 25],
                             # max_nfev = 10,
                             verbose=2) #,callback=callback_func
-        if sim_input['species'][ii]['#_states'] >= 3:
-            res = least_squares(residuals, 
+        elif sim_input['species'][ii]['#_states'] >= 3:
+            res = least_squares(def_residuals, 
                              start_values_fitting,
                              method = 'dogbox', # options trf, dogbox
                              bounds=(lower_bounds, upper_bounds),
@@ -182,20 +201,24 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
    
     if sim_input['perform_fitting']:
         print(f"Sum of squares: {round(sum_of_squares/len(sim_input['track_lengths']),4)}")
-        print(f"Final parameters: {np.round(shiftX,2)}")
+        print(f"Final parameters D_s and k_s: {np.round(shiftX,2)}")
+        print(f"Initial guesses: {np.round(start_values_fitting,2)}")
+        print(f"Loc error (µm): {np.round(sim_input['loc_error'],4)}")
 
 def fitFunc(start_values_fitting, sim_input):
     """ Sub-function for fitting """   
     print("...Sub-function for fitting...")
     ii = sim_input['species_to_select'] 
-
-    if sim_input['species'][ii]['#_states'] == 2:
+    if sim_input['species'][ii]['#_states'] == 1:
         # Python: to get the first two values use 0:2 not 0:1
-        sim_input['species'][ii]['diff_quot'] = np.array(start_values_fitting[0:2]) #/ sim_input['multiplicator']
+        sim_input['species'][ii]['diff_quot'] = np.array(start_values_fitting[0:1]) 
+    elif sim_input['species'][ii]['#_states'] == 2:
+        # Python: to get the first two values use 0:2 not 0:1
+        sim_input['species'][ii]['diff_quot'] = np.array(start_values_fitting[0:2]) 
         sim_input['species'][ii]['rates'] = start_values_fitting[2:4]
     # sim_input.species(ii).rates = [0,kAB,kAC; kBA,0,kBC; kCA,kCB,0];
     elif sim_input['species'][ii]['#_states'] >= 3:
-        sim_input['species'][ii]['diff_quot'] = np.array(start_values_fitting[0:3]) #/ sim_input['multiplicator']
+        sim_input['species'][ii]['diff_quot'] = np.array(start_values_fitting[0:3])
         sim_input['species'][ii]['rates'] = start_values_fitting[3:9]
     
     # Call the simulation initialization function
