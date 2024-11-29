@@ -10,8 +10,8 @@ import trackpy as tp
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
-#silence with tp.quiet()
+import scipy.optimize
+from sdt import io, motion, config, helper
 
 # Set random seed for reproducibility
 np.random.seed(42)
@@ -57,7 +57,7 @@ linked = linked.drop_duplicates(subset=['particle', 'frame'])
 # 6. Filter out Short Trajectories
 filtered = tp.filter_stubs(linked, threshold=10)
 
-fig, ax = plt.subplots(2, 2, figsize=(14, 10))
+fig, ax = plt.subplots(2, 2)
 ax[0, 0].set_title('Particle Trajectories')
 ax[0, 0].set_ylabel('y')
 ax[0, 0].set_xlabel('x')
@@ -98,3 +98,22 @@ print(fit)
 
 plt.tight_layout()  # Adjust layout to prevent overlap
 plt.show()
+
+
+
+# Some additions from std tracking library. It does calculate something but doesn;t show a plot?!
+# https://github.com/schuetzgroup/sdt-python-tutorials/blob/master/Diffusion%20constants.ipynb 
+pixel_size = 0.16  # pixel size in μm
+fps = 100  # frames per second
+exposure_time = 0.004  # seconds
+
+# Calculate ensemble MSDs and standard errors in 1000 rounds of bootstrapping
+
+msd_result = motion.Msd(linked, fps, n_lag=10, n_boot=100, pixel_size=pixel_size)
+m, e = msd_result.get_msd()
+
+fit_result = msd_result.fit("brownian", n_lag=2, exposure_time=exposure_time)
+fig, ax = plt.subplots()
+fit_result.plot(ax=ax)
+fit_result
+
