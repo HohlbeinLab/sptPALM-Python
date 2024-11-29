@@ -29,7 +29,7 @@ def set_parameters_sptPALM():
         'condition_names': [], # Initialise, further defined below
         'condition_files': [], # Initialise, further defined below
         # 'condition_to_select_MCDDA': 0, # which of the later to be defined conditions should be select as data source for MCDDA, default: 0 
-        'copynumber_intervals': np.array([[1, 100], [101, 200], [201, 300], [301, 400]]), # Initialise, further definied below        
+        'copynumber_intervals': [[1, 100], [101, 200], [201, 300], [301, 400]], # Initialise, further definied below        
 
         # Segmentation of cells allows linking localisations to individual cells
         'pixelsize': float(0.119),  # Pixelsize of the camera (this is also set in thunderstorm.ijm), default: ~0.119
