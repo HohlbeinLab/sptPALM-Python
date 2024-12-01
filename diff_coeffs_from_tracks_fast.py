@@ -15,7 +15,22 @@ import numpy as np
 import pandas as pd
 import time
 
+
+
 def diff_coeffs_from_tracks_fast(tracks, sim_input):
+
+# from typing import List, Tuple, Dict
+# def diff_coeffs_from_tracks_fast(tracks: List[List], sim_input: [Dict|none]) -> Tuple(int, np.ndarray()):
+
+    """
+    some description
+    
+    @params:
+        tracks: a list of tracks
+    """
+    
+    
+    
     print("\nRun 'diff_coeffs_from_tracks_fast.py'")
 
     # Initialize
