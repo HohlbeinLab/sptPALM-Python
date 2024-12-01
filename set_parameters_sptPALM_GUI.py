@@ -308,7 +308,7 @@ def set_parameters_sptPALM_GUI(para = None):
 
     row_index+=1
     # Condition files
-    tk.Label(file_frame, text="Condition files", width = width_text_labels,
+    tk.Label(file_frame, text="Condition files, e.g., [0,1],[2,3]", width = width_text_labels,
              anchor="w").grid(row=4, column=0, sticky=tk.W)
     condition_files_entry = tk.Entry(file_frame, width=width_text_fileIO)
     condition_files_entry.grid(row=4, column=1)
@@ -482,7 +482,7 @@ def set_parameters_sptPALM_GUI(para = None):
     tracklength_locs_min_entry.insert(0, para['tracklength_locs_min'])   
                 
     # Max locks per track  
-    tk.Label(tracking_frame, text="Min number locs per track", width = width_text_labels,
+    tk.Label(tracking_frame, text="Max number locs per track", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     tracklength_locs_max_entry = tk.Entry(tracking_frame, width=width_text_box)
     tracklength_locs_max_entry.grid(row=row_index, column=3)

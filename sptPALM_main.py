@@ -17,86 +17,94 @@ from plot_combined_data_sptPALM import plot_combined_data_sptPALM
 from MC_diffusion_distribution_analysis_sptPALM import MC_diffusion_distribution_analysis_sptPALM
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI 
+from combine_thunderstorm_csv_files import combine_thunderstorm_csv_files
 
-input_parameter = {}
-data = {}
-comb_data = {}
-sim_input = {}
+def sptPALM_main():
+    """
+    Main function to analyse single-particle-tracking Photo-Activated-Laser-Microscopy
+    run function from within Spyder or any other Python framework
+    
+    @params:
+        tracks: a list of tracks
+    """
+  
+    input_parameter = {}
+    data = {}
+    comb_data = {}
+    sim_input = {}  
+ 
+    while True:
+        print('-')
+        PROMPT = """Choose and press Enter
+        0: Exit
+        1: Set parameters GUI
+        2: Analyse individual movies
+        3: Combine individually analysed movies
+        4: Plot combined data
+        5: Monte-Carlo DDA
+        6: Auxillary functions
+        \n"""
 
-def combine_thunderstorm_csv_files():
-    print('-2-4-')
-    # Combine_ThunderSTORM_csv_files implementation here
-    return []
-
-while True:
-    print('-')
-    PROMPT = """Choose and press Enter
-    0: Exit
-    1: Set parameters GUI
-    2: Analyse individual movies
-    3: Combine individually analysed movies
-    4: Plot combined data
-    5: Monte-Carlo DDA
-    6: Auxillary functions
-    \n"""
-    # Check prompt
-    try:
-        prompt_input = int(input(PROMPT))
-    except ValueError:
-        print("Invalid input, please enter a number.")
-        continue
-
-    match prompt_input:       
-        case 0:
-            print('Exit!')
-            break
-        case 1:
-            input_parameter = set_parameters_sptPALM()
-            input_parameter = set_parameters_sptPALM_GUI(input_parameter)    
-            # Iterate through the dictionary and print each key-value pair on a new line          
-            print('  Show input_parameter') # Display analysis parameters
-            for key, value in input_parameter.items():
-                print(f"    .{key}: {value}")
-        case 2:  # sptPALM_analyse_Movies
-            [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
-            print("'data' now available in memory\n")
-        case 3:  # sptPALM_combineData
-            comb_data, input_parameter = combine_analysed_data_sptPALM(data, input_parameter)
-            print("Combined data 'comb_data' now available in memory\n")
-        case 4:  # sptPALM_PlotCombinedData
-            comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
-        case 5:  # MCDDA
-            comb_data = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
-        case 6:  # Combine_ThunderSTORM_csv_files
-            while True:
-                print('--')
-                SUB_PROMPT = """    Choose and press Enter
-       0: Go back to main prompt
-       1: Combine ThunderSTORM *.csv files 
-       2: Empty\n"""
-               # Check prompt
-                try:
-                    sub_prompt_input = int(input(SUB_PROMPT))
-                except ValueError:
-                    print("Invalid input, please enter a number.")
-                    continue
-
-                match sub_prompt_input:
-                    case 0:
-                       print('Exit sub!')
-                       break
-                    case 1:
-                        print('Run Combine_ThunderSTORM_csv_files')
-                        combine_thunderstorm_csv_files()
-                    case 2:
-                        print('Do nothing....')
-                    case _:
-                       print("Invalid option, please choose a valid number.")
-                       continue
-        case _:
-            print("Invalid option, please choose a valid number.")
+        try: # Check prompt
+            prompt_input = int(input(PROMPT))
+        except ValueError:
+            print("Invalid input, please enter a number.")
             continue
-print("Done")
+    
+        match prompt_input:       
+            case 0:
+                print('Exit!')
+                break
+            case 1: 
+                input_parameter = set_parameters_sptPALM()
+                input_parameter = set_parameters_sptPALM_GUI(input_parameter)    
+                # Iterate through the dictionary and print each key-value pair on a new line          
+                print('  Show input_parameter') # Display analysis parameters
+                for key, value in input_parameter.items():
+                    print(f"    .{key}: {value}")
+            case 2:  # analyse_movies_sptPALM,py
+                [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
+                print("'data' now available in memory\n")
+            case 3:  # combine_analysed_data_sptPALM.py
+                comb_data, input_parameter = combine_analysed_data_sptPALM(data, input_parameter)
+                print("Combined data 'comb_data' now available in memory\n")
+            case 4:  # plot_combined_data_sptPALM.py
+                comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
+            case 5:  # MCDDA
+                comb_data = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
+            case 6:  # Combine_ThunderSTORM_csv_files
+                while True:
+                    print('--')
+                    SUB_PROMPT = """    Choose and press Enter
+           0: Go back to main prompt
+           1: Combine ThunderSTORM *.csv files 
+           2: Empty\n"""
+                    try: # Check prompt
+                        sub_prompt_input = int(input(SUB_PROMPT))
+                    except ValueError:
+                        print("Invalid input, please enter a number.")
+                        continue
+    
+                    match sub_prompt_input:
+                        case 0:
+                           print('Exit sub!')
+                           break
+                        case 1: # combine_thunderstorm_csv_files
+                            print('Run Combine_ThunderSTORM_csv_files')
+                            combine_thunderstorm_csv_files()
+                        case 2:
+                            print('Do nothing....')
+                        case _:
+                           print("Invalid option, please choose a valid number.")
+                           continue
+            case _:
+                print("Invalid option, please choose a valid number.")
+                continue
+    print("Done")
+
+if __name__ == "__main__":
+    sptPALM_main()
+
 
 # Currently taken out:
     
