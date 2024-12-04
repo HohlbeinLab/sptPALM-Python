@@ -32,6 +32,29 @@ from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
 from helper_functions import yes_no_input, string_input_with_default
 
 def analyse_movies_sptPALM(input_parameter = None):
+    """
+    
+    
+    Parameters
+    ----------
+    input_parameter : DICT, optional
+        Contains all settings on what data to load and how to process ur. The default is None.
+
+    Raises
+    ------
+    Exception
+        DESCRIPTION.
+
+    Returns
+    -------
+    data : TYPE
+        DESCRIPTION.
+    input_parameter : TYPE
+        DESCRIPTION.
+
+    """
+    
+    
     print('\nRun analyse_movies_sptPALM.py')
     
     # 1.1 Define input parameters

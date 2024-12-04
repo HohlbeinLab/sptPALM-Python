@@ -3,8 +3,15 @@
 //note, this macro requires some macros/functions that come with an SCF installation
 //to install SCF: => ImageJ/Fiji => Help => Update... => Manage Update sites => tick the box for SCF MPI CBG and restart ImageJ/Fiji
 
+
+additional_processing = false //select true or false
+hMin = 47.0;		// values are ~40-55 // standard 47
+thresh = 1.0;
+peakFlooding = 100.0;
+	
 ////////////////////////////////
 //// open file for processing
+
 
 print("Macro Started");
 #@ File[] files
@@ -22,6 +29,8 @@ for (i = 0; i < files.length; i++) {
 	print("Name:", name);
 	print("Directory:", dir);
 
+
+	if (additional_processing == true){
 ////////////////////////////////
 ////run function for z-projection, averaging over all frames to reduce noise
 	print("run z-projection");
@@ -36,7 +45,8 @@ for (i = 0; i < files.length; i++) {
 	run("Median...", "radius=0.5");
 	run("Enhance Contrast...", "saturated=0.1 normalize");
 	run("8-bit");
-
+	}
+	
 ////////////////////////////////
 //// save processed brightield image in current folder
 	savename_procBrightfield = replace(name, ".tif", "_procBrightfield.tif");  // new name for image
@@ -48,12 +58,9 @@ for (i = 0; i < files.length; i++) {
 //// run macro for the interactive watershed (cell segmentation)
 	print("run cell segmentation...");
 // OPTION A: run interactive watershed
-//run("Interactive H_Watershed")
+	//run("Interactive H_Watershed")
 
 //OPTION B: if good seed values are known, run
-	hMin = 47.0;		// values are ~40-55 // standard 47
-	thresh = 0.0;
-	peakFlooding = 100.0;
 	run("H_Watershed", "impin=["+getTitle()+"] hmin="+hMin+" thresh="+thresh+" peakflooding="+peakFlooding + " displaystyle=Image outputmask=false allowsplitting=true");
 
 ////////////////////////////////

@@ -12,8 +12,8 @@ print("Macro Started");
 
 print("Number of files selected:  ", files.length);
 FitOption = "Phasor" // use "Phasor" or "MLE"
-removeFrames = false //select true or false
-performFTM2 = true //select true or false
+removeFrames = true //select true or false
+performFTM2 = false //select true or false
 
 for (i = 0; i < files.length; i++) {
 	path = files[i];

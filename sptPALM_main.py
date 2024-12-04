@@ -21,11 +21,32 @@ from combine_thunderstorm_csv_files import combine_thunderstorm_csv_files
 
 def sptPALM_main():
     """
-    Main function to analyse single-particle-tracking Photo-Activated-Laser-Microscopy
-    run function from within Spyder or any other Python framework
+    Main function to analyse single-particle-tracking Photo-Activated-Laser-Microscopy.
+    Run function sptPALM_main.py from within Spyder or any other Python framework.
     
-    @params:
-        tracks: a list of tracks
+    CC BY 4.0 License.
+    Original Creator: Johannes Hohlbein (Wageningen University & Research)
+    Date of Creation: September, 2024
+    
+    Parameters
+    ----------
+        None.
+
+    Raises
+    ------
+    Exception
+        None.
+
+    Returns
+    -------
+    input_parameter : DICT
+        DESCRIPTION.
+    data : DICT
+            DESCRIPTION.
+    comb_data : DICT
+                DESCRIPTION.
+    sim_input : DICT
+                DESCRIPTION.
     """
   
     input_parameter = {}
@@ -57,8 +78,7 @@ def sptPALM_main():
                 break
             case 1: 
                 input_parameter = set_parameters_sptPALM()
-                input_parameter = set_parameters_sptPALM_GUI(input_parameter)    
-                # Iterate through the dictionary and print each key-value pair on a new line          
+                input_parameter = set_parameters_sptPALM_GUI(input_parameter)           
                 print('  Show input_parameter') # Display analysis parameters
                 for key, value in input_parameter.items():
                     print(f"    .{key}: {value}")
@@ -101,6 +121,9 @@ def sptPALM_main():
                 print("Invalid option, please choose a valid number.")
                 continue
     print("Done")
+
+    return input_parameter, data, comb_data, sim_input
+
 
 if __name__ == "__main__":
     sptPALM_main()

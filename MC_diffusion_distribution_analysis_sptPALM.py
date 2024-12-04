@@ -52,7 +52,7 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     #     sim_input = pickle.load(f)
         
  
-        
+      
     """
     Actual start of the function
     """    
@@ -85,11 +85,13 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
         print("Run 'set_parameters_simulation.py' + GUI")
         sim_input = set_parameters_simulation()
         sim_input = set_parameters_simulation_GUI(sim_input)    
-    
-    print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][input_parameter['condition_to_select_MCDDA']]}\n")
+
+
+      
+    print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][sim_input['species_to_select']]}\n")
     
     # Use tracks from anaDDA style of plotting tracks
-    tracks = comb_data['anaDDA_tracks'][input_parameter['condition_to_select_MCDDA']]
+    tracks = comb_data['anaDDA_tracks'][sim_input['species_to_select']]
     
     # Generate average diffusion coefficients for each track
     sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
