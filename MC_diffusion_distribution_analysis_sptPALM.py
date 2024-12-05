@@ -34,16 +34,16 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     TEMPORARY: For bugfixing - Replace the following line with your file path if needed
     """
     
-    print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
-    with open(filename, 'rb') as f:
-        input_parameter = pickle.load(f)  
+    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
+    # with open(filename, 'rb') as f:
+    #     input_parameter = pickle.load(f)  
         
-    print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")    
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/output_python/sptData_combined_movies.pkl'
-    with open(filename, 'rb') as f:
-        comb_data = pickle.load(f)
+    # print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")    
+    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/output_python/sptData_combined_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     comb_data = pickle.load(f)
 
     # print("  TEMP! SPECIFIC FILE is being loaded: sim_input_parameter.pkl!")    
     # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
@@ -52,7 +52,7 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     #     sim_input = pickle.load(f)
         
  
-        
+      
     """
     Actual start of the function
     """    
@@ -85,11 +85,13 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
         print("Run 'set_parameters_simulation.py' + GUI")
         sim_input = set_parameters_simulation()
         sim_input = set_parameters_simulation_GUI(sim_input)    
-    
-    print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][input_parameter['condition_to_select_MCDDA']]}\n")
+
+
+      
+    print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][sim_input['species_to_select']]}\n")
     
     # Use tracks from anaDDA style of plotting tracks
-    tracks = comb_data['anaDDA_tracks'][input_parameter['condition_to_select_MCDDA']]
+    tracks = comb_data['anaDDA_tracks'][sim_input['species_to_select']]
     
     # Generate average diffusion coefficients for each track
     sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])

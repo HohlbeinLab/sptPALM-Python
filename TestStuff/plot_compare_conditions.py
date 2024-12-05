@@ -17,7 +17,7 @@ import numpy as np
 from skimage.io import imread
 import pandas as pd
 import pickle
-from set_parameters_sptPALM import set_parameters_sptPALM
+from ..set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
@@ -25,51 +25,23 @@ from tkinter.simpledialog import askstring
 import matplotlib.pyplot as plt
 
 # Assuming Para1 is a dictionary-like object
-def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
+def plot_compare_conditions(comb_data=None, input_parameter=None):
 
     print('\nRun plot_combined_data_sptPALM.py')
   
+    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/input_parameter.pkl'
+    with open(filename, 'rb') as f:
+        input_parameter = pickle.load(f)
+        
+   
+        
     # TEMPORARY For bugfixing - Replace the following line with your file path if needed
     filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
     with open(filename, 'rb') as f:
         comb_data = pickle.load(f)
         
         
-    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
-    # with open(filename, 'rb') as f:
-    #     input_parameter = pickle.load(f)    
-              
-        
-    
-    # 1.1 Check whether DATA was passed to the function
-    if not input_parameter:
-        input_parameter = set_parameters_sptPALM()
-        input_parameter = set_parameters_sptPALM_GUI(input_parameter)        
-    
-    if not comb_data:
-        Tk().withdraw()  # Close root window
-        starting_directory = os.path.join(input_parameter['data_dir'],
-                                                  input_parameter['default_output_dir'])
-        filename = askopenfilename(initialdir = starting_directory, 
-                                    filetypes = [("pickle file", "*.pkl")],
-                                    title = "Select *.pkl file from sptPALM_combine_movies.py")
-        if filename:
-            with open(filename, 'rb') as f:
-                comb_data = pickle.load(f)
-        else:
-            raise ValueError("No file selected!")
-    
-    # Figure A: plot stack plot with diffusion coefficients)
-    if input_parameter['use_segmentations']:
-        plot_stacked_diff_histo(comb_data)
-    else:
-        print("Let's skip plotting cell-dependend copy number analysis if no segmentation is present...")
-
-    
-
-
-
     return comb_data    
  
 def plot_stacked_diff_histo(comb_data):
