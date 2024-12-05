@@ -16,12 +16,6 @@ import os
 import pandas as pd
 from tkinter import Tk, filedialog, simpledialog
 
-
-import os
-import pandas as pd
-from tkinter import Tk, filedialog
-
-
 def combine_thunderstorm_csv_files():
     # Option A: Graphical User Interface for selecting files
     root = Tk()

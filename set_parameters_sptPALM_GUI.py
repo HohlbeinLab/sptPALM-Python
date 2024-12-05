@@ -475,14 +475,14 @@ def set_parameters_sptPALM_GUI(para = None):
  
     row_index+=1
     # Min locks per track
-    tk.Label(tracking_frame, text="Min number locs per track", width = width_text_labels,
+    tk.Label(tracking_frame, text="Min. number locs per track", width = width_text_labels,
              anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     tracklength_locs_min_entry = tk.Entry(tracking_frame, width=width_text_box)
     tracklength_locs_min_entry.grid(row=row_index, column=1)
     tracklength_locs_min_entry.insert(0, para['tracklength_locs_min'])   
                 
     # Max locks per track  
-    tk.Label(tracking_frame, text="Max number locs per track", width = width_text_labels,
+    tk.Label(tracking_frame, text="Max. number locs per track", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     tracklength_locs_max_entry = tk.Entry(tracking_frame, width=width_text_box)
     tracklength_locs_max_entry.grid(row=row_index, column=3)

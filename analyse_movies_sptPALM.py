@@ -11,14 +11,9 @@ Date of Creation: September, 2024
 Full license details can be found at https://creativecommons.org/licenses/by/4.0/
 """
 
-# import tkinter as tk
-# import sys
-from tkinter import simpledialog, filedialog
-from tkinter.simpledialog import askstring
 import os
 import pickle
 import pandas as pd
-import numpy as np
 
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
@@ -29,11 +24,11 @@ from analyse_diffusion_sptPALM import analyse_diffusion_sptPALM
 from plot_diffusion_tracklengths_sptPALM import plot_diffusion_tracklengths_sptPALM
 from single_cell_analysis_sptPALM import single_cell_analysis_sptPALM
 from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
-from helper_functions import yes_no_input, string_input_with_default
+from helper_functions import yes_no_input
 
 def analyse_movies_sptPALM(input_parameter = None):
     """
-    
+    analyse_movies_sptPALM.py: main function to analyse each movie based on the settings in 'input_parameter' 
     
     Parameters
     ----------
@@ -47,41 +42,29 @@ def analyse_movies_sptPALM(input_parameter = None):
 
     Returns
     -------
-    data : TYPE
-        DESCRIPTION.
-    input_parameter : TYPE
-        DESCRIPTION.
+    data : dict
+        Dictionary containing all processed experimental of each slected movie.
+    input_parameter : dict
+        Potentially updated input_parameter.
 
     """
-    
-    
+       
     print('\nRun analyse_movies_sptPALM.py')
     
-    # 1.1 Define input parameters
+    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
+    # with open(filename, 'rb') as f:
+    #     input_parameter = pickle.load(f)    
+        
+    # 1. Define input parameters
     if not input_parameter:
         print("  Re-run set_parameters_sptPALM.py + GUI")
         input_parameter = set_parameters_sptPALM()
         input_parameter = set_parameters_sptPALM_GUI(input_parameter)
     
-    # Fall-back to GUI if no list of ThunderSTORM.csv files 
-    # '*_thunder_.csv' are specified in define_input_parameters.py
-    if not input_parameter['fn_locs']:
-        print('  Select *.csv data with GUI...')
-        starting_directory = os.path.join(input_parameter['data_dir'],
-                                          input_parameter['default_output_dir'])
-        files = filedialog.askopenfilenames(
-            initialdir = starting_directory, 
-            title="Select *.csv from ThunderSTORM or other SMLM programs",
-            filetypes=[("CSV files", "*_thunder.csv")])
-        input_parameter['fn_locs'] = list(files)
-        if files:
-            # Overwrites inputParameter['data_pathname'] as defined in 'define_input_parameters.py'
-            input_parameter['data_dir'] = os.path.dirname(files[0])
-            os.chdir(input_parameter['data_dir'])
-            
     # Check whether an equal number of files for localisations and segmentations was selected
     # in the SPECIAL CASE that several *_thunder.csv files, but only one brightfield image
-    # were selected, ask whether to continue. If yes is chosen, this brightfiield image
+    # were selected, ask whether to continue. If 'yes' is chosen, this brightfiield image
     # is used for all loaded *_thunder.csv files.
     if input_parameter.get('use_segmentations'):
         if len(input_parameter['fn_locs']) != len(input_parameter['fn_proc_brightfield']):
@@ -101,20 +84,20 @@ def analyse_movies_sptPALM(input_parameter = None):
         os.makedirs(temp_path)
 
     # Display analysis parameters
-    print('  Show input_parameter')
     # Iterate through the dictionary and print each key-value pair on a new line
+    print('  Show input_parameter')
     for key, value in input_parameter.items():
         print(f"    .{key}: {value}")
 
-    # 2. sptPALM data analysis (looping over each movie)
+    # 2. sptPALM data analysis (looping over each single movie)
     data = {}
     data['movies'] = {}
     for ii in range(len(input_parameter['fn_locs'])):
-        input_parameter['movie_number'] = ii #start with 0 not 1
+        input_parameter['movie_number'] = ii # Python: start with 0 not 1
 
-        # 2.1 Initialisation of dictionary para (local analysis over one movie)
+        # 2.1 Initialisation of dictionary 'para' (local analysis over one movie)
         # Para will contain all parameters and updated references to filenames and pathnames.
-        para = input_parameter.copy() #Initialise data structure
+        para = input_parameter.copy() # Initialise data structure
         para['fn_locs'] = input_parameter['fn_locs'][ii]
         if input_parameter['fn_proc_brightfield']:
             para['fn_proc_brightfield'] = input_parameter['fn_proc_brightfield'][ii]
@@ -137,7 +120,7 @@ def analyse_movies_sptPALM(input_parameter = None):
         para = analyse_diffusion_sptPALM(para)
         para = plot_diffusion_tracklengths_sptPALM(para)
 
-        # 2.6 Single Cell Tracking Analysis
+        # 2.6 [Optional] SCTA Single Cell Tracking Analysis
         if input_parameter['use_segmentations']:
             para = single_cell_analysis_sptPALM(para)
             para = plot_single_cell_analysis_sptPALM(para)
@@ -154,16 +137,18 @@ def analyse_movies_sptPALM(input_parameter = None):
                     'average_diff_coeff_per_cell',
                 })
         
-        # 2.8 Save current analysis
-        with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:
-            pickle.dump(para, f)
-        print(f"  Parameter dictionary for current movie {ii} out of {len(input_parameter['fn_locs'])} movies(s) was saved as pickle file")
-        # Cell array containing all para structs
+        # 2.8 Save current analysis of a single movie
+        # DON'T THINK THIS IS NEEDED ANYMORE
+        # with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:
+        #     pickle.dump(para, f)
+        # print(f"  Parameter dictionary for current movie {ii} out of {len(input_parameter['fn_locs'])} movies(s) was saved as pickle file")
         
+        # Cell array containing all para structs
         data['movies'][ii] = para
         
     # 3. Save entire DATA dictionary
     data['input_parameter'] = input_parameter
+    
     with open(temp_path + para['fn_movies'], 'wb') as f:
         pickle.dump(data, f)
     print(f"Analysis of individual movie(s) saved as pickle file: {para['fn_movies']}")

@@ -34,16 +34,16 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     TEMPORARY: For bugfixing - Replace the following line with your file path if needed
     """
     
-    print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
-    with open(filename, 'rb') as f:
-        input_parameter = pickle.load(f)  
+    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
+    # with open(filename, 'rb') as f:
+    #     input_parameter = pickle.load(f)  
         
-    print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")    
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/output_python/sptData_combined_movies.pkl'
-    with open(filename, 'rb') as f:
-        comb_data = pickle.load(f)
+    # print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")    
+    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/output_python/sptData_combined_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     comb_data = pickle.load(f)
 
     # print("  TEMP! SPECIFIC FILE is being loaded: sim_input_parameter.pkl!")    
     # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'

@@ -61,7 +61,7 @@ for (i = 0; i < files.length; i++) {
 	//run("Interactive H_Watershed")
 
 //OPTION B: if good seed values are known, run
-	run("H_Watershed", "impin=["+getTitle()+"] hmin="+hMin+" thresh="+thresh+" peakflooding="+peakFlooding + " displaystyle=Image outputmask=false allowsplitting=true");
+	run("H_Watershed", "impin=["+getTitle()+"] hmin="+hMin+" thresh="+thresh+" peakflooding="+peakFlooding+ " displaystyle=Image outputmask=false allowsplitting=true");
 
 ////////////////////////////////
 //// save segmented image in current folder
