@@ -22,6 +22,7 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.simpledialog import askstring
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Assuming Para1 is a dictionary-like object
 def plot_compare_conditions(comb_data=None, input_parameter=None):
@@ -38,114 +39,106 @@ def plot_compare_conditions(comb_data=None, input_parameter=None):
     with open(filename, 'rb') as f:
         comb_data = pickle.load(f)
     
-    fig, ax = plt.subplots(2, 2, figsize=(14, 8)) # 
-
+    fig, ax = plt.subplots(2, 2, figsize=(14, 10)) # 
+    dot_size = 5
     
-    for ii in range(comb_data['#_conditions']):
-        data_temp = pd.DataFrame({'cell_area': comb_data['cell_data'][ii]['cell_area'], 
+    # A) Avg. diffusion coefficient per cell per condition
+    for ii, condition_name in enumerate(comb_data['condition_names']):
+        data_temp = pd.DataFrame({'cell_area': comb_data['cell_data'][ii]['cell_area']*input_parameter['pixelsize']*input_parameter['pixelsize'], 
                                   'diff_temp': comb_data['cell_data'][ii]['average_diff_coeff_per_cell']
                                       })
         data_temp = data_temp.dropna(axis=0)
-    
-        x = data_temp['cell_area']*input_parameter['pixelsize']*input_parameter['pixelsize']
-        y = data_temp['diff_temp']
-        # colors = para['scta_table']['average_diff_coeff_per_cell']  # Color based on diffusion coefficient
-        ax[0, 0].scatter(x, y, edgecolor='k')  # 'cmap' sets the color map
-    ax[0, 0].set_title('Scatter plot: Average diffusion coefficient per cell')
+        sns.scatterplot(data=data_temp, y='diff_temp', x='cell_area', ax=ax[0,0], size=dot_size, legend=False)  # 'cmap' sets the color map
+    ax[0, 0].set_title('Avg. diffusion coefficient per cell per condition')
     ax[0, 0].set_xlabel('Area per cell (µm$^2$)')
     ax[0, 0].set_ylabel("Average Diff. Coeff. (µm$^2$/s)")
-    ax[0, 0].set_xlim(0, max(x)+max(x)/20)
-    ax[0, 0].set_ylim(0, max(y)+max(y)/20)
-    # ax[0, 0].legend()
+    ax[0, 0].set_xlim(0, None)
+    ax[0, 0].set_ylim(0, None)
+    
+    # B) Avg. area per cell per movie per condition
+    for ii, condition_name in enumerate(comb_data['condition_names']):
+    
+        data_temp = pd.DataFrame({'cell_area': comb_data['cell_data'][ii]['cell_area']*input_parameter['pixelsize']*input_parameter['pixelsize'], 
+                                  'movie': comb_data['cell_data'][ii]['movie'],
+                                  'condition': condition_name,
+                                  })
+        data_temp = data_temp.dropna(axis=0)  
+        sns.boxplot(data=data_temp, y="cell_area", x="condition", whis=np.inf,fill= False, ax=ax[0, 1], color="black")
+        sns.stripplot(data=data_temp, y="cell_area", x="condition", hue="movie", ax=ax[0, 1], legend=False, dodge=True, size=dot_size)
+        stats = data_temp.groupby('condition')["cell_area"].agg(["mean", "std", "median", "min", "max"])
+        print('\nAvg. area per cell per movie per condition')
+        print(stats)
+    ax[0, 1].set_title('Avg. area per cell per movie per condition')
+    ax[0, 1].set_ylabel('Area per cell (µm$^2$)')        # breakpoint()
+    ax[0, 1].set_xlabel(None)        # breakpoint()
+    ax[0, 1].set_ylim(0, None)
     
     
+    # C) Avg. area per cell per movie per condition
+    for ii, condition_name in enumerate(comb_data['condition_names']):
+    
+        data_temp = pd.DataFrame({'average_diff_coeff_per_cell': comb_data['cell_data'][ii]['average_diff_coeff_per_cell'], 
+                                  'movie': comb_data['cell_data'][ii]['movie'],
+                                  'condition': condition_name,
+                                  })
+        data_temp = data_temp.dropna(axis=0)  
+        sns.boxplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", whis=np.inf,fill= False, ax=ax[1, 0], color="black")
+        sns.stripplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", hue="movie", ax=ax[1, 0], legend=False, dodge=True, size=dot_size)
+        stats = data_temp.groupby('condition')["average_diff_coeff_per_cell"].agg(["mean", "std", "median", "min", "max"])
+        print('\nAvg. diffusion coefficient per cell per movie per condition')
+        print(stats)
+    ax[1, 0].set_title('Avg. diffusion coefficient per cell per movie per condition')
+    ax[1, 0].set_ylabel('Avg. diffusion coefficient (µm$^2$/s)')        # breakpoint()
+    ax[1, 0].set_xlabel(None)        # breakpoint()
+    ax[1, 0].set_ylim(0, None)   
+ 
+    # C) Avg. area per cell per movie per condition
+    for ii, condition_name in enumerate(comb_data['condition_names']):
+    
+        data_temp = pd.DataFrame({'average_diff_coeff_per_cell': comb_data['cell_data'][ii]['average_diff_coeff_per_cell'], 
+                                  'movie': comb_data['cell_data'][ii]['movie'],
+                                  'condition': condition_name,
+                                  })
+        data_temp = data_temp.dropna(axis=0)  
+        sns.boxplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", whis=np.inf,fill= False, ax=ax[1, 0], color="black")
+        sns.stripplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", hue="movie", ax=ax[1, 0], legend=False, dodge=True, size=dot_size)
+        stats = data_temp.groupby('condition')["average_diff_coeff_per_cell"].agg(["mean", "std", "median", "min", "max"])
+        print('\nAvg. diffusion coefficient per cell per movie per condition')
+        print(stats)
+    ax[1, 0].set_title('Avg. diffusion coefficient per cell per movie per condition')
+    ax[1, 0].set_ylabel('Avg. diffusion coefficient (µm$^2$/s)')        # breakpoint()
+    ax[1, 0].set_xlabel(None)        # breakpoint()
+    ax[1, 0].set_ylim(0, None)   
+    
+ 
+    # D) Average number of tracks per cell per condition
+    for ii, condition_name in enumerate(comb_data['condition_names']):
+    
+        data_temp = pd.DataFrame({'tracks_number': comb_data['cell_data'][ii]['#tracks (unfiltered for #tracks per cell)'], 
+                                  'movie': comb_data['cell_data'][ii]['movie'],
+                                  'condition': condition_name,
+                                  })
+        data_temp = data_temp.dropna(axis=0)  
+        sns.boxplot(data=data_temp, y="tracks_number", x="condition", whis=np.inf,fill= False, ax=ax[1, 1], color="black")
+        sns.stripplot(data=data_temp, y="tracks_number", x="condition", hue="movie", ax=ax[1, 1], legend=False, dodge=True, size=dot_size)
+        stats = data_temp.groupby('condition')["tracks_number"].agg(["mean", "std", "median", "min", "max"])
+        print('\nAverage number of tracks per cell per condition')
+        print(stats)
+    ax[1, 1].set_title('Average number of tracks per cell per condition')
+    ax[1, 1].set_ylabel('Avg. number of tracks')        # breakpoint()
+    ax[1, 1].set_xlabel(None)        # breakpoint()
+    ax[1, 1].set_ylim(0, None)   
+   
+
     # Blank out axes
-    ax[0, 1].axis('off')
-    ax[1, 0].axis('off')  
-    ax[1, 1].axis('off')  
+    # ax[1, 1].axis('off')  
     
+    plt.tight_layout()
     
+    plt.show()
    
     return input_parameter, comb_data    
  
 if __name__ == "__main__":
      plot_compare_conditions()   
- 
-# def plot_stacked_diff_histo(comb_data):
-      
-#     fig1 = plt.figure('Diffusion coefficients versus copy numbers per cell')
-#     plt.clf()
-    
-#     # Aspect ratio (pbaspect equivalent)
-#     fig1.set_size_inches(10, 1)
-    
-#     edges = np.arange(np.log10(comb_data['input_parameter']['plot_diff_hist_min']),
-#                       np.log10(comb_data['input_parameter']['plot_diff_hist_max']) + 0.1, 0.1)
-    
-#     # Initialize a list to store axes
-#     axes = []
-    
-#     # Loop through each copy number interval
-#     for jj in range(len(comb_data['input_parameter']['copynumber_intervals'])):
-        
-#         # Create subplot in the specified grid
-#         temp = (len(comb_data['input_parameter']['copynumber_intervals']), 1, jj + 1)
-#         ax = plt.subplot(*temp)
-#         axes.append(ax)    
-    
-# # Histogram could be plotted better nexto each other without shading, 
-# # see here:  https://matplotlib.org/stable/gallery/statistics/histogram_multihist.html#sphx-glr-gallery-statistics-histogram-multihist-py
-#         # Loop through each condition
-#         for ff in range(comb_data['#_conditions']):
-
-#             # Filter data based on copy number intervals
-#             data_temp = pd.DataFrame({'diff_temp': comb_data['diff_data'][ff]['diff_coeffs_filtered'],
-#                                       'copy_temp': comb_data['diff_data'][ff]['copynumber']
-#                                       })
-
-#             # Define the copy number interval for the current `jj`
-#             copy_interval_min = comb_data['input_parameter']['copynumber_intervals'][jj][0]
-#             copy_interval_max = comb_data['input_parameter']['copynumber_intervals'][jj][1]
-
-#             # Filter data_temp based on the copy number intervals
-#             data_temp = data_temp[(data_temp['copy_temp'] >= copy_interval_min) & 
-#                       (data_temp['copy_temp'] < copy_interval_max)]
-
-#             # Plot histogram
-#             ax.hist(data_temp['diff_temp'], bins=10**edges, alpha=0.4)
-    
-#         # Set x limits and log scale
-#         ax.set_xlim([comb_data['input_parameter']['plot_diff_hist_min'],
-#                      comb_data['input_parameter']['plot_diff_hist_max']])
-#         ax.set_xscale('log')
-        
-#         # Configure x-axis label only for the last subplot
-#         if jj == len(comb_data['input_parameter']['copynumber_intervals'])-1:
-#             ax.legend(comb_data['condition_names'], loc='upper left')
-#             ax.set_xlabel('Diffusion coefficient (μm²/sec)')
-#         else:
-#             ax.set_xticklabels([])
-    
-#         # Set y-axis label
-#         ax.set_ylabel(comb_data['input_parameter']['plot_norm_histograms'])
-        
-#         # Set font size
-#         ax.tick_params(axis='both', which='major', labelsize=comb_data['input_parameter']['fontsize'])
-    
-#         # Set title
-#         ax.set_title(f"Diffcoeff for copynumber: {comb_data['input_parameter']['copynumber_intervals'][jj][0] } to {comb_data['input_parameter']['copynumber_intervals'][jj][1] }")
-    
-#     # Adjust figure position and size
-#     fig1.set_size_inches(5, 8)
-#     plt.tight_layout()
-    
-#     plt.show()
-#     return 
- 
-# def plot_beeswarm_plots(comb_data):
-
-    
-
-
-#     return    
  

@@ -88,6 +88,7 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
     # condi_table['anaDDA_condis'] = []
     condi_table['condis_#_cells'] = {}
 
+    # For each condition
     for ff in range(comb_data['#_conditions']):
 
         tmp_scta_table = data['movies'][ff]['scta_table'].iloc[0:0].copy()
@@ -103,8 +104,12 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
         for jj in range(comb_data['#_movies_per_condition'][ff]):
 
             tmp_ParaNr = comb_data['condition_files'][ff][jj]  # current movie ID
+
+            temp = data['movies'][tmp_ParaNr]['scta_table']
+            temp['movie']=jj
             tmp_scta_table = pd.concat(
                 [tmp_scta_table, data['movies'][tmp_ParaNr]['scta_table']], ignore_index=True)  # append cellwise data
+            
             tmp_dcoef_table = pd.concat(
                 [tmp_dcoef_table, data['movies'][tmp_ParaNr]['diff_coeffs_filtered_list']], ignore_index=True)  # append diffcoefficients
             
