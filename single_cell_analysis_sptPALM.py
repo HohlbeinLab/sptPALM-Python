@@ -33,6 +33,7 @@ def single_cell_analysis_sptPALM(para):
 
     # Prepare a table with remaining cell_ids, number of localizations per cell, and cumulative sum
     cell_df = pd.DataFrame({
+        'movie': -1.0,
         'cell_id': cell_ids,
         'cell_locs': cell_locs,
         'cell_area': cell_areas,
