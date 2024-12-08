@@ -27,17 +27,22 @@ import seaborn as sns
 
 # Assuming Para1 is a dictionary-like object
 def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
-
     print('\nRun plot_combined_data_sptPALM.py')
   
     # TEMPORARY For bugfixing - Replace the following line with your file path if needed
     print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/output_python/sptData_combined_movies.pkl'
+    filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter.pkl'
+    with open(filename, 'rb') as f:
+        input_parameter = pickle.load(f)
+
+
+    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
+    filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
     with open(filename, 'rb') as f:
         comb_data = pickle.load(f)
-          
 
-    # 1.1 Check whether DATA was passed to the function
+    #  Check whether data was passed to the function
     if not input_parameter:
         input_parameter = set_parameters_sptPALM()
         input_parameter = set_parameters_sptPALM_GUI(input_parameter)        
@@ -57,22 +62,20 @@ def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
     
     # Figure A: plot stack plot with diffusion coefficients)
     if input_parameter['use_segmentations']:
-        plot_stacked_diff_histo(comb_data)
-        plot_compare_conditions(comb_data)
+        plot_stacked_diff_histo(comb_data,input_parameter)
+        plot_compare_conditions(comb_data, input_parameter)
     else:
         print("Let's skip plotting cell-dependend copy number analysis if no segmentation is present...")
     return comb_data    
  
     
- 
-    
-def plot_stacked_diff_histo(comb_data):
+def plot_stacked_diff_histo(comb_data, input_parameter):
       
     fig1 = plt.figure('Diffusion coefficients versus copy numbers per cell')
     plt.clf()
     
     # Aspect ratio (pbaspect equivalent)
-    fig1.set_size_inches(10, 1)
+    fig1.set_size_inches(5, 8)
     
     edges = np.arange(np.log10(comb_data['input_parameter']['plot_diff_hist_min']),
                       np.log10(comb_data['input_parameter']['plot_diff_hist_max']) + 0.1, 0.1)
@@ -130,11 +133,15 @@ def plot_stacked_diff_histo(comb_data):
         # Set title
         ax.set_title(f"Diffcoeff for copynumber: {comb_data['input_parameter']['copynumber_intervals'][jj][0] } to {comb_data['input_parameter']['copynumber_intervals'][jj][1] }")
     
-    # Adjust figure position and size
-    fig1.set_size_inches(5, 8)
-    plt.tight_layout()
     
+    # Save figure as PNG
+    temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
+    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig01_Diffs.png', dpi = input_parameter['dpi'])
+ 
+    plt.tight_layout()
     plt.show()
+
+
     return 
  
 # Assuming Para1 is a dictionary-like object
@@ -195,34 +202,17 @@ def plot_compare_conditions(comb_data=None, input_parameter=None):
                                   'condition': condition_name,
                                   })
         data_temp = data_temp.dropna(axis=0)  
-        sns.boxplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", whis=np.inf,fill= False, ax=ax[1, 0], color="black")
-        sns.stripplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", hue="movie", ax=ax[1, 0], legend=False, dodge=True, size=dot_size)
+        sns.boxplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition",
+                    log_scale = True, whis=np.inf,fill= False, ax=ax[1, 0], color="black")
+        sns.stripplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", 
+                      log_scale = True, hue="movie", ax=ax[1, 0], legend=False, dodge=True, size=dot_size)
         stats = data_temp.groupby('condition')["average_diff_coeff_per_cell"].agg(["mean", "std", "median", "min", "max"])
         print('\nAvg. diffusion coefficient per cell per movie per condition')
         print(stats)
     ax[1, 0].set_title('Avg. diffusion coefficient per cell per movie per condition')
     ax[1, 0].set_ylabel('Avg. diffusion coefficient (µm$^2$/s)')        # breakpoint()
     ax[1, 0].set_xlabel(None)        # breakpoint()
-    ax[1, 0].set_ylim(0, None)   
- 
-    # C) Avg. area per cell per movie per condition
-    for ii, condition_name in enumerate(comb_data['condition_names']):
-    
-        data_temp = pd.DataFrame({'average_diff_coeff_per_cell': comb_data['cell_data'][ii]['average_diff_coeff_per_cell'], 
-                                  'movie': comb_data['cell_data'][ii]['movie'],
-                                  'condition': condition_name,
-                                  })
-        data_temp = data_temp.dropna(axis=0)  
-        sns.boxplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", whis=np.inf,fill= False, ax=ax[1, 0], color="black")
-        sns.stripplot(data=data_temp, y="average_diff_coeff_per_cell", x="condition", hue="movie", ax=ax[1, 0], legend=False, dodge=True, size=dot_size)
-        stats = data_temp.groupby('condition')["average_diff_coeff_per_cell"].agg(["mean", "std", "median", "min", "max"])
-        print('\nAvg. diffusion coefficient per cell per movie per condition')
-        print(stats)
-    ax[1, 0].set_title('Avg. diffusion coefficient per cell per movie per condition')
-    ax[1, 0].set_ylabel('Avg. diffusion coefficient (µm$^2$/s)')        # breakpoint()
-    ax[1, 0].set_xlabel(None)        # breakpoint()
-    ax[1, 0].set_ylim(0, None)   
-    
+    ax[1, 0].set_ylim(input_parameter['plot_diff_hist_min'], input_parameter['plot_diff_hist_max']) 
  
     # D) Average number of tracks per cell per condition
     for ii, condition_name in enumerate(comb_data['condition_names']):
@@ -242,12 +232,15 @@ def plot_compare_conditions(comb_data=None, input_parameter=None):
     ax[1, 1].set_xlabel(None)        # breakpoint()
     ax[1, 1].set_ylim(0, None)   
    
-
     # Blank out axes
     # ax[1, 1].axis('off')  
     
     plt.tight_layout()
-    
+   
+    # Save figure as PNG
+    temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
+    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig02_BoxPlots.png', dpi = input_parameter['dpi'])
+
     plt.show()
    
     return input_parameter, comb_data    
