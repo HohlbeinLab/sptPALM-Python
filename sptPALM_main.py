@@ -57,14 +57,14 @@ def sptPALM_main():
     while True:
         print('-')
         PROMPT = """Choose and press Enter
-        0: Exit
-        1: Set parameters GUI
-        2: Analyse individual movies
-        3: Combine individually analysed movies
-        4: Plot combined data
-        5: Monte-Carlo DDA
-        6: Auxillary functions
-        \n"""
+    0: Exit
+    1: Set parameters GUI
+    2: Analyse individual movies
+    3: Combine individually analysed movies
+    4: Plot combined data
+    5: Monte-Carlo DDA
+    6: Auxillary functions
+    \n"""
 
         try: # Check prompt
             prompt_input = int(input(PROMPT))
@@ -79,7 +79,7 @@ def sptPALM_main():
             case 1: 
                 input_parameter = set_parameters_sptPALM()
                 input_parameter = set_parameters_sptPALM_GUI(input_parameter)           
-                print('  Show input_parameter') # Display analysis parameters
+                print('  Show input_parameter:') # Display analysis parameters
                 for key, value in input_parameter.items():
                     print(f"    .{key}: {value}")
             case 2:  # analyse_movies_sptPALM,py

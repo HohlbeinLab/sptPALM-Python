@@ -17,7 +17,7 @@ import numpy as np
 from skimage.io import imread
 import pandas as pd
 
-# Assuming Para1 is a dictionary-like object
+
 def plot_single_cell_analysis_sptPALM(para):
     print('\nRun plot_single_cell_analysis_sptPALM.py')
     
@@ -49,8 +49,7 @@ def plot_tracks_in_cells(para):
     
     # Plot images initially segmented elsewhere
     fig2, ax = plt.subplots(1, 1, figsize=(14, 8)) 
-
-    
+  
     # Show processed brightfield image
     ax.imshow(bf_dict['proc_brightfield_image'], cmap='gray')
     ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)')
@@ -97,7 +96,7 @@ def plot_tracks_in_cells(para):
  
     # Save figure as PNG
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
-    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig03_tracks.png', dpi = para['dpi'])
+    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig04_tracks.png', dpi = para['dpi'])
 
     plt.show()
 
@@ -167,7 +166,7 @@ def plot_tracks_histograms(para):
  
     # Save figure as PNG
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
-    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig04_cells.png', dpi = para['dpi'])
+    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig05_cells.png', dpi = para['dpi'])
     
     plt.show()
 

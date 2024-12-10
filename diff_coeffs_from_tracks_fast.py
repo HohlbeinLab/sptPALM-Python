@@ -17,10 +17,10 @@ import time
 
 
 
-def diff_coeffs_from_tracks_fast(tracks, sim_input):
+def diff_coeffs_from_tracks_fast(tracks, para):
 
 # from typing import List, Tuple, Dict
-# def diff_coeffs_from_tracks_fast(tracks: List[List], sim_input: [Dict|none]) -> Tuple(int, np.ndarray()):
+# def diff_coeffs_from_tracks_fast(tracks: List[List], para: [Dict|none]) -> Tuple(int, np.ndarray()):
 
     """
     some description
@@ -29,26 +29,24 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input):
         tracks: a list of tracks
     """
     
-    
-    
     print("\nRun 'diff_coeffs_from_tracks_fast.py'")
 
     # Initialize
     tracks_data = tracks.copy()
     # Count occurrences of each unique track_ids
-    tracklength_counts = tracks_data['track_id'].value_counts()
- 
+    tracklength_counts = tracks_data['track_id'].value_counts()    
+    
     # Map these counts back to the DataFrame as a new column '#_loc'
     tracks_data['#_locs'] = tracks_data['track_id'].map(tracklength_counts)
     # Some more additions
     tracks_data['MSD'] = np.nan
     tracks_data['D_coeff'] = np.nan
-    tracks_data['frametime'] = sim_input['frametime']
+    tracks_data['frametime'] = para['frametime']
     
     start = time.time() 
 
-    # For each tracklength in sim_input
-    for i, track_len in enumerate(sim_input['track_lengths']):
+    # For each tracklength in para
+    for i, track_len in enumerate(para['tracklengths_steps']):
         # Find all tracks with a certain number of localisations per track
         idx = tracks_data.index[tracks_data['#_locs'] == track_len + 1].tolist()
         # If idx is not empty/false
@@ -62,38 +60,40 @@ def diff_coeffs_from_tracks_fast(tracks, sim_input):
     print(f"  Time for MSD calculation: {rounded_time} seconds")
 
 
-    # Correct for localization error if specified (option in anaDDA does require to switch that off)
-    # what is the best correction here? Michelet 2010 reduced localization error? 
-    if sim_input['correct_diff_calc_loc_error']:
-        loc_error_correction = np.random.normal(0, sim_input['loc_error'], 
-                                                len(tracks_data.loc[:, 'D_coeff']))**2 / sim_input['frametime']
-    else:
-        print('log error connection = 0')
-        loc_error_correction = 0
+    # # Correct for localization error if specified (option in anaDDA does require to switch that off)
+    # # what is the best correction here? Michelet 2010 reduced localization error? 
+    # if 'correct_diff_calc_loc_error' in para: 
+    #     if para['correct_diff_calc_loc_error']:
+    #         loc_error_correction = np.random.normal(0, para['loc_error'], 
+    #                                             len(tracks_data.loc[:, 'D_coeff']))**2 / para['frametime']
+    # else:
+    #     print('log error connection = 0')
+    #     loc_error_correction = 0
 
-    tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * sim_input['frametime']) - loc_error_correction
+    loc_error_correction =  (para['loc_error'] ** 2)/para['frametime']
+    tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * para['frametime']) - loc_error_correction
 
     D = tracks_data.copy()
 
     # Create the histogram of diffusion coefficients as a function of track lengths
-    if sim_input['plot_option'] == 'logarithmic':
-        edges = np.arange(np.log10(sim_input['plot_diff_hist_min']),
-                      np.log10(sim_input['plot_diff_hist_max']) + sim_input['binwidth'],
-                      sim_input['binwidth'])
+    if para['plot_option'] == 'logarithmic':
+        edges = np.arange(np.log10(para['plot_diff_hist_min']),
+                      np.log10(para['plot_diff_hist_max']) + para['binwidth'],
+                      para['binwidth'])
     else:
-        edges = np.arange(0, sim_input['plot_diff_hist_max'] + sim_input['binwidth'],
-                      sim_input['binwidth'])      
+        edges = np.arange(0, para['plot_diff_hist_max'] + para['binwidth'],
+                      para['binwidth'])      
 
     D_track_length_matrix = pd.DataFrame(np.zeros((len(edges),
-                                                   len(sim_input['track_lengths']) + 1)),
-                                         columns=['Bins'] + list(sim_input['track_lengths']))  
+                                                   len(para['tracklengths_steps']) + 1)),
+                                         columns=['Bins'] + list(para['tracklengths_steps']))  
  
-    if sim_input['plot_option'] == 'logarithmic':
+    if para['plot_option'] == 'logarithmic':
         D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
     else:
         D_track_length_matrix.loc[:, 'Bins'] = edges
     
-    for i, track_len in enumerate(sim_input['track_lengths']):
+    for i, track_len in enumerate(para['tracklengths_steps']):
         # Use idx_track_ids to prevent counting diffusion coefficients several times
         idx = tracklength_counts.index[tracklength_counts[:] == track_len + 1].tolist()
         if idx:

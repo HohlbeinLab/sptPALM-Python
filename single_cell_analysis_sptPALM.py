@@ -52,8 +52,7 @@ def single_cell_analysis_sptPALM(para):
     # Predefine some DataFrames
     para['scta_tracks_csv'] =  para['csv_data'].iloc[0:0].copy()
     para['tracks_filtered'] =  para['tracks'].iloc[0:0].copy()
-
-    
+   
     # Loop through each valid cell
     for jj in range(len(cell_ids)):
         # Select data from a particular cell_id

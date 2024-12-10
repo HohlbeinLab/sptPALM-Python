@@ -134,7 +134,10 @@ def tracking_sptPALM(para):
     csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
     print(f"  Track_ids have updated in {para['fn_locs'][:-4] + para['fn_csv_handle']}")
 
+    tracks['frametime'] = para['frametime'] # add column with frametime
     para['tracks'] = tracks
+
+    
     print('  Tracks have been stored in the para dictionary!')
     
     # Update para structure
@@ -174,7 +177,6 @@ def plot_trackPy_data(linked, para):
     MSD_fitting(ax, msd)
 
 
-
     plt.tight_layout()  # Adjust layout to prevent overlap  
 
     temp_path =  os.path.join(para['data_dir'], para['default_output_dir'])
@@ -184,9 +186,7 @@ def plot_trackPy_data(linked, para):
     return ()
 
 def MSD_fitting(ax, msd):
-
-
-
+    
     tau = msd.index.to_numpy()
     msd_ =  msd.to_numpy() # MSD values
 
@@ -202,9 +202,7 @@ def MSD_fitting(ax, msd):
     print("  MSD fitted for one frame using MSD = 4 * D * tau + 4 * sigma**2")
     print(f"  Fitted diffusion coefficient (D): {D_fit:.3f} µm/s^2")
     print(f"  Fitted localization variance (σ): {sigma_fit:.3f} µm")
-
-
-    
+ 
     ax[1, 1].scatter(tau, msd_, label="Data", color="blue")
     ax[1, 1].plot(tau, msd_function(tau, *popt), label="Fit", color="red")
     ax[1, 1].set_xlabel("Lag time (τ)")
