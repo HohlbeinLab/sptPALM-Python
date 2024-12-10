@@ -31,14 +31,13 @@ def diff_coeffs_from_tracks_fast(tracks, para):
     
     print("\nRun 'diff_coeffs_from_tracks_fast.py'")
 
-    # Initialize
+
     tracks_data = tracks.copy()
     # Count occurrences of each unique track_ids
     tracklength_counts = tracks_data['track_id'].value_counts()    
     
     # Map these counts back to the DataFrame as a new column '#_loc'
     tracks_data['#_locs'] = tracks_data['track_id'].map(tracklength_counts)
-    # Some more additions
     tracks_data['MSD'] = np.nan
     tracks_data['D_coeff'] = np.nan
     tracks_data['frametime'] = para['frametime']
@@ -73,8 +72,6 @@ def diff_coeffs_from_tracks_fast(tracks, para):
     loc_error_correction =  (para['loc_error'] ** 2)/para['frametime']
     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * para['frametime']) - loc_error_correction
 
-    D = tracks_data.copy()
-
     # Create the histogram of diffusion coefficients as a function of track lengths
     if para['plot_option'] == 'logarithmic':
         edges = np.arange(np.log10(para['plot_diff_hist_min']),
@@ -97,11 +94,33 @@ def diff_coeffs_from_tracks_fast(tracks, para):
         # Use idx_track_ids to prevent counting diffusion coefficients several times
         idx = tracklength_counts.index[tracklength_counts[:] == track_len + 1].tolist()
         if idx:
-            hist, _ = np.histogram(D.loc[idx, 'D_coeff'], D_track_length_matrix.loc[:, 'Bins'])
+            hist, _ = np.histogram(tracks_data.loc[idx, 'D_coeff'], D_track_length_matrix.loc[:, 'Bins'])
             D_track_length_matrix.loc[D_track_length_matrix.index[:-1], track_len] = hist
 
-    return D, D_track_length_matrix
+    # breakpoint()
+    # # Find unique elements in the track_id column
+    # track_ids, ic = np.unique(tracks_data['track_id'], return_inverse=True)
+    # track_length_steps = np.bincount(ic) 
 
+    # # Select tracks that are longer than diff_avg_steps_min and shorter than diff_avg_steps_max
+    # filter_vec = (track_length_steps > para['diff_avg_steps_min']) & (track_length_steps < max(para['tracklengths_steps']))
+    
+    # track_ids_filtered = track_ids[filter_vec]
+    # track_length_steps_filtered = track_length_steps[filter_vec]
+
+
+    # temp_Dcoeff_data = tracks_data['D_coeff'].to_numpy()[ic]  
+    # # Further filter based on filter_vec
+    # temp_Dcoeff_data_filtered = temp_Dcoeff_data[filter_vec]
+
+    # diffs_df = pd.DataFrame({
+    #     'diff_coeffs_filtered': temp_Dcoeff_data_filtered,
+    #     'track_length_filtered': track_length_steps_filtered,
+    #     'track_id': track_ids_filtered,
+    #     })
+
+
+    return tracks_data, D_track_length_matrix
 
 # Generalized function to calculate differences between two columns in groups of rows
 def calculate_MSD(df, col_name1, col_name2, group_size):

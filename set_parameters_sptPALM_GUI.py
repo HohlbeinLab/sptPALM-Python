@@ -122,11 +122,11 @@ def set_parameters_sptPALM_GUI(para = None):
             track_memory_entry.delete(0, tk.END)
             track_memory_entry.insert(0, new_para['track_memory'])
     
-            diff_hist_steps_min_entry.delete(0, tk.END)
-            diff_hist_steps_min_entry.insert(0, new_para['diff_hist_steps_min'])
+            diff_avg_steps_min_entry.delete(0, tk.END)
+            diff_avg_steps_min_entry.insert(0, new_para['diff_avg_steps_min'])
     
-            diff_hist_steps_max_entry.delete(0, tk.END)
-            diff_hist_steps_max_entry.insert(0, new_para['diff_hist_steps_max'])
+            diff_avg_steps_max_entry.delete(0, tk.END)
+            diff_avg_steps_max_entry.insert(0, new_para['diff_avg_steps_max'])
     
             tracklength_locs_min_entry.delete(0, tk.END)
             tracklength_locs_min_entry.insert(0, new_para['tracklength_locs_min'])
@@ -206,8 +206,8 @@ def set_parameters_sptPALM_GUI(para = None):
             'track_memory': int(track_memory_entry.get()),
             'frametime': float(frametime_entry.get()),
             'loc_error': float(loc_error_entry.get()),
-            'diff_hist_steps_min': int(diff_hist_steps_min_entry.get()),
-            'diff_hist_steps_max': int(diff_hist_steps_max_entry.get()),
+            'diff_avg_steps_min': int(diff_avg_steps_min_entry.get()),
+            'diff_avg_steps_max': int(diff_avg_steps_max_entry.get()),
             'tracklength_locs_min': int(tracklength_locs_min_entry.get()),
             'tracklength_locs_max': int(tracklength_locs_max_entry.get()),
             
@@ -466,35 +466,36 @@ def set_parameters_sptPALM_GUI(para = None):
     track_memory_entry.insert(0, para['track_memory'])
 
     row_index+=1
-    # Minimum number of steps per track
-    tk.Label(tracking_frame, text="Min. number steps (Diff. calc)", width = width_text_labels,
-             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    diff_hist_steps_min_entry = tk.Entry(tracking_frame, width=width_text_box)
-    diff_hist_steps_min_entry.grid(row=row_index,  column=1)
-    diff_hist_steps_min_entry.insert(0, para['diff_hist_steps_min'])
-    
-    # Maximum number of steps per track
-    tk.Label(tracking_frame, text="Max. number steps (Diff. calc)", width = width_text_labels,
-             anchor="w").grid(row=2, column=2, sticky=tk.W)
-    diff_hist_steps_max_entry = tk.Entry(tracking_frame, width=width_text_box)
-    diff_hist_steps_max_entry.grid(row=2, column=3)
-    diff_hist_steps_max_entry.insert(0, para['diff_hist_steps_max'])    
- 
-    row_index+=1
     # Min locks per track
-    tk.Label(tracking_frame, text="Min. number locs per track", width = width_text_labels,
+    tk.Label(tracking_frame, text="Min. locs per track", width = width_text_labels,
              anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     tracklength_locs_min_entry = tk.Entry(tracking_frame, width=width_text_box)
     tracklength_locs_min_entry.grid(row=row_index, column=1)
     tracklength_locs_min_entry.insert(0, para['tracklength_locs_min'])   
                 
     # Max locks per track  
-    tk.Label(tracking_frame, text="Max. number locs per track", width = width_text_labels,
+    tk.Label(tracking_frame, text="Max. locs per track", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     tracklength_locs_max_entry = tk.Entry(tracking_frame, width=width_text_box)
     tracklength_locs_max_entry.grid(row=row_index, column=3)
     tracklength_locs_max_entry.insert(0, para['tracklength_locs_max'])   
                
+    row_index+=1
+    # Minimum number of steps per track
+    tk.Label(tracking_frame, text="Min. steps (avg. Diff. calc)", width = width_text_labels,
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
+    diff_avg_steps_min_entry = tk.Entry(tracking_frame, width=width_text_box)
+    diff_avg_steps_min_entry.grid(row=row_index,  column=1)
+    diff_avg_steps_min_entry.insert(0, para['diff_avg_steps_min'])
+    
+    # Maximum number of steps per track
+    tk.Label(tracking_frame, text="Max. steps (avg. Diff. calc)", width = width_text_labels,
+             anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+    diff_avg_steps_max_entry = tk.Entry(tracking_frame, width=width_text_box)
+    diff_avg_steps_max_entry.grid(row=row_index, column=3)
+    diff_avg_steps_max_entry.insert(0, para['diff_avg_steps_max'])    
+ 
+
     """
     # Frame for plotting
     """
@@ -503,7 +504,7 @@ def set_parameters_sptPALM_GUI(para = None):
     plotting_frame.grid(row=1, column=1, padx=10, pady=10, sticky="new")  # Right half
 
     row_index = 0    
-    # plot_diff_hist_min
+    # plot_diff_avg_min
     tk.Label(plotting_frame, text="Diff. hist. min (µm^2/s)", width = width_text_labels,
              anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     diff_hist_min_entry = tk.Entry(plotting_frame, width=width_text_box)
@@ -511,7 +512,7 @@ def set_parameters_sptPALM_GUI(para = None):
     diff_hist_min_entry.insert(0, para['plot_diff_hist_min'])  
 
     # plot_diff_hist_max
-    tk.Label(plotting_frame, text="Diff. hist. max (µm^2/s)", width = width_text_labels,
+    tk.Label(plotting_frame, text="Diff. avg. max (µm^2/s)", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     diff_hist_max_entry = tk.Entry(plotting_frame, width=width_text_box)
     diff_hist_max_entry.grid(row=row_index, column=3)

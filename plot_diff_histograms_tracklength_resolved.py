@@ -22,12 +22,12 @@ def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, para, D=Non
     # More classical view
     plot_diff_histograms_conventional(D_track_length_matrix, para)
     
-    #Ridgeplot with seaborn
-    plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D)
+    # Ridgeplot with seaborn
+    # plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D)
     
-    # breakpoint()
-  #  Ridgeplot KDE with seaborn
-    plot_diff_histograms_KDE(D, para)
+
+  #  Ridgeplot KDE with seaborn, currently not working properly
+  #  plot_diff_histograms_KDE(D, para)
       
 def plot_diff_histograms_conventional(D_track_length_matrix, para):
     # Create the bin edges using logarithmic values

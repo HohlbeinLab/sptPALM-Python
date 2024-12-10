@@ -24,8 +24,8 @@ def analyse_diffusion_sptPALM(para):
     track_ids, ic = np.unique(para['tracks']['track_id'], return_inverse=True)
     track_length_steps = np.bincount(ic) #steps or locs? Think these are steps (= locs + 1)
     track_ids_length = np.column_stack((track_ids, track_length_steps))
-    # Select tracks that are longer than diff_hist_steps_min and shorter than diff_hist_steps_max
-    filter_vec = (track_length_steps > para['diff_hist_steps_min']) & (track_length_steps < para['diff_hist_steps_max'])
+    # Select tracks that are longer than diff_avg_steps_min and shorter than diff_avg_steps_max
+    filter_vec = (track_length_steps > para['diff_avg_steps_min']) & (track_length_steps < para['diff_avg_steps_max'])
     track_ids_length_filtered = track_ids_length[filter_vec, :]
 
     # Create empty vector for MSDs
@@ -40,8 +40,8 @@ def analyse_diffusion_sptPALM(para):
         
         temp_array = para['tracks'][para['tracks']['track_id'] == track_ids_length_filtered[ii,0]]
     
-        # Calculate averaged MSD for DiffHistSteps_min + 1 steps
-        for jj in range(para['diff_hist_steps_min']):
+        # Calculate averaged MSD for DiffavgSteps_min + 1 steps
+        for jj in range(para['diff_avg_steps_min']):
             con = temp_array.iloc[jj+1]['frame'] - temp_array.iloc[jj]['frame']
             
             # Account for 1-frame memories
@@ -54,7 +54,7 @@ def analyse_diffusion_sptPALM(para):
                             (temp_array.iloc[jj+1]['y [µm]'] - temp_array.iloc[jj]['y [µm]']) ** 2)
 
         # Divide by total number of steps
-        msd[ii] /= para['diff_hist_steps_min']  # Mean square displacement
+        msd[ii] /= para['diff_avg_steps_min']  # Mean square displacement
 
     print(f"   ...track {ii+1} out of {len(track_ids_length_filtered)} valid tracks.")
 
@@ -76,9 +76,9 @@ def analyse_diffusion_sptPALM(para):
     else:
         print('  Careful, empty list of diffusion coefficients returned!')
 
-    para['diff_coeffs_filtered_list'] = diffs_df
+    # para['diff_coeffs_filtered_list'] = diffs_df
     
-    return para
+    return diffs_df
 
 
 

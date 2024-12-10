@@ -65,8 +65,8 @@ def single_cell_analysis_sptPALM(para):
         track_df = pd.DataFrame({'track_id': track_ids, 'locs': track_locs})
 
         # Select tracks that have neither too few or too many localizations
-        track_df = track_df[(track_df['locs'] > para['diff_hist_steps_min']) &
-                                            (track_df['locs'] < para['diff_hist_steps_max'])]
+        track_df = track_df[(track_df['locs'] > para['diff_avg_steps_min']) &
+                                            (track_df['locs'] < para['diff_avg_steps_max'])]
      
         # Check for presence of tracks in particular cell              
         if track_df.empty == False:

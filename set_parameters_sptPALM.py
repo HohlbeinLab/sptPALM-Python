@@ -41,12 +41,14 @@ def set_parameters_sptPALM():
         'loc_error': float(0.035), # Localization error (um), default: 0.03
         'track_steplength_max': float(0.8), # Tracking window (um), default: 0.8 um or 0.5 um
         'track_memory': int(0), # Tracking memory in frames, default: 1
-        'diff_hist_steps_min': int(3), # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
-        'diff_hist_steps_max': int(100), # Maximum number of steps for a track to be analyzed, default: 100
         # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
         'tracklength_locs_min': int(2),  # 
         'tracklength_locs_max': int(8),  # 
         'tracklengths_steps':[], # further defined below
+        # more for averaging diffs over different track lengths
+        'diff_avg_steps_min': int(3), # Minimum number of steps for a track to be analyzed --> Actual value/number of localisations is 1 higher than this!, default: 3
+        'diff_avg_steps_max': int(100), # Maximum number of steps for a track to be analyzed, default: 100
+              
         # Cell by cell analysis
         'number_tracks_per_cell_min': int(1), # Minimum number of tracks for each cell, default: 1
         'number_tracks_per_cell_max': int(10000), # Maximum number of tracks for each cell, default: 10000

@@ -112,10 +112,10 @@ def analyse_movies_sptPALM(input_parameter = None):
         para = load_localisations_from_csv(para)
 
         """ 2.3 Apply cell segmentation """
-        if input_parameter['use_segmentations']:
+        if para['use_segmentations']:
             para = apply_cell_segmentation_sptPALM(para)
 
-        """ 2.4 Perform tracking: 
+        """ 2.4 Perform tracking with or without cell segmentation: 
          returns para['tracks']: x[µm), y[µm]], frame, track_id, frametime """
         para = tracking_sptPALM(para)
 
@@ -124,18 +124,17 @@ def analyse_movies_sptPALM(input_parameter = None):
             'diff_coeffs_filtered',
             'track_length_filtered': track_ids_length_filtered[:, 1],
             'track_id': track_ids_length_filtered[:, 0] """
-        # OLD:        
-        # para = analyse_diffusion_sptPALM(para)
-
+     
         # tracks: x[µm), y[µm]], frame, track_id, frametime
         # D: tracks + #_loc, MSD, D_coeff
         # D_track_length_matrix: Bins, steps[2-3]
-        [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(para['tracks'], input_parameter);
-     
-        # Plot experimental data
-        plot_diff_histograms_tracklength_resolved(D_track_length_matrix, input_parameter, D)
+        [para['tracks'], para['D_tracklengths_matrix']] = diff_coeffs_from_tracks_fast(para['tracks'], para);
+        para['diff_coeffs_filtered_list']  = analyse_diffusion_sptPALM(para) # OLD
+
         
-        para = plot_diffusion_tracklengths_sptPALM(para)
+        # Plot experimental data
+        plot_diff_histograms_tracklength_resolved(para['D_tracklengths_matrix'], para, para['tracks'])
+        para = plot_diffusion_tracklengths_sptPALM(para)  # OLD
 
         """ 2.6 [Optional] SCTA Single Cell Tracking Analysis """
         if input_parameter['use_segmentations']:
