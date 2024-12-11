@@ -25,7 +25,7 @@
     "frametime": 0.01,
     "sigma_noise": 0.03,
     "diff_hist_steps_min": 3,
-    "diff_hist_steps_max": 100,
+    "diff_avg_steps_max": 100,
     "number_tracks_per_cell_min": 2,
     "number_tracks_per_cell_max": 10000,
     "scta_vis_cells": false,

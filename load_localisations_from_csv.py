@@ -19,7 +19,7 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 
 import pandas as pd
 import numpy as np
-import os
+import os # Needed if export the '*_analysis.csv' file is enabled
 
 def load_localisations_from_csv(para):
     # Import *.csv data (for example obtained from running ThunderSTORM)

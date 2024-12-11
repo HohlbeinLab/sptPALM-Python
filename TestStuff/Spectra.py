@@ -20,8 +20,8 @@ https://cloudconvert.com/about
 file_path = 'DyeSpectra.xlsx'
 
 # Assuming each spectrum is on a separate sheet
-No1 = pd.read_excel(file_path, sheet_name='Alexa647_EM').to_numpy()
-No1 = np.nan_to_num(No1, nan=0)
+# No1 = pd.read_excel(file_path, sheet_name='Alexa647_EM').to_numpy()
+# No1 = np.nan_to_num(No1, nan=0)
 
 No2 = pd.read_excel(file_path, sheet_name='CF660C_EM').to_numpy()
 No2 = np.nan_to_num(No2, nan=0)
@@ -73,10 +73,10 @@ ax1.spines['bottom'].set_linewidth(LineWidth)
 """
 Normalize and fill data, add overlay
 """
-plt.fill_between(No1[:, 0], No1[:, 1] / np.max(No1[:, 1]), color='darkorange', alpha=0.5, label="Alexa 647 (em)")
+# plt.fill_between(No1[:, 0], No1[:, 1] / np.max(No1[:, 1]), color='darkorange', alpha=0.5, label="Alexa 647 (em)")
 # plt.plot(No1[:, 0], No1[:, 1] / np.max(No1[:, 1]), linewidth=LineWidth, color='gold', linestyle='-')
 
-plt.fill_between(No2[:, 0], No2[:, 1] / np.max(No2[:, 1]), color='orangered', alpha=0.5, label="CF660 (em)")
+plt.fill_between(No2[:, 0], No2[:, 1] / np.max(No2[:, 1]), color='darkorange', alpha=0.5, label="CF660 (em)") # orangered
 # plt.plot(No2[:, 0], No2[:, 1] / np.max(No2[:, 1]), linewidth=LineWidth, color='darkorange')
 
 plt.fill_between(No3[:, 0], No3[:, 1] / np.max(No3[:, 1]), color='darkred', alpha=0.5, label="CF680 (em)")

@@ -16,6 +16,7 @@ from tkinter import filedialog
 from set_parameters_sptPALM import set_parameters_sptPALM
 from ast import literal_eval # Safely parse the string back to a list of lists
 import pickle
+import numpy as np
 
 def set_parameters_sptPALM_GUI(para = None):
     print("\nRun 'set_parameters_sptPALM_GUI.py'")
@@ -82,11 +83,11 @@ def set_parameters_sptPALM_GUI(para = None):
             fn_csv_handle_entry.delete(0, tk.END)
             fn_csv_handle_entry.insert(0, new_para['fn_csv_handle'])
     
-            fn_dict_handle_entry.delete(0, tk.END)
-            fn_dict_handle_entry.insert(0, new_para['fn_dict_handle'])
+            # fn_dict_handle_entry.delete(0, tk.END)
+            # fn_dict_handle_entry.insert(0, new_para['fn_dict_handle'])
     
-            fn_diffs_handle_entry.delete(0, tk.END)
-            fn_diffs_handle_entry.insert(0, new_para['fn_diffs_handle'])
+            # fn_diffs_handle_entry.delete(0, tk.END)
+            # fn_diffs_handle_entry.insert(0, new_para['fn_diffs_handle'])
     
             fn_movies_entry.delete(0, tk.END)
             fn_movies_entry.insert(0, new_para['fn_movies'])
@@ -121,11 +122,11 @@ def set_parameters_sptPALM_GUI(para = None):
             track_memory_entry.delete(0, tk.END)
             track_memory_entry.insert(0, new_para['track_memory'])
     
-            diff_hist_steps_min_entry.delete(0, tk.END)
-            diff_hist_steps_min_entry.insert(0, new_para['diff_hist_steps_min'])
+            diff_avg_steps_min_entry.delete(0, tk.END)
+            diff_avg_steps_min_entry.insert(0, new_para['diff_avg_steps_min'])
     
-            diff_hist_steps_max_entry.delete(0, tk.END)
-            diff_hist_steps_max_entry.insert(0, new_para['diff_hist_steps_max'])
+            diff_avg_steps_max_entry.delete(0, tk.END)
+            diff_avg_steps_max_entry.insert(0, new_para['diff_avg_steps_max'])
     
             tracklength_locs_min_entry.delete(0, tk.END)
             tracklength_locs_min_entry.insert(0, new_para['tracklength_locs_min'])
@@ -141,6 +142,8 @@ def set_parameters_sptPALM_GUI(para = None):
     
             binwidth_entry.delete(0, tk.END)
             binwidth_entry.insert(0, new_para['binwidth'])
+            
+            plot_option_var.set(new_para['plot_option'])
     
             fontsize_entry.delete(0, tk.END)
             fontsize_entry.insert(0, new_para['fontsize'])
@@ -189,8 +192,8 @@ def set_parameters_sptPALM_GUI(para = None):
             # 'condition_to_select_MCDDA': int(condition_to_select_MCDDA_entry.get()),
            
             'fn_csv_handle': fn_csv_handle_entry.get(),
-            'fn_dict_handle': fn_dict_handle_entry.get(),
-            'fn_diffs_handle': fn_diffs_handle_entry.get(),
+            # 'fn_dict_handle': fn_dict_handle_entry.get(),
+            # 'fn_diffs_handle': fn_diffs_handle_entry.get(),
             'fn_movies': fn_movies_entry.get(),    
             'fn_combined_movies': fn_combined_movies_entry.get(),
             
@@ -203,8 +206,8 @@ def set_parameters_sptPALM_GUI(para = None):
             'track_memory': int(track_memory_entry.get()),
             'frametime': float(frametime_entry.get()),
             'loc_error': float(loc_error_entry.get()),
-            'diff_hist_steps_min': int(diff_hist_steps_min_entry.get()),
-            'diff_hist_steps_max': int(diff_hist_steps_max_entry.get()),
+            'diff_avg_steps_min': int(diff_avg_steps_min_entry.get()),
+            'diff_avg_steps_max': int(diff_avg_steps_max_entry.get()),
             'tracklength_locs_min': int(tracklength_locs_min_entry.get()),
             'tracklength_locs_max': int(tracklength_locs_max_entry.get()),
             
@@ -219,13 +222,15 @@ def set_parameters_sptPALM_GUI(para = None):
             'plot_diff_hist_max': float(diff_hist_max_entry.get()),
             'binwidth': float(binwidth_entry.get()),
             'fontsize': int(fontsize_entry.get()),
+            'plot_option': plot_option_var.get(),# wether to plot D_histograms logarithmic or linear
             'linewidth': int(linewidth_entry.get()),
-            'plot_norm_histograms': bool(plot_norm_histograms_var.get()),
+            'plot_norm_histograms': plot_norm_histograms_var.get(),
             'plot_frame_number': bool(use_plot_frame_number_var.get()),
             'dpi': int(dpi_entry.get()),
             'cmap_applied': cmap_applied_var.get()
         }
-    
+        para['tracklengths_steps'] = np.arange(para['tracklength_locs_min']-1,
+                                                para['tracklength_locs_max'])
     
     def save_params(): 
         # Get data from GUI
@@ -338,21 +343,21 @@ def set_parameters_sptPALM_GUI(para = None):
     fn_csv_handle_entry.grid(row=7, column=1)
     fn_csv_handle_entry.insert(0, para['fn_csv_handle'])
 
-    row_index+=1
-    # Handle: fn_dict_handle 
-    tk.Label(file_frame, text="Handle: dictionary ", width = width_text_labels,
-             anchor="w").grid(row=8, column=0, sticky=tk.W)
-    fn_dict_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_dict_handle_entry.grid(row=8, column=1)
-    fn_dict_handle_entry.insert(0, para['fn_dict_handle'])
+    # row_index+=1
+    # # Handle: fn_dict_handle 
+    # tk.Label(file_frame, text="Handle: dictionary ", width = width_text_labels,
+    #          anchor="w").grid(row=8, column=0, sticky=tk.W)
+    # fn_dict_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
+    # fn_dict_handle_entry.grid(row=8, column=1)
+    # fn_dict_handle_entry.insert(0, para['fn_dict_handle'])
 
-    row_index+=1
-    # Handle: fn_diffs_handle 
-    tk.Label(file_frame, text="Handle: diffusion coeff. ", width = width_text_labels,
-             anchor="w").grid(row=9, column=0, sticky=tk.W)
-    fn_diffs_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_diffs_handle_entry.grid(row=9, column=1)
-    fn_diffs_handle_entry.insert(0, para['fn_diffs_handle'])
+    # row_index+=1
+    # # Handle: fn_diffs_handle 
+    # tk.Label(file_frame, text="Handle: diffusion coeff. ", width = width_text_labels,
+    #          anchor="w").grid(row=9, column=0, sticky=tk.W)
+    # fn_diffs_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
+    # fn_diffs_handle_entry.grid(row=9, column=1)
+    # fn_diffs_handle_entry.insert(0, para['fn_diffs_handle'])
 
     row_index+=1
     # Handle: fn_movies     
@@ -369,6 +374,7 @@ def set_parameters_sptPALM_GUI(para = None):
     fn_combined_movies_entry = tk.Entry(file_frame, width=width_text_fileIO)
     fn_combined_movies_entry.grid(row=11, column=1)
     fn_combined_movies_entry.insert(0, para['fn_combined_movies'])
+    
 
     """
     # Frame for Segmentation inputs
@@ -385,10 +391,11 @@ def set_parameters_sptPALM_GUI(para = None):
     pixelsize_entry.grid(row=row_index, column=1)
     pixelsize_entry.insert(1, para['pixelsize'])
 
+    row_index+=1
     # Use Segmentations
     use_segmentations_var = tk.BooleanVar(value = para['use_segmentations'])
     tk.Checkbutton(segmentation_frame, text="Use segmentations", variable=use_segmentations_var,
-                   width = width_text_labels, anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+                   width = width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
 
     row_index+=1
     # Cell area (min/max)
@@ -406,14 +413,14 @@ def set_parameters_sptPALM_GUI(para = None):
     cellarea_max_entry.insert(0, para['cellarea_pixels_max'])
     
     row_index+=1
-    # Minimum number of steps per track
+    # Minimum number tracks/cell
     tk.Label(segmentation_frame, text="Min. number tracks/cell", width = width_text_labels,
-             anchor="w").grid(row=2, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     number_tracks_per_cell_min_entry = tk.Entry(segmentation_frame, width=width_text_box)
-    number_tracks_per_cell_min_entry.grid(row=2,  column=1)
+    number_tracks_per_cell_min_entry.grid(row=row_index,  column=1)
     number_tracks_per_cell_min_entry.insert(0, para['number_tracks_per_cell_min'])
     
-    # Maximum number of steps per track
+    # Maximum number tracks/cell
     tk.Label(segmentation_frame, text="Max. number tracks/cell", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     number_tracks_per_cell_max_entry = tk.Entry(segmentation_frame, width=width_text_box)
@@ -459,35 +466,36 @@ def set_parameters_sptPALM_GUI(para = None):
     track_memory_entry.insert(0, para['track_memory'])
 
     row_index+=1
-    # Minimum number of steps per track
-    tk.Label(tracking_frame, text="Min. number steps", width = width_text_labels,
-             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    diff_hist_steps_min_entry = tk.Entry(tracking_frame, width=width_text_box)
-    diff_hist_steps_min_entry.grid(row=row_index,  column=1)
-    diff_hist_steps_min_entry.insert(0, para['diff_hist_steps_min'])
-    
-    # Maximum number of steps per track
-    tk.Label(tracking_frame, text="Max. number steps", width = width_text_labels,
-             anchor="w").grid(row=2, column=2, sticky=tk.W)
-    diff_hist_steps_max_entry = tk.Entry(tracking_frame, width=width_text_box)
-    diff_hist_steps_max_entry.grid(row=2, column=3)
-    diff_hist_steps_max_entry.insert(0, para['diff_hist_steps_max'])    
- 
-    row_index+=1
     # Min locks per track
-    tk.Label(tracking_frame, text="Min. number locs per track", width = width_text_labels,
+    tk.Label(tracking_frame, text="Min. locs per track", width = width_text_labels,
              anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     tracklength_locs_min_entry = tk.Entry(tracking_frame, width=width_text_box)
     tracklength_locs_min_entry.grid(row=row_index, column=1)
     tracklength_locs_min_entry.insert(0, para['tracklength_locs_min'])   
                 
     # Max locks per track  
-    tk.Label(tracking_frame, text="Max. number locs per track", width = width_text_labels,
+    tk.Label(tracking_frame, text="Max. locs per track", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     tracklength_locs_max_entry = tk.Entry(tracking_frame, width=width_text_box)
     tracklength_locs_max_entry.grid(row=row_index, column=3)
     tracklength_locs_max_entry.insert(0, para['tracklength_locs_max'])   
                
+    row_index+=1
+    # Minimum number of steps per track
+    tk.Label(tracking_frame, text="Min. steps (avg. Diff. calc)", width = width_text_labels,
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
+    diff_avg_steps_min_entry = tk.Entry(tracking_frame, width=width_text_box)
+    diff_avg_steps_min_entry.grid(row=row_index,  column=1)
+    diff_avg_steps_min_entry.insert(0, para['diff_avg_steps_min'])
+    
+    # Maximum number of steps per track
+    tk.Label(tracking_frame, text="Max. steps (avg. Diff. calc)", width = width_text_labels,
+             anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+    diff_avg_steps_max_entry = tk.Entry(tracking_frame, width=width_text_box)
+    diff_avg_steps_max_entry.grid(row=row_index, column=3)
+    diff_avg_steps_max_entry.insert(0, para['diff_avg_steps_max'])    
+ 
+
     """
     # Frame for plotting
     """
@@ -496,7 +504,7 @@ def set_parameters_sptPALM_GUI(para = None):
     plotting_frame.grid(row=1, column=1, padx=10, pady=10, sticky="new")  # Right half
 
     row_index = 0    
-    # plot_diff_hist_min
+    # plot_diff_avg_min
     tk.Label(plotting_frame, text="Diff. hist. min (µm^2/s)", width = width_text_labels,
              anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     diff_hist_min_entry = tk.Entry(plotting_frame, width=width_text_box)
@@ -504,7 +512,7 @@ def set_parameters_sptPALM_GUI(para = None):
     diff_hist_min_entry.insert(0, para['plot_diff_hist_min'])  
 
     # plot_diff_hist_max
-    tk.Label(plotting_frame, text="Diff. hist. max (µm^2/s)", width = width_text_labels,
+    tk.Label(plotting_frame, text="Diff. avg. max (µm^2/s)", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     diff_hist_max_entry = tk.Entry(plotting_frame, width=width_text_box)
     diff_hist_max_entry.grid(row=row_index, column=3)
@@ -525,6 +533,7 @@ def set_parameters_sptPALM_GUI(para = None):
     fontsize_entry.grid(row=row_index, column=3)
     fontsize_entry.insert(0, para['fontsize'])   
   
+    
     row_index+=1
     # dpi
     tk.Label(plotting_frame, text="Resolution figures (dpi)", width = width_text_labels,
@@ -543,40 +552,50 @@ def set_parameters_sptPALM_GUI(para = None):
     row_index+=1
     # Plot frame numbers next to tracks
     use_plot_frame_number_var = tk.BooleanVar(value=para['plot_frame_number'])
-    tk.Checkbutton(plotting_frame, text="Plot frame number", variable=use_plot_frame_number_var,
+    tk.Checkbutton(plotting_frame, text="Plot frame_id next to tracks", variable=use_plot_frame_number_var,
                    width = width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
   
-    # Plot frame numbers next to tracks
+    row_index+=1
+    # Show individual cells
     scta_vis_cells_var = tk.BooleanVar(value=para['scta_vis_cells'])
     tk.Checkbutton(plotting_frame, text="Show individual cells", variable=scta_vis_cells_var,
-                   width = width_text_labels, anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+                   width = width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
 
-    row_index+=1
-    # Plot frame numbers next to tracks
+    # Cycle through cells
     scta_vis_interactive_var = tk.BooleanVar(value=para['scta_vis_interactive'])
     tk.Checkbutton(plotting_frame, text="Cycle through cells", variable=scta_vis_interactive_var,
-                   width = width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
+                   width = width_text_labels, anchor="w").grid(row=row_index, column=2, sticky=tk.W)
 
     row_index+=1
     # Dropdown Menu for Colormap Selection
     tk.Label(plotting_frame, text="Select color map", width = width_text_labels,
              anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    # Create StringVar for dropdown selection
     cmap_applied_var = tk.StringVar()
     cmap_applied_var.set("gist_ncar")  # Default option
-    # Create a dropdown menu
     cmap_applied_entry = tk.OptionMenu(plotting_frame, cmap_applied_var, "gist_ncar", "nipy_spectral", "tab20c")
-    # cmap_dropdown.config(width=10)
+    cmap_applied_entry.config(width=width_text_box)  # Adjust width as needed
     cmap_applied_entry.grid(row=row_index, column=1, sticky=tk.W)
-   
-    # Dropdown Menu for plotting diffusion histrograms Selection
+
+    row_index+=1 
+    # Dropdown Menu for plotting diffusion histogram selection
     tk.Label(plotting_frame, text="Select plotting option", width = width_text_labels,
-             anchor="w").grid(row=row_index, column=2, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     plot_norm_histograms_var = tk.StringVar()
     plot_norm_histograms_var.set("probability")  # Default option
     plot_norm_histograms_entry = tk.OptionMenu(plotting_frame, plot_norm_histograms_var, 
                                                "probability", "counts")
-    plot_norm_histograms_entry.grid(row=row_index, column=3, sticky=tk.W)
+    plot_norm_histograms_entry.config(width=width_text_box)  # Adjust width as needed
+    plot_norm_histograms_entry.grid(row=row_index, column=1, sticky=tk.W)
+    
+    row_index+=1
+    # Dropdown Menu for plotting option selection
+    tk.Label(plotting_frame, text="Plot option Diff. (log or linear)", width = width_text_labels,
+               anchor="w").grid(row=row_index, column=0, sticky=tk.W)
+    plot_option_var = tk.StringVar()
+    plot_option_var.set(para['plot_option'])  # Default option
+    plot_option_entry = tk.OptionMenu(plotting_frame, plot_option_var, "linear", "logarithmic")
+    plot_option_entry.config(width=width_text_box)  # Adjust width as needed
+    plot_option_entry.grid(row=row_index, column=1, sticky=tk.W)
     
     row_index+=1
     # Radius in pixels for plotting individual cells and their tracks

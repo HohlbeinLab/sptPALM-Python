@@ -138,14 +138,14 @@ SCTA: Single-cell tracking analysis. Parameters in order of appearance.
 | frametime | 0.01 | Length of a single movie frame in seconds |
 | loc_error (µm)| 0.035 | Assumed localisation error (µm). Could be calculated based on the localisation precisionin ThunderSTORM, but not possible with phasor-based localisation. |
 | diff_hist_steps_min | 3 | Minimum number of steps for a track to be analyzed. Note that the actual number of localisations is one higher  |
-| diff_hist_steps_max |  100 | Minimum number of steps for a track to be analyzed.  
+| diff_avg_steps_max |  100 | Minimum number of steps for a track to be analyzed.  
 | track_lengths |  1,2,3,4,5,6,7,8 | Minimum number of steps for a track to be analyzed.  
 | number_tracks_per_cell_min  | 1 | Minimum number of tracks that each cell must contain |
 | number_tracks_per_cell_max | 10000 | Maximum number of tracks that each cell must contain |
 | scta_vis_cells | False | Visualize individual cells true/false |
 | scta_plot_cell_window | 15 | Radius in pixels for plotting individual cells and their tracks|
 | scta_vis_interactive | False | Interactively cycle through indiviudally plotted cells true/false |
-| scta_vis_rangemax | 0.3 | Color-coding in the range of 0 to (SCTA_vis_rangemax * plotDiffHist_max) |
+| scta_vis_rangemax | 0.3 | Color-coding in the range of 0 to (SCTA_vis_rangemax * plotDiffavg_max) |
 | plot_diff_hist_min | 4E-3 | plot and histogram from min µm<sup>2</sup>/s to max µm<sup>2</sup>/s |
 | plot_diff_hist_max | 10 | plot and histogram from µm<sup>2</sup>/s to µm<sup>2</sup>/s |
 | binwith | 0.1 | width of bins, default: 0.1 |

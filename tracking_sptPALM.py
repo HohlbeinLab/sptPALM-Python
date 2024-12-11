@@ -134,7 +134,10 @@ def tracking_sptPALM(para):
     csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
     print(f"  Track_ids have updated in {para['fn_locs'][:-4] + para['fn_csv_handle']}")
 
+    tracks['frametime'] = para['frametime'] # add column with frametime
     para['tracks'] = tracks
+
+    
     print('  Tracks have been stored in the para dictionary!')
     
     # Update para structure
@@ -144,7 +147,7 @@ def tracking_sptPALM(para):
 
 def plot_trackPy_data(linked, para):
     # Filter out Short Trajectories
-    filtered = tp.filter_stubs(linked, threshold=para['diff_hist_steps_min'])
+    filtered = tp.filter_stubs(linked, threshold=para['diff_avg_steps_min'])
     fig, ax = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle('Some output provided by trackpy')
     ax[0, 0].set_title('Subset of particle trajectories')
@@ -153,7 +156,7 @@ def plot_trackPy_data(linked, para):
     ax[0, 0].set_ylabel('y (um)')
     ax[0, 0].set_xlabel('x (um)')
 
-     # Compute Mean Squared Displacement (MSD)
+    # Compute Mean Squared Displacement (MSD)
     msd = tp.emsd(filtered, mpp=1, fps=1/para['frametime'], max_lagtime = 7, pos_columns= ['x [µm]', 'y [µm]'])
     # Plots and fits Mean Squared Displacement (MSD)
     ax[0, 1].set_title('Mean Squared Displacement: with fit, no drift correction')
@@ -174,7 +177,6 @@ def plot_trackPy_data(linked, para):
     MSD_fitting(ax, msd)
 
 
-
     plt.tight_layout()  # Adjust layout to prevent overlap  
 
     temp_path =  os.path.join(para['data_dir'], para['default_output_dir'])
@@ -184,9 +186,7 @@ def plot_trackPy_data(linked, para):
     return ()
 
 def MSD_fitting(ax, msd):
-
-
-
+    
     tau = msd.index.to_numpy()
     msd_ =  msd.to_numpy() # MSD values
 
@@ -199,17 +199,25 @@ def MSD_fitting(ax, msd):
 
     # Extract the diffusion coefficient and localization variance
     D_fit, sigma_fit = popt
-    print("  MSD fitted for one frame using MSD = 4 * D * tau + 4 * sigma**2")
-    print(f"  Fitted diffusion coefficient (D): {D_fit:.3f} µm/s^2")
-    print(f"  Fitted localization variance (σ): {sigma_fit:.3f} µm")
-
-
-    
+    text_lines = [
+        "  MSD fitted for one frame using MSD = 4 * D * tau + 4 * sigma**2",
+        f"  Fitted diffusion coefficient (D): {D_fit:.3f} µm/s^2",
+        f"  Fitted localization variance (σ): {sigma_fit:.3f} µm",
+        ]
+ 
+    print(text_lines)
     ax[1, 1].scatter(tau, msd_, label="Data", color="blue")
     ax[1, 1].plot(tau, msd_function(tau, *popt), label="Fit", color="red")
     ax[1, 1].set_xlabel("Lag time (τ)")
     ax[1, 1].set_ylabel("MSD (τ)")
     ax[1, 1].legend()
     ax[1, 1].set_title("MSD Fit over all (!) tracks using lagtime of one frame only")
+    
+    # Add text to the subplot
+    text_y_position = 0.9  # Starting y-position (normalized, from 0 to 1)
+    for line in text_lines:
+        ax[1, 1].text(0.05, text_y_position, line, transform=ax[1, 1].transAxes, fontsize=10, verticalalignment='top')
+        text_y_position -= 0.05  # Move down for the next line
+
     
     return()

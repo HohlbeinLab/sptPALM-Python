@@ -146,8 +146,8 @@ def set_parameters_simulation_GUI(sim_input=None):
             
          } 
         # Make sure that the track lengths are defined    
-        sim_input['track_lengths'] = np.arange(sim_input['tracklength_locs_min']-1,
-                                                    sim_input['tracklength_locs_max'])
+        sim_input['tracklengths_steps'] = np.arange(sim_input['tracklength_locs_min']-1,
+                                            sim_input['tracklength_locs_max'])
     
         sim_input['#_species'] = len(sim_input['species'])
         print("sim_input transfered")
@@ -377,7 +377,7 @@ def set_parameters_simulation_GUI(sim_input=None):
     binwidth_entry.insert(0, sim_input['binwidth'])  
 
     # Dropdown Menu for plotting option selection
-    tk.Label(plotting_frame, text="Plot option (log or lin)", width = width_text_labels,
+    tk.Label(plotting_frame, text="Plot option (log or linear)", width = width_text_labels,
              anchor="w").grid(row=row_index, column=2, sticky=tk.W)
     plot_option_var = tk.StringVar()
     plot_option_var.set(sim_input['plot_option'])  # Default option

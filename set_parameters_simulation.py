@@ -27,6 +27,7 @@ def set_parameters_simulation():
     # Track lengths and diffusion constraints (also track_lengths': [1,2,3,4,5,6,7,8])
     'tracklength_locs_min': int(2),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
     'tracklength_locs_max': int(7),  # Track lengths (2 to 8 frames) tracklength of 1 is two locs, or track_lengths': [1,2,3,4,5,6,7,8]
+    'tracklengths_steps':[], # further defined below
     'mean_track_length': float(4),  # Mean track length for exponential distribution, default 3
     
     # Simulation parameters
@@ -56,7 +57,7 @@ def set_parameters_simulation():
    'dpi': int(150), # DPI setting for plotting figures, default: 300
    }
     
-    sim_input['track_lengths'] = np.arange(sim_input['tracklength_locs_min']-1,
+    sim_input['tracklengths_steps'] = np.arange(sim_input['tracklength_locs_min']-1,
                                             sim_input['tracklength_locs_max'])
     
     """

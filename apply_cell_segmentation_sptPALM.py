@@ -20,13 +20,13 @@ from skimage.io import imread
 def apply_cell_segmentation_sptPALM(para):
     print('Run apply_cell_segmentation_sptPALM.py')
     
-    # the following definition will it make easier to wrap other segmentation inpuit
+    # the following definition will it make easier to wrap other segmentation input
     # general structue: colum_names={'name_internally','name_from_extern'}
     segm_table_column_names = {'Label':'Label',
                     'volume':'volume'
                     } 
     
-    # Define filenames to load existing data (requires correct settings in ImageJ/Fiji macro 'Cell Segmentation')
+    # Define filenames to load existing data (requires correct settings in ImageJ/Fiji: 'Macro_CellSegmentation.imj')
     para['fn_proc_brightfield_segm'] = para['fn_proc_brightfield'][:-4] + '_segm.tif'
     para['fn_proc_brightfield_segm_table'] = para['fn_proc_brightfield_segm'][:-4] + '_table.csv'
 
@@ -42,17 +42,13 @@ def apply_cell_segmentation_sptPALM(para):
     # Load table with information on the segmentations, filename '*_procBrightfield_segm_table.csv'
     print(f"  Load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
     bf_dict['proc_brightfield_segm_table'] = pd.read_csv(para['data_dir'] + para['fn_proc_brightfield_segm_table'])
-     
-    # # To go with Python convention, start labels from 0 (image segmentation + labels start from 1!!!)
-    # bf_dict['proc_brightfield_segm_image'] -= 1 if bf_dict['proc_brightfield_segm_image'].min() == 1 else 0
-    # bf_dict['proc_brightfield_segm_table'].loc[:, segm_table_column_names['Label']] -= 1 if bf_dict['proc_brightfield_segm_table'].loc[:, segm_table_column_names['Label']].min() == 1 else 0
-    
+         
     # Import '*_analysis.csv'
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     csv_data = pd.read_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'])
 
     # Check for x- and y-positions and transform them into pixels
-    # ATTENTION: replace with your actual column names
+    # ATTENTION: replace with different column names if needed
     column_names = ['x', 'y', 'cell_id', 'cell_area'] 
     bf_dict['loc_pixel_table'] = pd.DataFrame(np.zeros((len(csv_data), len(column_names))), columns=column_names)
 
@@ -76,7 +72,7 @@ def apply_cell_segmentation_sptPALM(para):
 
     # Filter cells for size
     # e.g., Min, max size for cell-outline data in pixel^2
-    # ATTENTION: replace with your actual column names
+    # ATTENTION: replace with different column names if needed
     column_names = ['segm_cell_id', 'segm_cell_area']
     bf_dict['temp_cell_table'] = pd.DataFrame(columns=column_names)
     

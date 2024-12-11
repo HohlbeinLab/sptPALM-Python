@@ -91,11 +91,14 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][sim_input['species_to_select']]}\n")
     
     # Use tracks from anaDDA style of plotting tracks
+    # tracks: x[µm), y[µm]], frame, track_id, frametime
     tracks = comb_data['anaDDA_tracks'][sim_input['species_to_select']]
     
     # Generate average diffusion coefficients for each track
     sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
 
+    # D: tracks + #_loc, MSD, D_coeff
+    # D_track_length_matrix: Bins, steps[2-3]
     [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input);
     
     # Plot experimental data
@@ -107,9 +110,9 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     
     # Initiate the simulation
     particle_data, sim_input = initiate_simulation(sim_input)
-      
+   
     # Fit the experimental data
-    fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input)
+    fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_parameter)
 
     return comb_data    
     

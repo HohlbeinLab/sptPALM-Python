@@ -52,8 +52,7 @@ def single_cell_analysis_sptPALM(para):
     # Predefine some DataFrames
     para['scta_tracks_csv'] =  para['csv_data'].iloc[0:0].copy()
     para['tracks_filtered'] =  para['tracks'].iloc[0:0].copy()
-
-    
+   
     # Loop through each valid cell
     for jj in range(len(cell_ids)):
         # Select data from a particular cell_id
@@ -66,8 +65,8 @@ def single_cell_analysis_sptPALM(para):
         track_df = pd.DataFrame({'track_id': track_ids, 'locs': track_locs})
 
         # Select tracks that have neither too few or too many localizations
-        track_df = track_df[(track_df['locs'] > para['diff_hist_steps_min']) &
-                                            (track_df['locs'] < para['diff_hist_steps_max'])]
+        track_df = track_df[(track_df['locs'] > para['diff_avg_steps_min']) &
+                                            (track_df['locs'] < para['diff_avg_steps_max'])]
      
         # Check for presence of tracks in particular cell              
         if track_df.empty == False:

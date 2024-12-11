@@ -24,6 +24,8 @@ from analyse_diffusion_sptPALM import analyse_diffusion_sptPALM
 from plot_diffusion_tracklengths_sptPALM import plot_diffusion_tracklengths_sptPALM
 from single_cell_analysis_sptPALM import single_cell_analysis_sptPALM
 from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
+from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
+from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
 from helper_functions import yes_no_input
 
 def analyse_movies_sptPALM(input_parameter = None):
@@ -52,11 +54,13 @@ def analyse_movies_sptPALM(input_parameter = None):
     print('\nRun analyse_movies_sptPALM.py')
     
     # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
+    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter_single.pkl'
     # with open(filename, 'rb') as f:
     #     input_parameter = pickle.load(f)    
-        
-    # 1. Define input parameters
+ 
+       
+    """ 1. Define input parameters """
     if not input_parameter:
         print("  Re-run set_parameters_sptPALM.py + GUI")
         input_parameter = set_parameters_sptPALM()
@@ -83,20 +87,18 @@ def analyse_movies_sptPALM(input_parameter = None):
     if not os.path.exists(temp_path):
         os.makedirs(temp_path)
 
-    # Display analysis parameters
-    # Iterate through the dictionary and print each key-value pair on a new line
+    # Display input parameters
     print('  Show input_parameter')
     for key, value in input_parameter.items():
         print(f"    .{key}: {value}")
 
-    # 2. sptPALM data analysis (looping over each single movie)
+    """ 2. sptPALM data analysis (looping over each single movie) """
     data = {}
     data['movies'] = {}
     for ii in range(len(input_parameter['fn_locs'])):
         input_parameter['movie_number'] = ii # Python: start with 0 not 1
 
-        # 2.1 Initialisation of dictionary 'para' (local analysis over one movie)
-        # Para will contain all parameters and updated references to filenames and pathnames.
+        """ 2.1 Initialisation of dictionary 'para' (local analysis over one movie) """
         para = input_parameter.copy() # Initialise data structure
         para['fn_locs'] = input_parameter['fn_locs'][ii]
         if input_parameter['fn_proc_brightfield']:
@@ -106,21 +108,35 @@ def analyse_movies_sptPALM(input_parameter = None):
 
         os.chdir(para['data_dir'])
 
-        # 2.2 Loading and preparing localisation data
+        """ 2.2 Loading and preparing localisation data """
         para = load_localisations_from_csv(para)
 
-        # 2.3 Apply cell segmentation
-        if input_parameter['use_segmentations']:
+        """ 2.3 Apply cell segmentation """
+        if para['use_segmentations']:
             para = apply_cell_segmentation_sptPALM(para)
 
-        # 2.4 Perform tracking
+        """ 2.4 Perform tracking with or without cell segmentation: 
+         returns para['tracks']: x[µm), y[µm]], frame, track_id, frametime """
         para = tracking_sptPALM(para)
 
-        # 2.5 Calculate and plot diffusion coefficients
-        para = analyse_diffusion_sptPALM(para)
-        para = plot_diffusion_tracklengths_sptPALM(para)
+        """ 2.5 Calculate and plot diffusion coefficients: 
+         returns para['diff_coeffs_filtered_list']: 
+            'diff_coeffs_filtered',
+            'track_length_filtered': track_ids_length_filtered[:, 1],
+            'track_id': track_ids_length_filtered[:, 0] """
+     
+        # tracks: x[µm), y[µm]], frame, track_id, frametime
+        # D: tracks + #_loc, MSD, D_coeff
+        # D_track_length_matrix: Bins, steps[2-3]
+        [para['tracks'], para['D_tracklengths_matrix']] = diff_coeffs_from_tracks_fast(para['tracks'], para);
+        para['diff_coeffs_filtered_list']  = analyse_diffusion_sptPALM(para) # OLD
 
-        # 2.6 [Optional] SCTA Single Cell Tracking Analysis
+        
+        # Plot experimental data
+        plot_diff_histograms_tracklength_resolved(para['D_tracklengths_matrix'], para, para['tracks'])
+        para = plot_diffusion_tracklengths_sptPALM(para)  # OLD
+
+        """ 2.6 [Optional] SCTA Single Cell Tracking Analysis """
         if input_parameter['use_segmentations']:
             para = single_cell_analysis_sptPALM(para)
             para = plot_single_cell_analysis_sptPALM(para)
@@ -137,8 +153,7 @@ def analyse_movies_sptPALM(input_parameter = None):
                     'average_diff_coeff_per_cell',
                 })
         
-        # 2.8 Save current analysis of a single movie
-        # DON'T THINK THIS IS NEEDED ANYMORE
+        """ 2.7 Save current analysis of a single movie """
         # with open(temp_path + para['fn_locs'][:-4] + para['fn_dict_handle'], 'wb') as f:
         #     pickle.dump(para, f)
         # print(f"  Parameter dictionary for current movie {ii} out of {len(input_parameter['fn_locs'])} movies(s) was saved as pickle file")
@@ -146,7 +161,7 @@ def analyse_movies_sptPALM(input_parameter = None):
         # Cell array containing all para structs
         data['movies'][ii] = para
         
-    # 3. Save entire DATA dictionary
+    """ 3. Save entire DATA dictionary """
     data['input_parameter'] = input_parameter
     
     with open(temp_path + para['fn_movies'], 'wb') as f:
