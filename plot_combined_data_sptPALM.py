@@ -11,7 +11,7 @@ Date of Creation: September, 2024
 Full license details can be found at https://creativecommons.org/licenses/by/4.0/
 """
 
-import matplotlib.pyplot as plt
+
 import os
 import numpy as np
 from skimage.io import imread
@@ -29,18 +29,18 @@ import seaborn as sns
 def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
     print('\nRun plot_combined_data_sptPALM.py')
   
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter.pkl'
-    with open(filename, 'rb') as f:
-        input_parameter = pickle.load(f)
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter.pkl'
+    # with open(filename, 'rb') as f:
+    #     input_parameter = pickle.load(f)
 
 
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
-    with open(filename, 'rb') as f:
-        comb_data = pickle.load(f)
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     comb_data = pickle.load(f)
 
     #  Check whether data was passed to the function
     if not input_parameter:
@@ -110,7 +110,7 @@ def plot_stacked_diff_histo(comb_data, input_parameter):
                       (data_temp['copy_temp'] < copy_interval_max)]
 
             # Plot histogram
-            ax.hist(data_temp['diff_temp'], bins=10**edges, alpha=0.4)
+            ax.hist(data_temp['diff_temp'], bins=10**edges,edgecolor='lightgray', facecolor='lightgray')
     
         # Set x limits and log scale
         ax.set_xlim([comb_data['input_parameter']['plot_diff_hist_min'],
@@ -131,7 +131,7 @@ def plot_stacked_diff_histo(comb_data, input_parameter):
         ax.tick_params(axis='both', which='major', labelsize=comb_data['input_parameter']['fontsize'])
     
         # Set title
-        ax.set_title(f"Diffcoeff for copynumber: {comb_data['input_parameter']['copynumber_intervals'][jj][0] } to {comb_data['input_parameter']['copynumber_intervals'][jj][1] }")
+        ax.set_title(f"Avg. Diffcoeff for copynumber: {comb_data['input_parameter']['copynumber_intervals'][jj][0] } to {comb_data['input_parameter']['copynumber_intervals'][jj][1] }")
     
     
     # Save figure as PNG
@@ -149,15 +149,15 @@ def plot_compare_conditions(comb_data=None, input_parameter=None):
 
     print('\nRun plot_combined_data_sptPALM.py')
 
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter.pkl'
-    with open(filename, 'rb') as f:
-        input_parameter = pickle.load(f)
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter.pkl'
+    # with open(filename, 'rb') as f:
+    #     input_parameter = pickle.load(f)
         
-    # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
-    with open(filename, 'rb') as f:
-        comb_data = pickle.load(f)
+    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
+    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
+    # with open(filename, 'rb') as f:
+    #     comb_data = pickle.load(f)
     
     fig, ax = plt.subplots(2, 2, figsize=(14, 10)) # 
     dot_size = 5

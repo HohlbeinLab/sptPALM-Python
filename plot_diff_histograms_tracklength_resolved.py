@@ -14,6 +14,7 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 # note that 'para' can be either 'sim_input' or 'input_parameter'
 def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, para, D=None):
@@ -26,7 +27,7 @@ def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, para, D=Non
     # plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D)
     
 
-  #  Ridgeplot KDE with seaborn, currently not working properly
+  #  (currently not working properly) Ridgeplot KDE with seaborn
   #  plot_diff_histograms_KDE(D, para)
       
 def plot_diff_histograms_conventional(D_track_length_matrix, para):
@@ -61,6 +62,12 @@ def plot_diff_histograms_conventional(D_track_length_matrix, para):
     
     # Show the plot
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
+    
+    # Save figure as PNG
+    if 'data_dir' in para:
+        temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
+        plt.savefig(temp_path + para['fn_combined_movies'][:-4] + '_Fig02_BoxPlots.png', dpi = para['dpi'])
+
     plt.show()
  
     

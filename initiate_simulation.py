@@ -25,7 +25,7 @@ def initiate_simulation(sim_input):
     sim_input['#_species'] = len(sim_input['species'])
     
     sim_input['total_length_cell'] = float(2 * sim_input['radius_cell'] + sim_input['length_cell'])
-    sim_input['total_duration_simulation'] = float(max(sim_input['track_lengths']) * sim_input['frametime'] )
+    sim_input['total_duration_simulation'] = float(max(sim_input['tracklengths_steps']) * sim_input['frametime'] )
     sim_input['steptime'] = sim_input['frametime']/sim_input['oversampling']
     sim_input['steps_simulation'] = int(sim_input['total_duration_simulation'] / sim_input['steptime'])
     

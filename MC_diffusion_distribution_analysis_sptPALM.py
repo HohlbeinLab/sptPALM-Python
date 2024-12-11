@@ -111,10 +111,8 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     # Initiate the simulation
     particle_data, sim_input = initiate_simulation(sim_input)
    
-    breakpoint() 
-   
     # Fit the experimental data
-    fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input)
+    fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_parameter)
 
     return comb_data    
     

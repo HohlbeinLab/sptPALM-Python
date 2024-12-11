@@ -14,6 +14,7 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import os
 from scipy.optimize import least_squares
 from scipy.stats import chi2
 from initiate_simulation import initiate_simulation
@@ -21,7 +22,7 @@ from diffusion_simulation import diffusion_simulation
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
 
 
-def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
+def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_parameter):
     print("\nRun diff_coeffs_from_tracks_fast.py")
 
     # Check if fitting is supported for multiple species
@@ -37,14 +38,14 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
 
     # Normalize the D_track_length_matrix
     D_track_length_matrix_normalized = D_track_length_matrix.copy()
-    D_track_length_matrix_normalized.loc[:, list(sim_input['track_lengths'])] /= np.sum(D_track_length_matrix_normalized.loc[:, list(sim_input['track_lengths'])], axis=0)
+    D_track_length_matrix_normalized.loc[:, list(sim_input['tracklengths_steps'])] /= np.sum(D_track_length_matrix_normalized.loc[:, list(sim_input['tracklengths_steps'])], axis=0)
 
     # Define the histogram edges for diffusion coefficients
     edges = D_track_length_matrix['Bins']
 
     # Plotting setup
-    nrows_temp = math.ceil(len(sim_input['track_lengths']) / 2.0)
-    # ncols_temp = 2 if len(sim_input['track_lengths']) > 1 else 1
+    nrows_temp = math.ceil(len(sim_input['tracklengths_steps']) / 2.0)
+    # ncols_temp = 2 if len(sim_input['tracklengths_steps']) > 1 else 1
     
     fig, axs = plt.subplots(nrows = nrows_temp, ncols=2, figsize=(10, 10))
     fig.suptitle('Histogram of diffusion coefficients per track length')
@@ -87,7 +88,7 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
         _, D_track_length_matrix = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input)
    
         # Normalize and linearize the matrix
-        D_track_length_matrix.loc[:, list(sim_input['track_lengths'])] /= np.sum(D_track_length_matrix.loc[:, list(sim_input['track_lengths'])], axis=0)
+        D_track_length_matrix.loc[:, list(sim_input['tracklengths_steps'])] /= np.sum(D_track_length_matrix.loc[:, list(sim_input['tracklengths_steps'])], axis=0)
         linearized_array = D_track_length_matrix.values.ravel()
 
         return linearized_array
@@ -151,30 +152,29 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
     # breakpoint()
     sum_of_squares=0
     # for i, ax in enumerate(axs.flat):
-    for i, ax in enumerate(sim_input['track_lengths']):
+    for i, ax in enumerate(sim_input['tracklengths_steps']):
         ax = axs.flat[i]
-        print(f"i: {i}, sim_input['track_lengths'][i]: {sim_input['track_lengths'][i]}")
-        if i < len(sim_input['track_lengths']):
-            ax.set_title(f"D distribution for track length {sim_input['track_lengths'][i]} steps")
+        print(f"i: {i}, sim_input['tracklengths_steps'][i]: {sim_input['tracklengths_steps'][i]}")
+        if i < len(sim_input['tracklengths_steps']):
+            ax.set_title(f"D distribution for track length {sim_input['tracklengths_steps'][i]} steps")
         else:
-            ax.set_title(f"D distribution for track lengths > {sim_input['track_lengths'][i]} steps")
+            ax.set_title(f"D distribution for track lengths > {sim_input['tracklengths_steps'][i]} steps")
 
-        # breakpoint()
         # Filter the experimental data for the current track length (i)
         ax.stairs(D_track_length_matrix_normalized.loc[D_track_length_matrix_normalized.index[:-1],
-                  sim_input['track_lengths'][i]],
+                  sim_input['tracklengths_steps'][i]],
                   edges, color='lightgray', fill = True)  # 'count' corresponds to `density=False`
 
 
         # Plot steps for initial guesses
-        ax.step(edges, out_initial_guess.loc[out_initial_guess.index[:],sim_input['track_lengths'][i]],
+        ax.step(edges, out_initial_guess.loc[out_initial_guess.index[:],sim_input['tracklengths_steps'][i]],
                 color = 'red',
                 where = 'post')  # 'count' corresponds to `density=False`
   
         # Plot final fit results if fitting was performed
         if sim_input['perform_fitting']:
             # ax.plot(out_final_fit[:, 0], out_final_fit[:, i + 1], color='black')
-            ax.step(edges, out_final_fit.loc[out_final_fit.index[:],sim_input['track_lengths'][i]],
+            ax.step(edges, out_final_fit.loc[out_final_fit.index[:],sim_input['tracklengths_steps'][i]],
                     color = 'black',
                     where = 'post')  # 'count' corresponds to `density=False`
  
@@ -186,21 +186,27 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input):
         ax.set_xlabel('Diffusion coefficient (µm^2/s)')
         ax.set_ylabel('#')
         
-        part_guess = out_initial_guess.loc[out_initial_guess.index[:-1],sim_input['track_lengths'][i]]       
-        part_data = D_track_length_matrix_normalized.loc[D_track_length_matrix_normalized.index[:-1], sim_input['track_lengths'][i]]
+        part_guess = out_initial_guess.loc[out_initial_guess.index[:-1],sim_input['tracklengths_steps'][i]]       
+        part_data = D_track_length_matrix_normalized.loc[D_track_length_matrix_normalized.index[:-1], sim_input['tracklengths_steps'][i]]
         print(f"i: {i}, sum-of-squares [guess vs. data]: {round(np.sum(( part_guess - part_data )**2),4)}")
         
         if sim_input['perform_fitting']:
-            part_fit = out_final_fit.loc[out_final_fit.index[:-1], sim_input['track_lengths'][i]]
+            part_fit = out_final_fit.loc[out_final_fit.index[:-1], sim_input['tracklengths_steps'][i]]
             sum_of_squares += np.sum(( part_fit - part_data )**2)
             print(f"i: {i}, sum-of-squares [fit vs. data]: {round(sum_of_squares,4)}")
             
             
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
+    
+    
+    temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
+    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig03_MCDDA.png', dpi = input_parameter['dpi'])
+
+    
     plt.show()
    
     if sim_input['perform_fitting']:
-        print(f"Sum of squares: {round(sum_of_squares/len(sim_input['track_lengths']),4)}")
+        print(f"Sum of squares: {round(sum_of_squares/len(sim_input['tracklengths_steps']),4)}")
         print(f"Final parameters D_s and k_s: {np.round(shiftX,2)}")
         print(f"Initial guesses: {np.round(start_values_fitting,2)}")
         print(f"Loc error (µm): {np.round(sim_input['loc_error'],4)}")
@@ -232,7 +238,7 @@ def fitFunc(start_values_fitting, sim_input):
     _, D_track_length_matrix = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input)
 
     # Normalize the matrix
-    D_track_length_matrix.loc[:, list(sim_input['track_lengths'])] /= np.sum(D_track_length_matrix.loc[:, list(sim_input['track_lengths'])], axis=0)
+    D_track_length_matrix.loc[:, list(sim_input['tracklengths_steps'])] /= np.sum(D_track_length_matrix.loc[:, list(sim_input['tracklengths_steps'])], axis=0)
     
     return D_track_length_matrix
 
