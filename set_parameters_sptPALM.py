@@ -65,7 +65,8 @@ def set_parameters_sptPALM():
         'plot_frame_number': bool(True), # Plot frame numbers next to the tracks in Plot_SingleCellTrackingAnalysis.m
         'dpi': int(150), # DPI setting for plotting figures, default: 300
         'cmap_applied': 'gist_ncar', ##was: 'nipy_spectral', tab20c, 
-        'plot_option': 'logarithmic', # 'logarithmic', # How to plot x-axes either logarithmic or linear
+        'plot_option_axes': 'logarithmic', # 'logarithmic', # How to plot x-axes either logarithmic or linear
+        'plot_option_save': 'png', # How to save figures, svg, png, pdf
         
         
         # (OPTIONAL) settings for visualisation of tracks SCTA: Single-cell tracking analysis

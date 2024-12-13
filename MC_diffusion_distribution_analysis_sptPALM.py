@@ -62,7 +62,9 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
         print("  Run set_parameters_sptPALM.py + GUI")
         input_parameter = set_parameters_sptPALM()
         input_parameter = set_parameters_sptPALM_GUI()
-    
+    else:
+        print(" 'input_parameter' loaded from memory... ")
+        
     # Check whether 'comb_data' was passed to the function
     if not comb_data:
         print("No 'comb_data' from option 3 available")
@@ -79,15 +81,18 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
                 comb_data = pickle.load(f)
         else:
             raise ValueError("No file selected!")
-  
+    else:
+          print(" 'comb_data' loaded from memory... ")
+          
     # Check whether 'sim_input' was passed to the function
     if not sim_input:
         print("Run 'set_parameters_simulation.py' + GUI")
         sim_input = set_parameters_simulation()
         sim_input = set_parameters_simulation_GUI(sim_input)    
+    else:
+          print(" 'sim_input' loaded from memory... ")
 
-
-      
+   
     print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][sim_input['species_to_select']]}\n")
     
     # Use tracks from anaDDA style of plotting tracks
@@ -114,5 +119,5 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     # Fit the experimental data
     fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_parameter)
 
-    return comb_data    
+    return comb_data, input_parameter  
     

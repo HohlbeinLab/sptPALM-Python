@@ -48,7 +48,7 @@ def plot_diff_histograms_conventional(D_track_length_matrix, para):
         else:
             ax.set_title(f'D distribution for track lengths > {para["tracklengths_steps"][ii]} steps')
         
-        if para['plot_option']=='logarithmic':
+        if para['plot_option_axes']=='logarithmic':
             ax.set_xscale('log')  # Set the x-axis scale to logarithmic
                 
         ax.set_xlabel('Diffusion coefficient (µm$^2$/s)')
@@ -63,10 +63,10 @@ def plot_diff_histograms_conventional(D_track_length_matrix, para):
     # Show the plot
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
     
-    # Save figure as PNG
+    # Save figure as PNG/SVG, etc
     if 'data_dir' in para:
         temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
-        plt.savefig(temp_path + para['fn_combined_movies'][:-4] + '_Fig02_BoxPlots.png', dpi = para['dpi'])
+        plt.savefig(temp_path + para['fn_combined_movies'][:-4] + '_Fig02_BoxPlots' + para['plot_option_save'], dpi = para['dpi'])
 
     plt.show()
  
@@ -105,7 +105,7 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D):
                          color=palette[len(y_columns)-1-i], alpha=0.6, label=column)
          
         # Label each curve
-        if para['plot_option']=='logarithmic':
+        if para['plot_option_axes']=='logarithmic':
             plt.text(0.005, (len(y_columns)-1-i) * vertical_offset + 0.5*vertical_offset,
                      f"steps per track: {column}", va='center') 
             D_avg = np.mean(D.loc[ D.loc[:, '#_locs'] == column+1, 'D_coeff'])
@@ -115,7 +115,7 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D):
             plt.text(4, i * vertical_offset + 0.5*vertical_offset,
                      f"steps per track: {column}", va='center') #np.median(x_values)
    
-    if para['plot_option']=='logarithmic':
+    if para['plot_option_axes']=='logarithmic':
         plt.xscale('log')
     
     # Remove the frame (spines)

@@ -20,7 +20,6 @@ window_size = 50 //number of consectutive frames to calculate the median from
 
 // select fit_option and some parameters (check belopw for further parameters!)
 fit_option = "Phasor" // use "Phasor" or "MLE"
-pixel_size = 106 // effective camera pixel size in nanometer
 
 for (i = 0; i < files.length; i++) {
 	path = files[i];
@@ -33,12 +32,12 @@ for (i = 0; i < files.length; i++) {
 	print("Name: ", name_reduced);
 	print("Directory: ", dir);
 
-	if (removeFrames == true){
+	if (remove_frames == true){
 		print("remove initial frames...");
 		run("Slice Remover", "first=1 last="+no_frames_remove+" increment=1");
 	}
 
-	if (performFTM2 == true){
+	if (perform_FTM2 == true){
 		print("run fast temporal median filter...");
 		run("Use Opened Image and Run", "window="+window_size+" begin=1 end=0 file=tif show output=[]");
 	}
@@ -46,9 +45,9 @@ for (i = 0; i < files.length; i++) {
 	// run ThunderSTORM to localise the fluorophores
 	// JH 2022-10-26: threshold 20 seems to be okay when MedianFilter is off, otherwise use 10 or 12 (now: std(Wave.F1)*1.2)
 	print("run ThunderSTORM...");
-	run("Camera setup", "readoutnoise=0.0 offset=414.0 quantumefficiency=1.0 isemgain=false photons2adu=3.6 pixelsize="+pixel_size+);
+	run("Camera setup", "readoutnoise=0.0 offset=414.0 quantumefficiency=1.0 isemgain=false photons2adu=3.6 pixelsize=106");
 
-	if(FitOption == "MLE"){
+	if(fit_option == "MLE"){
 		print("run ...MLE");
 		run("Run analysis", "filter=[Difference-of-Gaussians filter] sigma2=8.0 sigma1=2.0 detector=[Local maximum] connectivity=8-neighbourhood threshold=std(Wave.F1)*1.2 estimator=[PSF: Gaussian] sigma=1.5 fitradius=4 method=[Maximum likelihood] full_image_fitting=false mfaenabled=false renderer=[Averaged shifted histograms] pickedlut=CET-L17 magnification=10.0 colorize=false threed=false shifts=2 repaint=50");
 		
@@ -58,13 +57,13 @@ for (i = 0; i < files.length; i++) {
 		// Filtering based on width of Gaussfit and intensities
 		run("Show results table", "action=filter formula=[sigma <250 & sigma >70 & intensity < 8000 & intensity > 250]");
 		}
-	else if (FitOption == "Phasor"){
+	else if (fit_option == "Phasor"){
 		print("run ...Phasor");
 		// Hohlbein lab standard
 		// run("Run analysis", "filter=[Difference-of-Gaussians filter] sigma2=8.0 sigma1=2.0 detector=[Local maximum] connectivity=8-neighbourhood threshold=std(Wave.F1)*1.2 estimator=[Phasor-based localisation 2D] fitradius=4 renderer=[Averaged shifted histograms] magnification=10.0 colorize=false threed=false shifts=2 repaint=50");
 		// run("Show results table", "action=filter formula=[intensity < 8000 & intensity > 250]");
 		run("Run analysis", "filter=[Difference-of-Gaussians filter] sigma2=8.0 sigma1=2.0 detector=[Local maximum] connectivity=8-neighbourhood threshold=std(Wave.F1)*1.5 estimator=[Phasor-based localisation 2D] fitradius=4 renderer=[Averaged shifted histograms] magnification=10.0 colorize=false threed=false shifts=2 repaint=50");
-		run("Show results table", "action=filter formula=[intensity < 80000 & intensity > 250]");
+		run("Show results table", "action=filter formula=[intensity < 100000 & intensity > 250]");
 		}
 	else{
 		print("Not running ThunderSTORM: wrong option chosen!");	
@@ -72,7 +71,7 @@ for (i = 0; i < files.length; i++) {
  
 	// save thunderSTORM CSV table in current folder
 	print("save ThunderSTORM data...");
-	NewPathTable = dir + File.separator + name_reduced + "_" + FitOption + "_thunder.csv";
+	NewPathTable = dir + File.separator + name_reduced + "_" + fit_option + "_thunder.csv";
 	print("NewPathTable: ", NewPathTable);
 	run("Export results", "floatprecision=5 filepath=["+NewPathTable+"] fileformat=[CSV (comma separated)] intensity=true offset=true saveprotocol=true x=true sigma2=true y=true sigma1=true z=true bkgstd=true id=true frame=true");
 

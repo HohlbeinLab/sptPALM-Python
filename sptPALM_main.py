@@ -91,7 +91,7 @@ def sptPALM_main():
             case 4:  # plot_combined_data_sptPALM.py
                 comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
             case 5:  # MCDDA
-                comb_data = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
+                comb_data, input_parameter = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
             case 6:  # Combine_ThunderSTORM_csv_files
                 while True:
                     print('--')
