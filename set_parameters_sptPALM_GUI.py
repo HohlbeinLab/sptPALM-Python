@@ -143,7 +143,9 @@ def set_parameters_sptPALM_GUI(para = None):
             binwidth_entry.delete(0, tk.END)
             binwidth_entry.insert(0, new_para['binwidth'])
             
-            plot_option_var.set(new_para['plot_option'])
+            plot_option_axes_var.set(new_para['plot_option_axes'])
+    
+            plot_option_save_var.set(new_para['plot_option_save'])                                          
     
             fontsize_entry.delete(0, tk.END)
             fontsize_entry.insert(0, new_para['fontsize'])
@@ -222,7 +224,8 @@ def set_parameters_sptPALM_GUI(para = None):
             'plot_diff_hist_max': float(diff_hist_max_entry.get()),
             'binwidth': float(binwidth_entry.get()),
             'fontsize': int(fontsize_entry.get()),
-            'plot_option': plot_option_var.get(),# wether to plot D_histograms logarithmic or linear
+            'plot_option_axes': plot_option_axes_var.get(),# whether to plot D_histograms logarithmic or linear
+            'plot_option_save': plot_option_save_var.get(),# whether to save figs as png, pdf, svg
             'linewidth': int(linewidth_entry.get()),
             'plot_norm_histograms': plot_norm_histograms_var.get(),
             'plot_frame_number': bool(use_plot_frame_number_var.get()),
@@ -591,12 +594,21 @@ def set_parameters_sptPALM_GUI(para = None):
     # Dropdown Menu for plotting option selection
     tk.Label(plotting_frame, text="Plot option Diff. (log or linear)", width = width_text_labels,
                anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-    plot_option_var = tk.StringVar()
-    plot_option_var.set(para['plot_option'])  # Default option
-    plot_option_entry = tk.OptionMenu(plotting_frame, plot_option_var, "linear", "logarithmic")
-    plot_option_entry.config(width=width_text_box)  # Adjust width as needed
-    plot_option_entry.grid(row=row_index, column=1, sticky=tk.W)
-    
+    plot_option_axes_var = tk.StringVar()
+    plot_option_axes_var.set(para['plot_option_axes'])  # Default option
+    plot_option_axes_entry = tk.OptionMenu(plotting_frame, plot_option_axes_var, "linear", "logarithmic")
+    plot_option_axes_entry.config(width=width_text_box)  # Adjust width as needed
+    plot_option_axes_entry.grid(row=row_index, column=1, sticky=tk.W)
+ 
+    row_index+=1
+    # Dropdown Menu for plotting option selection
+    tk.Label(plotting_frame, text="Plot option (log or linear)", width = width_text_labels,
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
+    plot_option_save_var = tk.StringVar()
+    plot_option_save_var.set(para['plot_option_save'])  # Default option
+    plot_option_save_entry = tk.OptionMenu(plotting_frame, plot_option_save_var, "png", "svg", "pdf")
+    plot_option_save_entry.grid(row=row_index, column=1, sticky=tk.W)   
+ 
     row_index+=1
     # Radius in pixels for plotting individual cells and their tracks
     tk.Label(plotting_frame, text="Radius plotting cells (px)", width = width_text_labels, 

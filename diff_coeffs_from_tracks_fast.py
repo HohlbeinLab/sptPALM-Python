@@ -73,7 +73,7 @@ def diff_coeffs_from_tracks_fast(tracks, para):
     tracks_data['D_coeff'] = tracks_data['MSD'] / (4 * para['frametime']) - loc_error_correction
 
     # Create the histogram of diffusion coefficients as a function of track lengths
-    if para['plot_option'] == 'logarithmic':
+    if para['plot_option_axes'] == 'logarithmic':
         edges = np.arange(np.log10(para['plot_diff_hist_min']),
                       np.log10(para['plot_diff_hist_max']) + para['binwidth'],
                       para['binwidth'])
@@ -85,7 +85,7 @@ def diff_coeffs_from_tracks_fast(tracks, para):
                                                    len(para['tracklengths_steps']) + 1)),
                                          columns=['Bins'] + list(para['tracklengths_steps']))  
  
-    if para['plot_option'] == 'logarithmic':
+    if para['plot_option_axes'] == 'logarithmic':
         D_track_length_matrix.loc[:, 'Bins'] = 10 ** edges
     else:
         D_track_length_matrix.loc[:, 'Bins'] = edges

@@ -180,7 +180,7 @@ def plot_trackPy_data(linked, para):
     plt.tight_layout()  # Adjust layout to prevent overlap  
 
     temp_path =  os.path.join(para['data_dir'], para['default_output_dir'])
-    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig02_track.png', dpi = para['dpi'])
+    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig02_track.' + para['plot_option_save'], dpi = para['dpi'])
     
     plt.show()
     return ()

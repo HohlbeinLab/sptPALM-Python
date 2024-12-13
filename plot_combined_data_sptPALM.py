@@ -35,9 +35,8 @@ def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
     # with open(filename, 'rb') as f:
     #     input_parameter = pickle.load(f)
 
-
     # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
+    # print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")  
     # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
     # with open(filename, 'rb') as f:
     #     comb_data = pickle.load(f)
@@ -62,13 +61,72 @@ def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
     
     # Figure A: plot stack plot with diffusion coefficients)
     if input_parameter['use_segmentations']:
+        plot_diff_tracklength_combined(comb_data,input_parameter)
         plot_stacked_diff_histo(comb_data,input_parameter)
         plot_compare_conditions(comb_data, input_parameter)
     else:
         print("Let's skip plotting cell-dependend copy number analysis if no segmentation is present...")
     return comb_data    
  
+ 
+def plot_diff_tracklength_combined(comb_data, input_parameter):
+    print('\nRun plot_diffusion_tracklengths_sptPALM.py')
+
+
+    breakpoint()
+    for ii, condition_name in enumerate(comb_data['condition_names']):
+        # Create figure for histograms
+        fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5)) #
+        fig1.suptitle(f"Histogram condition {ii}: Diffusion coefficients and track lengths combined movies")
+        
+      
+        
+        data_temp = pd.DataFrame({'diff_coeffs_filtered': comb_data['diff_data'][ii]['diff_coeffs_filtered'],
+                                  'tracklength': comb_data['diff_data'][ii]['track_length_filtered'],
+                                  'movie': comb_data['cell_data'][ii]['movie'],
+                                  'condition': condition_name,
+                                  })
+     
+        edges = np.arange(np.log10(input_parameter['plot_diff_hist_min']), np.log10(input_parameter['plot_diff_hist_max']) + input_parameter['binwidth'], input_parameter['binwidth'])
+        ax1.hist(data_temp['diff_coeffs_filtered'], 10**edges, edgecolor='black', facecolor='lightgray', alpha=0.9)
+        # 'count' corresponds to `density=False`
+        ax1.set_xlim([input_parameter['plot_diff_hist_min'], input_parameter['plot_diff_hist_max']])
     
+    
+        if input_parameter['plot_option_axes']=='logarithmic':
+            ax1.set_xscale('log')  # Set the x-axis scale to logarithmic
+    
+        ax1.set_title(f" Avg. D_coeff calculated from { input_parameter['diff_avg_steps_min'] } steps ") # ": <D> = {np.mean(diff_coeffs_temp):.2f} ± {np.std(diff_coeffs_temp):.2f} µm²/sec")
+        ax1.set_xlabel('Diffusion coefficient (µm²/sec)')
+        ax1.set_ylabel('Number of tracks')
+    
+    
+        # Create histogram of filtered track lengths
+        ax2.hist(data_temp['tracklength'], bins=np.arange(0.5, 51.5, 1), density=(input_parameter['plot_norm_histograms'] == 'probability'),
+                 edgecolor='black', facecolor='lightgray')
+        
+        ax2.set_yscale('log')
+        ax2.set_xlim([0, 50])
+        ax2.set_xlabel('Track length (frames)')
+        ax2.set_ylabel('Probability')
+        ax2.set_title('Distribution of all all track lengths')
+        ax2.tick_params(axis='both', which='major', labelsize=input_parameter['fontsize'])
+    
+        plt.tight_layout()
+        
+        
+        # Save figure as PNG/SVG/PDF
+        temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
+        plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '-Cond:-' + f'{ii}' +'_Fig2_BoxPlots' + input_parameter['plot_option_save'], dpi = input_parameter['dpi'])
+
+        
+        plt.show()
+    
+    return 
+
+
+
+   
 def plot_stacked_diff_histo(comb_data, input_parameter):
       
     fig1 = plt.figure('Diffusion coefficients versus copy numbers per cell')
@@ -110,7 +168,7 @@ def plot_stacked_diff_histo(comb_data, input_parameter):
                       (data_temp['copy_temp'] < copy_interval_max)]
 
             # Plot histogram
-            ax.hist(data_temp['diff_temp'], bins=10**edges,edgecolor='lightgray', facecolor='lightgray')
+            ax.hist(data_temp['diff_temp'], bins=10**edges, alpha=0.4) # edgecolor='lightgray', facecolor='lightgray')
     
         # Set x limits and log scale
         ax.set_xlim([comb_data['input_parameter']['plot_diff_hist_min'],
@@ -134,12 +192,13 @@ def plot_stacked_diff_histo(comb_data, input_parameter):
         ax.set_title(f"Avg. Diffcoeff for copynumber: {comb_data['input_parameter']['copynumber_intervals'][jj][0] } to {comb_data['input_parameter']['copynumber_intervals'][jj][1] }")
     
     
-    # Save figure as PNG
-    temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
-    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig01_Diffs.png', dpi = input_parameter['dpi'])
- 
     plt.tight_layout()
     plt.show()
+    
+    # Save figure as PNG
+    temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
+    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig01_Diffs.' + input_parameter['plot_option_save'],
+                dpi = input_parameter['dpi'])
 
 
     return 
@@ -237,9 +296,9 @@ def plot_compare_conditions(comb_data=None, input_parameter=None):
     
     plt.tight_layout()
    
-    # Save figure as PNG
+    # Save figure as PNG/SVG/PDF
     temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
-    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig02_BoxPlots.png', dpi = input_parameter['dpi'])
+    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig2_BoxPlots' + input_parameter['plot_option_save'], dpi = input_parameter['dpi'])
 
     plt.show()
    

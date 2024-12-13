@@ -48,7 +48,7 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_paramete
     # ncols_temp = 2 if len(sim_input['tracklengths_steps']) > 1 else 1
     
     fig, axs = plt.subplots(nrows = nrows_temp, ncols=2, figsize=(10, 10))
-    fig.suptitle('Histogram of diffusion coefficients per track length')
+
 
     # Initial guesses and bounds
     if sim_input['species'][ii]['#_states'] == 1:
@@ -149,7 +149,6 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_paramete
         out_final_fit = fitFunc(shiftX, sim_input)
    
     # Plot histograms for each track length
-    # breakpoint()
     sum_of_squares=0
     # for i, ax in enumerate(axs.flat):
     for i, ax in enumerate(sim_input['tracklengths_steps']):
@@ -178,7 +177,7 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_paramete
                     color = 'black',
                     where = 'post')  # 'count' corresponds to `density=False`
  
-        if sim_input['plot_option']=='logarithmic':
+        if sim_input['plot_option_axes']=='logarithmic':
             ax.set_xscale('log')
         
         
@@ -197,10 +196,13 @@ def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_paramete
             
             
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
-    
-    
+    string_out = np.round(shiftX,2)
+    fig.suptitle(f"Histogram of diffusion coefficients per track length: Final D_s and k_s: {string_out}")
+   
+    # fig.suptitle('Histogram of diffusion coefficients per track length')
     temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
-    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig03_MCDDA.png', dpi = input_parameter['dpi'])
+    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig03_MCDDA.' + input_parameter['plot_option_save'],
+                dpi = input_parameter['dpi'])
 
     
     plt.show()

@@ -46,7 +46,9 @@ def set_parameters_simulation():
     'plot_diff_hist_max': float(10.0),  # Diffusion coefficient histogram max (µm^2/s), deafult: 10.0
     'binwidth': float(0.1),  # Bin width for histogram, default 0.1
     'species_to_select': int(0), # For fitting, only one specis can be selected, set here which one, default:0
-    'plot_option': 'logarithmic', # 'logarithmic', # How to plot x-axes either logarithmic or linear
+    'plot_option_axes': 'logarithmic', # 'logarithmic', # How to plot x-axes either logarithmic or linear
+    'plot_option_save': 'png', # 'logarithmic', # How to plot x-axes either logarithmic or linear
+    
     # Error handling values
     'avoidFloat0': float(1e-09),  # To avoid rates being exactly zero, default: 1e-09
    
