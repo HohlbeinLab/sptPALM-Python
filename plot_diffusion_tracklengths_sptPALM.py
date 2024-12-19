@@ -20,7 +20,7 @@ def plot_diffusion_tracklengths_sptPALM(para):
     print('\nRun plot_diffusion_tracklengths_sptPALM.py')
 
     # Create figure for histograms
-    fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6.5)) #
+    fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5)) #
     fig1.suptitle('Histogram: Diffusion coefficients and track lengths')
     
     # Plot the histogram: bars
@@ -33,8 +33,21 @@ def plot_diffusion_tracklengths_sptPALM(para):
     if index.size > 0:
         track_lengths = para['tracklengths_steps'][index[0]:]
     diffs_temp = para['D_tracklengths_matrix'].loc[para['D_tracklengths_matrix'].index[:-1],track_lengths].sum(axis=1) 
-    ax1.stairs(diffs_temp, edges, color='lightgray', fill = True)  # 'count' corresponds to `density=False`
+    # breakpoint()
+    # edges = np.arange(np.log10(para['plot_diff_hist_min']), np.log10(para['plot_diff_hist_max']) + para['binwidth'], para['binwidth'])
+
+    # ax1.hist(diffs_temp, edges, edgecolor='black', facecolor='lightgray', alpha=0.9)
+
+    # ax1.stairs(diffs_temp, edges, color='black')  # 'count' corresponds to `density=False`
+    # ax1.fill_between(edges[:-1], diffs_temp, step='post', 
+    #              edgecolor='black', facecolor='lightgray')  # Fill with custom colors
+
+    ax1.hist(edges[:-1], bins=edges, weights=diffs_temp,
+         edgecolor='black', facecolor='lightgray')
+
+    
     ax1.set_xlim([para['plot_diff_hist_min'], para['plot_diff_hist_max']])
+    
     if para['plot_option_axes']=='logarithmic':
         ax1.set_xscale('log')  # Set the x-axis scale to logarithmic
 

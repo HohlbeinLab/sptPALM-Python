@@ -18,6 +18,15 @@ import os
 
 # note that 'para' can be either 'sim_input' or 'input_parameter'
 def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, para, D=None):
+    """
+    Function to plot histograms of diffusion coefficients as a function 
+    of the number of steps per track.
+    
+    CC BY 4.0 License.
+    Original Creator: Johannes Hohlbein (Wageningen University & Research)
+    Date of Creation: September, 2024
+    """
+    
     print("\nRun plot_diff_histograms_tracklength_resolved.py")
     
     # More classical view
@@ -27,7 +36,7 @@ def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, para, D=Non
     # plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D)
     
 
-  #  (currently not working properly) Ridgeplot KDE with seaborn
+  #  (currently not yet working properly) Ridgeplot KDE with seaborn
   #  plot_diff_histograms_KDE(D, para)
       
 def plot_diff_histograms_conventional(D_track_length_matrix, para):
@@ -35,7 +44,7 @@ def plot_diff_histograms_conventional(D_track_length_matrix, para):
     edges = D_track_length_matrix['Bins']
     
     # Initialize the figure
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(10, 10))
     plt.suptitle('Histogram of diffusion coefficients per track length')
     
     # Loop through the track lengths and create histograms
@@ -52,10 +61,11 @@ def plot_diff_histograms_conventional(D_track_length_matrix, para):
             ax.set_xscale('log')  # Set the x-axis scale to logarithmic
                 
         ax.set_xlabel('Diffusion coefficient (µm$^2$/s)')
-        ax.set_ylabel('#')
+        ax.set_ylabel('Counts')
                
         # Plot the histogram: bars
-        ax.stairs(D_track_length_matrix.loc[D_track_length_matrix.index[:-1],tra_len], edges, color='lightgray', fill = True)  # 'count' corresponds to `density=False`
+        ax.stairs(D_track_length_matrix.loc[D_track_length_matrix.index[:-1],tra_len],
+                  edges, color='lightgray', fill = True)  # 'count' corresponds to `density=False`
         
         # Set the limits of the x-axis
         ax.set_xlim([para['plot_diff_hist_min'], para['plot_diff_hist_max']])

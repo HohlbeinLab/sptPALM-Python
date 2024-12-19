@@ -28,6 +28,15 @@ from fit_data_with_MCDDA_sptPALM import fit_data_with_MCDDA_sptPALM
 
  # Assuming Para1 is a dictionary-like object
 def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=None, sim_input=None):
+    """
+    Function to analyse histograms of diffusion coefficients using 
+    Monte-Carlo Diffusion Distribution Analysis MC-DDA   
+    
+    CC BY 4.0 License.
+    Original Creator: Johannes Hohlbein (Wageningen University & Research)
+    Date of Creation: September, 2024
+    """  
+        
     print('\nRun MC_diffusion_distribution_analysis_sptPALM.py')
 
     """
