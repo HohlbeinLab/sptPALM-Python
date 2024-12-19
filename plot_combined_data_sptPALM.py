@@ -73,7 +73,6 @@ def plot_diff_tracklength_combined(comb_data, input_parameter):
     print('\nRun plot_diffusion_tracklengths_sptPALM.py')
 
 
-    breakpoint()
     for ii, condition_name in enumerate(comb_data['condition_names']):
         # Create figure for histograms
         fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5)) #
@@ -89,7 +88,6 @@ def plot_diff_tracklength_combined(comb_data, input_parameter):
      
         edges = np.arange(np.log10(input_parameter['plot_diff_hist_min']), np.log10(input_parameter['plot_diff_hist_max']) + input_parameter['binwidth'], input_parameter['binwidth'])
         ax1.hist(data_temp['diff_coeffs_filtered'], 10**edges, edgecolor='black', facecolor='lightgray', alpha=0.9)
-        # 'count' corresponds to `density=False`
         ax1.set_xlim([input_parameter['plot_diff_hist_min'], input_parameter['plot_diff_hist_max']])
     
     

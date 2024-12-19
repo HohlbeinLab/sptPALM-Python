@@ -96,7 +96,7 @@ def plot_tracks_in_cells(para):
  
     # Save figure as PNG
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
-    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig05_tracks' + para['plot_option_save'], dpi = para['dpi'])
+    plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig05_tracks.' + para['plot_option_save'], dpi = para['dpi'])
 
     plt.show()
 

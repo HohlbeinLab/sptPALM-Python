@@ -23,6 +23,12 @@ from MC_diffusion_distribution_analysis_sptPALM import MC_diffusion_distribution
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 
+
+"""
+    Not yet fully functional, more something for later!
+"""
+
+
 # Global variables
 input_parameter = {}
 data = {}
@@ -64,39 +70,49 @@ def exit_app():
 def set_parameters():
     global input_parameter
     input_parameter = set_parameters_sptPALM()
-    input_parameter = set_parameters_sptPALM_GUI(input_parameter)
-    update_output(f"Input parameters set: {input_parameter}")
+    input_parameter = set_parameters_sptPALM_GUI(input_parameter)           
+    update_output('  Show input_parameter:') # Display analysis parameters
+    for key, value in input_parameter.items():
+        update_output(f"    .{key}: {value}")
+    # return input_parameter
 
 def analyse_movies():
-    global data
-    if input_parameter:
-        update_output("Using existing 'input_parameter'.")
-        data = analyse_movies_sptPALM(input_parameter)
-    else:
-        update_output("No 'input_parameter' available, using default.")
-        data = analyse_movies_sptPALM()
-    update_output("'data' now available in memory")
+    global data, input_parameter
+    # if input_parameter:
+    #     update_output("Using existing 'input_parameter'.")
+    #     data = analyse_movies_sptPALM(input_parameter)
+    # else:
+    #     update_output("No 'input_parameter' available, using default.")
+    #     data = analyse_movies_sptPALM()
+    # update_output("'data' now available in memory")
+    [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
+    print("'data' now available in memory\n")
+    # return data, input_parameter
 
 def combine_data():
-    global comb_data
-    if data:
-        comb_data = combine_analysed_data_sptPALM(data)
-    else:
-        update_output("No 'data' from option 2 available")
-        comb_data = combine_analysed_data_sptPALM()
-    update_output("'comb_data' now available in memory")
+    global comb_data, input_parameter
+    # if data:
+    #     comb_data = combine_analysed_data_sptPALM(data)
+    # else:
+    #     update_output("No 'data' from option 2 available")
+    #     comb_data = combine_analysed_data_sptPALM()
+    # update_output("'comb_data' now available in memory")
+    comb_data, input_parameter = combine_analysed_data_sptPALM(data, input_parameter)
+    print("Combined data 'comb_data' now available in memory\n")
 
 def plot_combined_data():
     global comb_data
-    if comb_data:
-        # Run the plotting function that generates a figure
-        fig = plot_combined_data_sptPALM(comb_data)
-        if fig:
-            show_figure(fig)  # Display the figure in the GUI
-    else:
-        update_output("No combined data available, select a file from GUI.")
-        comb_data = plot_combined_data_sptPALM()
-
+    # if comb_data:
+    #     # Run the plotting function that generates a figure
+    #     fig = plot_combined_data_sptPALM(comb_data)
+    #     if fig:
+    #         show_figure(fig)  # Display the figure in the GUI
+    # else:
+    #     update_output("No combined data available, select a file from GUI.")
+    #     comb_data = plot_combined_data_sptPALM()
+    comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
+    
+    
 def monte_carlo_dda():
     global comb_data
     condition_to_select = 0
