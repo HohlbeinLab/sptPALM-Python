@@ -224,6 +224,8 @@ def plot_MCDDA_histograms(D_track_length_matrix,
     # fig.suptitle('Histogram of diffusion coefficients per track length')
     temp_path = os.path.join(input_parameter['data_dir'],
                              input_parameter['default_output_dir'])
+    
+    # breakpoint()
     plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + 
                 '_Fig03_MCDDA.' + input_parameter['plot_option_save'],
                 dpi = input_parameter['dpi'])

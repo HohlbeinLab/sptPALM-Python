@@ -40,6 +40,7 @@ if __name__ == "__main__":
     
     # Calculate average yearly increase
     avg_increase = calculate_average_yearly_increase(historical_data)
+    # avg_increase = 0.106
     print(f"Average yearly increase: {avg_increase * 100:.2f}%")
     
     # Get the latest S&P 500 closing value
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     print(f"Latest S&P 500 closing value: {latest_close:.2f}")
     
     # Extrapolate to January 2029
-    target_date = datetime(2029, 1, 1)
+    target_date = datetime(2029, 1, 19)
     projected_value = extrapolate_to_date(latest_close, avg_increase, target_date)
     print(f"Projected S&P 500 value on {target_date.strftime('%Y-%m-%d')}: {projected_value:.2f}")
 

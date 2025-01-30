@@ -86,7 +86,7 @@ def analyse_movies():
     #     data = analyse_movies_sptPALM()
     # update_output("'data' now available in memory")
     [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
-    print("'data' now available in memory\n")
+    update_output("'data' now available in memory\n")
     # return data, input_parameter
 
 def combine_data():
@@ -110,8 +110,8 @@ def plot_combined_data():
     # else:
     #     update_output("No combined data available, select a file from GUI.")
     #     comb_data = plot_combined_data_sptPALM()
-    comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
-    
+    comb_data, fig = plot_combined_data_sptPALM(comb_data, input_parameter)
+    show_figure(fig)  # Display the figure in the GUI
     
 def monte_carlo_dda():
     global comb_data

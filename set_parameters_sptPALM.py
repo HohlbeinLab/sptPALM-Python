@@ -79,25 +79,51 @@ def set_parameters_sptPALM():
     input_parameter['tracklengths_steps'] = np.arange(input_parameter['tracklength_locs_min']-1,
                                             input_parameter['tracklength_locs_max'])
     
-    # Directory containing your data
-    input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
+   # DO NOT REMOVE THE FOLLOWING LINES! (GITHUB SETTING HERE)
+    # Directory containing your data (make sure you end with a '/' or '\')
+    input_parameter['data_dir'] = '/Users/hohlbein/Documents/GitHub/sptPALM-Python/experimental_data/'
     input_parameter['data_dir']  = os.path.join(input_parameter['data_dir'] , '')
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [
-        '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
-        # 'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
-        # 'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+        'Cas12aScrambled_localisations_part1_MLE_thunder.csv',
+        'Cas12aScrambled_localisations_part2_MLE_thunder.csv',
+        'Cas12aTargeting_localisations_part1_MLE_thunder.csv',
+        'Cas12aTargeting_localisations_part2_MLE_thunder.csv',
     ]
     #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
     #filename is also used to locate the segmented image and corresponding csv-table!)
     input_parameter['fn_proc_brightfield'] = [
-        '9NTFixTL_2_1_MMStack_Pos0.ome_procBrightfield.tif'
+        'Cas12aScrambled_procBrightfield.tif',
+        'Cas12aScrambled_procBrightfield.tif',
+        'Cas12aTargeting_procBrightfield.tif',
+        'Cas12aTargeting_procBrightfield.tif',
     ]
 
-    # Name and assign your measurement conditions/files
-    #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
-    input_parameter['condition_names'] = ['Cond 1']
-    input_parameter['condition_files'] = [[0]]  # refers to the order of files defined above
+    input_parameter['condition_names'] = ['Cas12a_scrambled', 'Cas12a_targetting']
+    input_parameter['condition_files'] = [[0,1],[2,3]]  # refers to the order of files defined above
+    
+    
+    # # Directory containing your data
+    # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
+    # input_parameter['data_dir']  = os.path.join(input_parameter['data_dir'] , '')
+    # # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
+    # input_parameter['fn_locs'] = [
+    #     '9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv'
+    #     # 'Short_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+    #     # 'VeryShort_9NTFixTL_LASER2_1_MMStack_Pos0.ome_thunder.csv',
+    # ]
+    # #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
+    # #filename is also used to locate the segmented image and corresponding csv-table!)
+    # input_parameter['fn_proc_brightfield'] = [
+    #     '9NTFixTL_2_1_MMStack_Pos0.ome_procBrightfield.tif'
+    # ]
+
+    # # Name and assign your measurement conditions/files
+    # #1.2 (sptPALM_CombineData) Name and assing your measurement conditions/files
+    # input_parameter['condition_names'] = ['Cond 1']
+    # input_parameter['condition_files'] = [[0]]  # refers to the order of files defined above
+  
+  
     
    # # DO NOT REMOVE THE FOLLOWING LINES!
    #  # Directory containing your data (make sure you end with a '/' or '\')
@@ -121,6 +147,7 @@ def set_parameters_sptPALM():
 
    #  input_parameter['condition_names'] = ['Cas12a_scrambled', 'Cas12a_targetting']
    #  input_parameter['condition_files'] = [[0,1],[2,3]]  # refers to the order of files defined above
+
 
 
     return input_parameter

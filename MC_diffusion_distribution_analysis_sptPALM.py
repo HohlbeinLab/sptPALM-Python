@@ -54,13 +54,6 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     # with open(filename, 'rb') as f:
     #     comb_data = pickle.load(f)
 
-    # print("  TEMP! SPECIFIC FILE is being loaded: sim_input_parameter.pkl!")    
-    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/sim_input_parameter.pkl'
-    # with open(filename, 'rb') as f:
-    #     sim_input = pickle.load(f)
-        
- 
       
     """
     Actual start of the function
