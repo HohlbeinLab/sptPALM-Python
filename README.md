@@ -68,28 +68,32 @@ Macro_CellSegmentation.ijm is used to segment cells on 'MyBrightfield.tif'. Curr
 Main function to analyse experimental data. We require:
 
 1. *.csv file(s) containing the x,y and, optionally, z positions of individual emitters as obtainbed via, for example, ThunderSTORM or any other SMLM data suite. 
-2. (optional) brightfield images of cells, their segmentation and a *.csv table containing relevant information on the segmentation
+2. (optional) brightfield images of cells, their segmentation, and a *.csv table containing relevant information on the segmentation
 
 Run the function in the command line of your Python development environment by typing:  *runfile('/...your folder.../GitHub/sptPALM-Python/sptPALM_main.py', wdir='/...your folder.../GitHub/sptPALM-Python')* and pressing Enter.
 
 The following prompt will appear:
 
     0: Exit
-    1: Analyse individual movies
-    2: Combine individually analysed movies
-    3: Plot combined data
-    4: Monte-Carlo DDA
-    5: Additional functions...
+    1: Set parameters GUI
+    2: Analyse individual movies
+    3: Combine individually analysed movies
+    4: Plot combined data
+    5: Monte-Carlo DDA
+    6: Auxillary functions
 
 | <div style="width:200px"> <span style="color: red;">Option</span> </div>  |  <div style="width:100px"> Description </div> |
 |---|---|
-|0: Exit|Closes the prompt and returns to the command line.|
-|1: Analyse individual movies|Runs *analyse_movies_sptPALM.py* to analyse individual movies as either defined in *set_parameters_sptPALM.py* or selected via a graphical user interface. Returns a DataFrame called 'data' which contains the localisations and further information. Results are saved into '**sptData_movies.pkl'**' or similar|
-|2: Combine individually analysed movies|Runs *Combine_individually_analysed_movies.py* to group the data of individually analysed files available in the DataFrame 'data' based on conditions defined in *set_parameters_sptPALM.py*. Returns a DataFrame called 'comb_data'. Results are are saved into '**sptData_combined_movies.pkl**'|
-|3: Plot combined data|Graphical output of the data combined in Option 2. Name of function called in Matlab: 'sptPALM_PlotCombinedData(CombinedDATA)'|
-|4: Monte-Carlo DDA|Runs *MC_diffusion_distribution_analysis_sptPALM.py* to perform fitting of the experimental data based on parameters defined in *set_parameters_simulation.py*|
+|0: Exit | Closes the prompt and returns to the command line.|
+|1: Set parameters GUI | Runs *set_parameters_sptPALM.py* loading default settings for the data analysis followed by *set_parameters_sptPALM_GUI.py* that allows changing, loading, and saving specific sets of parameters to analyse the experimental data|
+|2: Analyse individual movies | Runs *analyse_movies_sptPALM.py* to analyse individual movies as earlier defined option 1. If no output from 1 is in memory, the option 1 is run again. Returns a DataFrame called 'data' which contains all localisations and further information. Results are saved into '**sptData_movies.pkl**' or similar|
+|3: Combine individually analysed movies | Runs *Combine_individually_analysed_movies.py* to group the data of individually analysed files available in the DataFrame 'data' based on conditions defined in *set_parameters_sptPALM.py*. If no data is in memory, a GUI will open to load '**sptData_movies.pkl'**' or similar. Function returns a DataFrame called 'comb_data'. Results are are saved into '**sptData_combined_movies.pkl**' or similar|
+|4: Plot combined data|Graphical output of the data combined in Option 3. Name of function: plot_combined_data_sptPALM.py|
+|5: Monte-Carlo DDA|Runs *MC_diffusion_distribution_analysis_sptPALM.py* to perform fitting of the experimental data based on parameters defined in *set_parameters_simulation.py*|
+|6: Auxillary functions|Provides option to combine *.csv files to enable particle counting per cell over many movies|
 
 ### 5.2 Subfunctions called in *analyse_movies_sptPALM.py*
+
 | <div style="width:200px"> **<span style="color: red;">Name</span>** </div>  |  <div style="width:100px"> Description </div> |
 |---|---|
 | *load_localisations_from_csv.py* | Imports *.csv data (e.g., from running ThunderSTORM) and extends the data frame with additional columns before saving it on the disc. Note that we change from unit [nm] to [µm]|
@@ -113,7 +117,7 @@ To simulate distributions of diffusion coefficients, the following functions are
 | *plot_diff_histograms_tracklength_resolved.py* | Function for plotting the data|
 
 
-## 5.3. Settings defined in '*DefineInputParameters.m*'
+## 5.3. Settings defined in '*set_parameters_sptPALM.py*'
 SCTA: Single-cell tracking analysis. Parameters in order of appearance.
 | <div style="width:200px"> name </div>  |  <div style="width:100px"> Default </div> |  <div style="width:100px"> Description </div> |
 |---|:---|---|
@@ -138,14 +142,14 @@ SCTA: Single-cell tracking analysis. Parameters in order of appearance.
 | frametime | 0.01 | Length of a single movie frame in seconds |
 | loc_error (µm)| 0.035 | Assumed localisation error (µm). Could be calculated based on the localisation precisionin ThunderSTORM, but not possible with phasor-based localisation. |
 | diff_hist_steps_min | 3 | Minimum number of steps for a track to be analyzed. Note that the actual number of localisations is one higher  |
-| diff_avg_steps_max |  100 | Minimum number of steps for a track to be analyzed.  
+| diff_hist_steps_max |  100 | Minimum number of steps for a track to be analyzed.  
 | track_lengths |  1,2,3,4,5,6,7,8 | Minimum number of steps for a track to be analyzed.  
 | number_tracks_per_cell_min  | 1 | Minimum number of tracks that each cell must contain |
 | number_tracks_per_cell_max | 10000 | Maximum number of tracks that each cell must contain |
 | scta_vis_cells | False | Visualize individual cells true/false |
 | scta_plot_cell_window | 15 | Radius in pixels for plotting individual cells and their tracks|
 | scta_vis_interactive | False | Interactively cycle through indiviudally plotted cells true/false |
-| scta_vis_rangemax | 0.3 | Color-coding in the range of 0 to (SCTA_vis_rangemax * plotDiffavg_max) |
+| scta_vis_rangemax | 0.3 | Color-coding in the range of 0 to (SCTA_vis_rangemax * plotDiffHist_max) |
 | plot_diff_hist_min | 4E-3 | plot and histogram from min µm<sup>2</sup>/s to max µm<sup>2</sup>/s |
 | plot_diff_hist_max | 10 | plot and histogram from µm<sup>2</sup>/s to µm<sup>2</sup>/s |
 | binwith | 0.1 | width of bins, default: 0.1 |
@@ -164,8 +168,8 @@ SCTA: Single-cell tracking analysis. Parameters in order of appearance.
 | fn_locs| **<span style="color: red;">User defined</span>** | List of one or more '_thunder.csv' files to be analysed
 | fn_proc_brightfield |  **<span style="color: red;">User defined</span>** | List of one or more processed brightield images for cell segmentation '_procBrightfield.tif'. Filename is also used to locate the segmented image and corresponding *.csv table! |
 |**<span style="color: green;">csv data saved as '\_py_out.csv' </span>** | initialised in *load_csv.py*| Columns: loc_id, movie_id, frame_id, track_id, cell_id, x [µm], y [µm], z [µm], brightness, bg, i0, sx, sy, empty (NaN). CSV table based on the structure of the CSV output provided by ThunderSTORM (software used for sub-pixel localisation)
-|**<span style="color: green;">tracks</span>** | calculated in TrackingAnalysis.m |  Some 'tracks' have a length of one thereby representing single localisations! Columns: x(µm), y(µm), time(frame), track_id. If 'useSegmentations = true', 'TrackingAnalysis.m' runs for each valid cell (cellarea_pixels min/max thresholds active) using all localisations found therein. **Not filtered for 'diff_hist_steps_min(max)' and 'number_tracks_per_cell_min(max)'!**|
-|**<span style="color: green;">DiffsCoeffsList</span>** | calculated in DiffusionAnalysis.m, extended in SCTA.m | List of diffusion coefficients (unit: nm^2/s!) and more. Columns: DiffCoeffsFiltered, #localisations, track_id, cell_id and copynumber. **Filtered for 'diff_hist_steps_min(max)'**   |
-|**<span style="color: green;">scta_table</span>** | calculated in SCTA.m | Overview table after filtering for 'DiffHistSteps', 'numberTracksPerCell' in valid cells (CellAreaPix_min/max thresholds active). Columns: cell_id, #locs per cell, cumulative #locs, #tracks (filtered for #tracks per cell), cum. #tracks (filtered for #tracks per cell), cum. #tracks (unfiltered for #tracks per cell), keep_cells, averageDiffCoeffperCell
-|**<span style="color: green;">scta_tracks</span>** | calculated in SCTA.m| Table containg for each valid cell, the full information for each localisation of each valid track 
-|**<span style="color: green;">tracks_filtered</span>** | calculated in SCTA.m | Columns: x(nm), y(nm), time(frame), track_id. **Filtered for 'diff_hist_steps_min(max)s' and 'number_tracks_per_cell_min(max)'! using valid cells** |
+|**<span style="color: green;">tracks</span>** | -- |  Some 'tracks' have a length of one thereby representing single localisations! Columns: x(µm), y(µm), time(frame), track_id. If 'useSegmentations = true', 'TrackingAnalysis.m' runs for each valid cell (cellarea_pixels min/max thresholds active) using all localisations found therein. **Not filtered for 'diff_hist_steps_min(max)' and 'number_tracks_per_cell_min(max)'!**|
+|**<span style="color: green;">DiffsCoeffsList</span>** | -- | List of diffusion coefficients (unit: µm^2/s!) and more. Columns: DiffCoeffsFiltered, #localisations, track_id, cell_id and copynumber. **Filtered for 'diff_hist_steps_min(max)'**   |
+|**<span style="color: green;">scta_table</span>** | -- | Overview table after filtering for 'DiffHistSteps', 'numberTracksPerCell' in valid cells (CellAreaPix_min/max thresholds active). Columns: cell_id, #locs per cell, cumulative #locs, #tracks (filtered for #tracks per cell), cum. #tracks (filtered for #tracks per cell), cum. #tracks (unfiltered for #tracks per cell), keep_cells, averageDiffCoeffperCell
+|**<span style="color: green;">scta_tracks</span>** | -- | Table containg for each valid cell, the full information for each localisation of each valid track 
+|**<span style="color: green;">tracks_filtered</span>** | -- | Columns: x(µm), y(µm), time(frame), track_id. **Filtered for 'diff_hist_steps_min(max)s' and 'number_tracks_per_cell_min(max)'! using valid cells** |

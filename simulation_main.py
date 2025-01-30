@@ -17,6 +17,7 @@ from initiate_simulation import initiate_simulation
 from diffusion_simulation import diffusion_simulation
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
 from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
+from set_parameters_sptPALM import set_parameters_sptPALM
 from fit_data_with_MCDDA_sptPALM import fit_data_with_MCDDA_sptPALM
 import pickle
 
@@ -46,6 +47,10 @@ sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
 # Function for plotting the data
 plot_diff_histograms_tracklength_resolved(D_track_length_matrix, sim_input, D)
 
-# Fit the experimental data
-fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input)
+# load 'input_parameter' was passed to the function
+input_parameter = set_parameters_sptPALM()
+# input_parameter = set_parameters_sptPALM_GUI()
+
+# Fit the simulated or experimental data
+fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_parameter)
 
