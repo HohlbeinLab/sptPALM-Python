@@ -22,8 +22,6 @@ Workflow and code for single-particle, single-cell tracking analysis.
 4. "Direct visualization of native CRISPR target search in live bacteria reveals Cascade DNA surveillance mechanism", J.N.A. Vink, K.J.A. Martens, M. Vlot, R.E. McKenzie, C. Almendros, B. Estrada Bonilla, D.J.W. Brocken, J. Hohlbein, S.J.J. Brouns, Molecular Cell, 77, 39-50.e10, 2020, [[link]](https://doi.org/10.1016/j.molcel.2019.10.021)
 5. "Extracting transition rates in particle tracking using analytical diffusion distribution analysis (anaDDA)", J. Vink, S.J.J. Brouns, and J. Hohlbein, Biophysical Journal, 119, 1970–83, 2020, [[link]](https://doi.org/10.1016/j.bpj.2020.09.033)
 
-Python code to analyse experimental data and simulate single-particle tracking in bacteria.
-Make sure that you have, (1) a Python installation (e.g., Anaconda), (2) a  Python development environment (e.g., Spyder), and (3) trackpy (e.g., 'pip install trackpy') installed.
 
 ## 2. Known issues
 1. --
@@ -36,7 +34,7 @@ Make sure that you have, (1) a Python installation (e.g., Anaconda), (2) a  Pyth
     2. cell outlines, e.g., 'MyBrightfield.tif', recorded using bright field microscopy.
 2. run script called *Macro_thunderSTORM.ijm* in **ImageJ/Fiji** on 'MyRawData.tif' to obtain 'MyRawData_thunder.csv' which contains the localisations of the fluorophores. Details: [ImageJ / Fiji: segmentation and localisation](#ImageJFiji).
 3. run script called *Macro_CellSegmentation.ijm* in **ImageJ/Fiji** on 'MyBrightfield.tif' to obtain 'MyBrightfield_procBrightfield.tif', 'MyBrightfield_procBrightfield_segm.tif', and 'MyBrightfield_procBrightfield_segm_Table.csv' containing segmented cells and associated data. Details: [ImageJ / Fiji: segmentation and localisation](#ImageJFiji).
-4. Run script called 'Run_sptPALM_analysis.m' in **Matlab**. For details: [Matlab: sptPALM analysis](#Matlab).
+
 
 <a name="ImageJFiji"></a>
 
@@ -64,6 +62,12 @@ Macro_CellSegmentation.ijm is used to segment cells on 'MyBrightfield.tif'. Curr
 
 ## 5 Python 
 
+Python code to analyse experimental data and simulate single-particle tracking in bacteria.
+Make sure that you have a
+1. Python installation (e.g., Anaconda)
+2. Python development environment (e.g., Spyder) 
+3. trackpy installed (to install: e.g., 'pip install trackpy')
+
 ### 5.1 sptPALM_main.py
 Main function to analyse experimental data. We require:
 
@@ -73,7 +77,7 @@ Main function to analyse experimental data. We require:
 Run the function in the command line of your Python development environment by typing:  *runfile('/...your folder.../GitHub/sptPALM-Python/sptPALM_main.py', wdir='/...your folder.../GitHub/sptPALM-Python')* and pressing Enter.
 
 The following prompt will appear:
-
+    
     0: Exit
     1: Set parameters GUI
     2: Analyse individual movies
