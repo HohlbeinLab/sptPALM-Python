@@ -41,8 +41,8 @@ def single_cell_analysis_sptPALM(para):
         'cum. #tracks (filtered for #tracks per cell)': 0,
         '#tracks (unfiltered for #tracks per cell)': 0, 
         'cum. #tracks (unfiltered for #tracks per cell)': 0,
-        'keep_cells': np.NaN,
-        'average_diff_coeff_per_cell': np.NaN,
+        'keep_cells': np.nan,
+        'average_diff_coeff_per_cell': np.nan,
     })
     
     # Initialize additional columns in the DiffCoeffsList dataframe
