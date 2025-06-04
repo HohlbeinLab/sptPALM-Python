@@ -96,6 +96,7 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
         tmp_dcoef_table = data['movies'][ff]['diff_coeffs_filtered_list'].iloc[0:0].copy()
         tmp_tracks_table = data['movies'][ff]['tracks'].iloc[0:0].copy()
 
+        # breakpoint()
         # Check whether data is loaded that doesn't exist
         if max(comb_data['condition_files'][ff]) > comb_data['#_movies_loaded']:
             raise ValueError('Please check: You are trying to load a non-existing movie!')
@@ -133,7 +134,9 @@ def combine_analysed_data_sptPALM(data=None, input_parameter=None):
         condi_table['diff_data'][ff] = tmp_dcoef_table  # all diffcoefficients per condition
        
         anaDDA_tracks = tmp_tracks_table[['x [µm]', 'y [µm]', 'frame', 'track_id']] 
-        anaDDA_tracks['frametime'] = data['input_parameter']['frametime']
+        anaDDA_tracks['frametime'] = data['input_parameter']['frametime'] #warning on win: using .loc[row_indexer, col_indexer] instead
+ #       anaDDA_tracks.loc[:,'frametime'] = data['input_parameter']['frametime'] #warning on win: using .loc[row_indexer, col_indexer] instead
+   
         condi_table['anaDDA_tracks'][ff] = anaDDA_tracks
 
         # condi_table['anaDDA_condis'].append(f"anaDDA: {comb_data['condition_names'][ff]}")
