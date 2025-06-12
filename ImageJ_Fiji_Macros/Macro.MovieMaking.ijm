@@ -1,14 +1,16 @@
+// Towards creating movies showing tracks (localisations obtained with ThunderSTORM) 
+// on top of a brightfield-microscopy picture
+// LAst chenge: 12.06.2025, JH
 
-//Towards creating movies with tracks
-
-// make sure that the coordinates of the file are given in nm: 
+// make sure that the coordinates of the brightfield file are given in nm: 
 // Fiji => Image => Adjust Coordinates => Image Coordinates:
 // multiply 1000 to go from µm to nm, for a specific file:
 
 Pixel_nm = 119; //used to rescale the brightfield images from pixels/µms to nm
-nCopies = 1000;
+nCopies = 10000; //prepare a stack of nCopies of the brightfield image
+frame_time = 10; //probably not necessary, frame time in ms between the frames of the stack
 
-// Open brightfield files(s)
+// Open processed brightfield files(s)
 #@ File[] files
 print("Number of files selected:  ", files.length);
 
@@ -46,8 +48,7 @@ for (ii = 0; ii < files.length; ii++) {
 	}
 	
 	// Make sure that the pixel callibration is correct:
-
-	run("Properties...", "unit=nm pixel_width="+Pixel_nm+" pixel_height="+Pixel_nm+"");
+	run("Properties...", "unit=nm pixel_width="+Pixel_nm+" pixel_height="+Pixel_nm+" frame=["+frame_time+" ms]");
 	
 	//Save new stack
 	print("save stacked brightfield image...");
@@ -57,26 +58,31 @@ for (ii = 0; ii < files.length; ii++) {
 	saveAs("Tiff", NewPathImage_stack);
 }
 
-// Fiji alsready contains the plugin 'TrackMate'
+// Fiji alsready contains the plugin -> Tracking -> 'TrackMate'
 // make sure the update site 'TrackMate CSV importer' has been selected
 
-// run("TrackMate CSV importer");
+ run("TrackMate CSV importer");
 // CSV file should be the ThunderStorm output
 // target image should be the brightfield stack 
-// compute all feature: not ticked
-// import tracks: not ticked
+// compute all feature: option not ticked
+// import tracks: option not ticked
 // Radius: set to 1000 nm (not really sure what it does)
-// press 'import', will take a few seconds
+// => press 'import', will take a few seconds
 // new window will pop up,
-// all locas will be selected un;ess '+' is pressed to select and filter the data (e.g. for frames)
+// all locs will be selected unless '+' is pressed to select and filter the data (e.g. for certain frames)
+// => press 'next'
 // next page: select tracker "Simple LAP tracker"
+// => press 'next'
 // tracker options (similar to what is used in sptPALM-python: 
 //		link max distance: 800 nm
 //		gap closing distance: 800 nm
 //		gap closing frame: 1
-// press next and start tracking
-// press next and add additional filters for the tracks (e.g., duration) if required
-// press next and select display options
-// press next a few times until you arrive at 'select an option'
-
-
+// press 'next' and start tracking (look for 'Found XXX tracks')
+// press 'next' and, if required, add additional filters for the tracks (e.g., minimum duration)
+// press 'next' and select display options (keep 'display spots' and 'display tracks' checked
+// 		=> change 'show entire tracks' into 'show tracks backward in time'
+//		=> uncheck 'fade tracks in time'
+// press 'next' a few times until you arrive at 'select an action'
+// 		=> select 'capture overlay'
+//		=> press execute and select a range of frames (computation will take a long time for, say 10000 frames)
+// new stack can be saved as *.avi etc.
