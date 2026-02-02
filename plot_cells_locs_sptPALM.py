@@ -25,7 +25,10 @@ def plot_cells_locs_sptPALM(para, bf_dict):
 
     # Show processed brightfield image
     ax[0, 0].imshow(bf_dict['proc_brightfield_image'], cmap='gray')
-    ax[0, 0].set_title('Proc. brightfield image (MacroCellSegmentation.ijm)')
+    if para['used_segmentation_method'] == 'Watershed':
+        ax[0, 0].set_title('Processed brightfield image (from MacroCellSegmentation.ijm)')
+    elif para['used_segmentation_method'] == 'Cellpose/Omnipose':
+        ax[0, 0].set_title('Processed brightfield image')
     ax[0, 0].set_xlabel('Pixels')
     ax[0, 0].set_ylabel('Pixels')
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal

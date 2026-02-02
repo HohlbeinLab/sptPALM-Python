@@ -52,7 +52,10 @@ def plot_tracks_in_cells(para):
   
     # Show processed brightfield image
     ax.imshow(bf_dict['proc_brightfield_image'], cmap='gray')
-    ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)')
+    if para['used_segmentation_method'] == 'Watershed':
+        ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)')
+    elif para['used_segmentation_method'] == 'Cellpose/Omnipose':
+        ax.set_title('Processed brightfield image (from Cellpose/Omnipose)')
     ax.set_xlabel('Pixels')
     ax.set_ylabel('Pixels')
     ax.set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
@@ -122,7 +125,7 @@ def plot_tracks_histograms(para):
     ax[0, 1].imshow(para['bf_dict']['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
     ax[0, 1].scatter(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'], para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'], circle_spot_size,
                       'magenta', label='Localisations')
-    ax[0, 1].set_title(f"{len(para['bf_dict']['loc_pixel_table_filt'])} localisations that are parts pf tracks")
+    ax[0, 1].set_title(f"{len(para['bf_dict']['loc_pixel_table_filt'])} localisations that are parts of tracks")
     ax[0, 1].set_xlabel('Pixels')
     ax[0, 1].set_ylabel('Pixels')
     ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal

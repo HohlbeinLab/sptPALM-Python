@@ -103,6 +103,8 @@ def set_parameters_sptPALM_GUI(para = None):
     
             cellarea_max_entry.delete(0, tk.END)
             cellarea_max_entry.insert(0, new_para['cellarea_pixels_max'])
+            
+            used_segmentation_method_var.set(new_para['used_segmentation_method'])
     
             number_tracks_per_cell_min_entry.delete(0, tk.END)
             number_tracks_per_cell_min_entry.insert(0, new_para['number_tracks_per_cell_min'])
@@ -157,6 +159,9 @@ def set_parameters_sptPALM_GUI(para = None):
             linewidth_entry.insert(0, new_para['linewidth'])
     
             use_segmentations_var.set(new_para['use_segmentations'])
+            applied_segmentation_var.set(new_para['applied_segmentation'])
+            z_projection_var.set(new_para['z_projection'])
+            
             plot_norm_histograms_var.set(new_para['plot_norm_histograms'])
             use_plot_frame_number_var.set(new_para['plot_frame_number'])
             scta_vis_cells_var.set(new_para['scta_vis_cells'])
@@ -204,6 +209,9 @@ def set_parameters_sptPALM_GUI(para = None):
             'cellarea_pixels_min': int(cellarea_min_entry.get()),
             'cellarea_pixels_max': int(cellarea_max_entry.get()),
             'use_segmentations': bool(use_segmentations_var.get()),
+            'used_segmentation_method': used_segmentation_method_var.get(),
+            'applied_segmentation': bool(applied_segmentation_var.get()),
+            'z_projection': bool(z_projection_var.get()),
             'track_steplength_max': float(track_steplength_entry.get()),
             'track_memory': int(track_memory_entry.get()),
             'frametime': float(frametime_entry.get()),
@@ -215,7 +223,7 @@ def set_parameters_sptPALM_GUI(para = None):
             
             'number_tracks_per_cell_min': int(number_tracks_per_cell_min_entry.get()),
             'number_tracks_per_cell_max': int(number_tracks_per_cell_max_entry.get()),
-            
+                        
             'scta_vis_cells': bool(scta_vis_cells_var.get()),
             'scta_plot_cell_window': int(scta_plot_cell_window_entry.get()),
             'scta_vis_interactive': bool(scta_vis_interactive_var.get()),
@@ -393,13 +401,33 @@ def set_parameters_sptPALM_GUI(para = None):
     pixelsize_entry = tk.Entry(segmentation_frame, width=width_text_box)
     pixelsize_entry.grid(row=row_index, column=1)
     pixelsize_entry.insert(1, para['pixelsize'])
-
+    
+   # Segmentation method selection dropdown box
+    row_index+=1
+    # Used segmentation method
+    tk.Label(segmentation_frame, text="Segmentation method", width = width_text_labels, 
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
+    used_segmentation_method_var = tk.StringVar()
+    used_segmentation_method_var.set(para['used_segmentation_method'])
+    used_segmentation_method_entry = tk.OptionMenu(segmentation_frame, used_segmentation_method_var, "Watershed", "Cellpose/Omnipose")
+    used_segmentation_method_entry.config(width=15)
+    used_segmentation_method_entry.grid(row=row_index, column=1, sticky=tk.W)   
+    
     row_index+=1
     # Use Segmentations
     use_segmentations_var = tk.BooleanVar(value = para['use_segmentations'])
     tk.Checkbutton(segmentation_frame, text="Use segmentations", variable=use_segmentations_var,
                    width = width_text_labels, anchor="w").grid(row=row_index, column=0, sticky=tk.W)
-
+    
+    # already segmented???
+    applied_segmentation_var = tk.BooleanVar(value = para['applied_segmentation'])
+    tk.Checkbutton(segmentation_frame, text="Already segmented (Omnipose only)", variable=applied_segmentation_var,
+                   width = width_text_labels+12, anchor="w").grid(row=row_index, column=1, sticky=tk.W)
+    # Require z-projection: in case not averaged over all frames yet
+    z_projection_var = tk.BooleanVar(value=para['z_projection'])
+    tk.Checkbutton(segmentation_frame, text="Additional processing (Omnipose)", variable=z_projection_var,
+                   width = width_text_labels+6, anchor='w').grid(row=row_index, column=2, sticky=tk.W)
+    
     row_index+=1
     # Cell area (min/max)
     tk.Label(segmentation_frame, text="Min. cell area (pixels)", width = width_text_labels,

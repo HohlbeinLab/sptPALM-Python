@@ -18,6 +18,7 @@ from MC_diffusion_distribution_analysis_sptPALM import MC_diffusion_distribution
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI 
 from combine_thunderstorm_csv_files import combine_thunderstorm_csv_files
+from OmniposeFromMain import start_omnipose
 
 def sptPALM_main():
     """
@@ -82,6 +83,8 @@ def sptPALM_main():
                 print('  Show input_parameter:') # Display analysis parameters
                 for key, value in input_parameter.items():
                     print(f"    .{key}: {value}")
+                if input_parameter['use_segmentations'] == True:
+                    start_omnipose(input_parameter) # go to start up Omnipose file
             case 2:  # analyse_movies_sptPALM,py
                 [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
                 print("'data' now available in memory\n")

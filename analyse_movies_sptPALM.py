@@ -28,6 +28,8 @@ from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
 from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
 from helper_functions import yes_no_input
 
+from OmniposeFromMain import start_omnipose
+
 def analyse_movies_sptPALM(input_parameter = None):
     """
     analyse_movies_sptPALM.py: main function to analyse each movie based on the settings in 'input_parameter' 
@@ -91,7 +93,32 @@ def analyse_movies_sptPALM(input_parameter = None):
     print('  Show input_parameter')
     for key, value in input_parameter.items():
         print(f"    .{key}: {value}")
-
+        
+    """ 1.5. Check whether segmentation is already done for Omnipose"""
+    if input_parameter.get('used_segmentation_method') == 'Cellpose/Omnipose':
+        while input_parameter['applied_segmentation'] == False:
+            start_omnipose(input_parameter)
+    
+            # For the case segmentation is not done or not correctly
+            # Allow user to reset parameters or do segmentation again in Omnipose GUI
+            if input_parameter['applied_segmentation'] == False:
+                print("\nSegmentation not completed.")
+                print("Options:")
+                print("  [0] Reset parameters")
+                print("  [1] Try segmentation GUI again")
+                
+                user_choice = input("Enter 0 or 1 (default is 1): ").strip()
+                
+                # Resetting input parameters
+                if user_choice == '0':
+                    print("Resetting parameters...")
+                    input_parameter = set_parameters_sptPALM()
+                    input_parameter = set_parameters_sptPALM_GUI(input_parameter)
+                    
+                # Rerunning segmentation with Omnipose
+                else:
+                    print("Retrying segmentation GUI...")
+                   
     """ 2. sptPALM data analysis (looping over each single movie) """
     data = {}
     data['movies'] = {}
