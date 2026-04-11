@@ -135,7 +135,8 @@ def plot_compare_conditions(comb_data=None, input_parameter=None):
     
     plt.tight_layout()
     
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
    
     return input_parameter, comb_data    
  

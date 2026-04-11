@@ -21,7 +21,6 @@ from initiate_simulation import initiate_simulation
 from diffusion_simulation import diffusion_simulation
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
 
-
 def fit_data_with_MCDDA_sptPALM(D_track_length_matrix, sim_input, input_parameter):
     print("\nRun diff_coeffs_from_tracks_fast.py")
 
@@ -230,7 +229,9 @@ def plot_MCDDA_histograms(D_track_length_matrix,
                 '_Fig03_MCDDA.' + input_parameter['plot_option_save'],
                 dpi = input_parameter['dpi'])
   
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
+    input("Press Enter to exit...")  # holds the process open
    
     if sim_input['perform_fitting']:
         print(f"Sum of squares: {round(sum_of_squares/len(sim_input['tracklengths_steps']),4)}")

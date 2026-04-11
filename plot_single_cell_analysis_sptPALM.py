@@ -168,7 +168,8 @@ def plot_tracks_histograms(para):
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig06_cells.' + para['plot_option_save'], dpi = para['dpi'])
     
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
 
     return para
 

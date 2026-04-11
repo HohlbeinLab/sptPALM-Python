@@ -23,15 +23,15 @@ import pickle
 
 print("\nRun simulation_main.py!")
 
-# Function for setting all parameters
+# Function for setting all parameters as provided in 'set_parameters_simulation.py'
 sim_input = set_parameters_simulation();
 
-# print("  TEMP! SPECIFIC FILE is being loaded: sim_input_parameter.pkl!")    
-# filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/sim_input_parameter_static.pkl'
-# with open(filename, 'rb') as f:
-#     sim_input = pickle.load(f)
-
-# # # set_parameters_simulation_GUI(sim_input)
+""" print("  TEMP! SPECIFIC FILE is being loaded: sim_input_parameter.pkl!")    
+filename = '/Users/hohlbein/Documents/GitHub/sptPALM-Python/sim_input_parameter_singleSpecies.pkl'
+with open(filename, 'rb') as f:
+    sim_input = pickle.load(f)
+ """
+## set_parameters_simulation_GUI(sim_input)
 sim_input = set_parameters_simulation_GUI(sim_input)
 
 # Function for setting all starting positions, starting states etc

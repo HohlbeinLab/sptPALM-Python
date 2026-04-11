@@ -174,11 +174,12 @@ def set_parameters_sptPALM_GUI(para = None):
 
     def exit_GUI():
         para_function()
-        root.quit()  # Exits the Tkinter event loop
         root.destroy()  # Destroys the Tkinter window
+        root.mainloop()
+
     
     # Collect all parameters from the GUI
-    # required to fill in new variables into para after pressing "Save" or "Exit"
+    # required to fill in new variables into para after pressing "Save" or "Exit/Continue"
     def para_function():
         nonlocal para
         para = {
@@ -256,8 +257,14 @@ def set_parameters_sptPALM_GUI(para = None):
             print("Save operation canceled.")
         
     root = tk.Tk()
-    root.title("SPT-PALM Parameter GUI (defaults imported from set_parameter_sptPALM.py)")
-    
+    root.title("sptPALM parameter GUI (Default values imported from set_parameter_sptPALM.py)")
+
+    # Place GUI to the top left corner of the screen and make sure it is on top
+    root.geometry("+50+50")
+    root.lift()          # raise window to top of stacking order
+    root.focus_force()   # force keyboard focus to this window
+
+    root.protocol("WM_DELETE_WINDOW", exit_GUI)
     # Adjust the column configuration of the root window to split into two
     root.grid_columnconfigure(0, weight=1)  # First column gets full width (file_frame)
     root.grid_columnconfigure(1, weight=1)  # Second column (numeric_frame) gets half width
@@ -644,10 +651,8 @@ def set_parameters_sptPALM_GUI(para = None):
     tk.Button(button_frame, text="Save...",
               command=save_params).grid(row=0, column=1, padx=5)
 
-    tk.Button(button_frame, text="Exit",
+    tk.Button(button_frame, text="Close GUI",
               command=exit_GUI).grid(row=0, column=4, padx=5)
-
-    root.mainloop()
 
     # Return collected parameters after window closes
     return para

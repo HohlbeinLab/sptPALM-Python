@@ -242,7 +242,12 @@ def set_parameters_simulation_GUI(sim_input=None):
     # Disable window resizing in both horizontal and vertical directions
     root.resizable(False, False)
 
-    root.title("sptPALM simulation GUI (defaults imported from set_parameter_simulation.py)")
+    # Make Sure the GUI is fully on screen: First, let Tk calculate the window size
+    root.geometry("+50+50")
+    root.lift()          # raise window to top of stacking order
+    root.focus_force()   # force keyboard focus to this window
+
+    root.title("sptPALM simulation GUI (defaults values imported from 'set_parameter_simulation.py')")
 
     root.grid_columnconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
@@ -430,7 +435,7 @@ def set_parameters_simulation_GUI(sim_input=None):
               command=load_params).grid(row=0, column=0, padx=5)
     tk.Button(button_frame, text="Save...",
               command=save_params).grid(row=0, column=2, padx=5)
-    tk.Button(button_frame, text="Exit",
+    tk.Button(button_frame, text="Close GUI",
               command=exit_GUI).grid(row=0, column=4, padx=5)
 
     root.mainloop()

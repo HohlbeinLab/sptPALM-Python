@@ -153,6 +153,9 @@ def auxiliary_functions():
 
 # Create the main application window
 root = tk.Tk()
+root.geometry("+50+50") # place window close to the top left corner of the screen
+root.lift()          # raise window to top of stacking order
+root.focus_force()   # force keyboard focus to this window
 root.title("sptPALM Data Analysis GUI")
 
 # Create frames
@@ -188,7 +191,7 @@ btn5.pack(fill=tk.X)
 btn6 = tk.Button(left_frame, text="Auxiliary Functions", command=auxiliary_functions)
 btn6.pack(fill=tk.X)
 
-btn_exit = tk.Button(left_frame, text="Exit", command=exit_app)
+btn_exit = tk.Button(left_frame, text="Close GUI", command=exit_app)
 btn_exit.pack(fill=tk.X)
 
 # Output area (top of right frame)

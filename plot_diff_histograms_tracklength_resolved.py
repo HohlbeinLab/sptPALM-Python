@@ -35,7 +35,6 @@ def plot_diff_histograms_tracklength_resolved(D_track_length_matrix, para, D=Non
     # Ridgeplot with seaborn
     # plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D)
     
-
   #  (currently not yet working properly) Ridgeplot KDE with seaborn
   #  plot_diff_histograms_KDE(D, para)
       
@@ -78,7 +77,8 @@ def plot_diff_histograms_conventional(D_track_length_matrix, para):
         temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
         plt.savefig(temp_path + para['fn_combined_movies'][:-4] + '_Fig02_BoxPlots' + para['plot_option_save'], dpi = para['dpi'])
 
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
  
     
 def plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D): 
@@ -146,7 +146,8 @@ def plot_diff_histograms_ridgeplot1(D_track_length_matrix, para, D):
     plt.tight_layout()
     
     # Show the plot
-    plt.show()  
+    plt.show(block=False)
+    plt.pause(0.1)
 
     
 def plot_diff_histograms_KDE(D, para):
@@ -179,5 +180,6 @@ def plot_diff_histograms_KDE(D, para):
     plt.xscale('log')
     # Show the plot
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout so the suptitle doesn't overlap
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
 

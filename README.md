@@ -65,7 +65,7 @@ Macro_CellSegmentation.ijm is used to segment cells on 'MyBrightfield.tif'. Curr
 Python code to analyse experimental data and simulate single-particle tracking in bacteria.
 Make sure that you have a
 1. Python installation (e.g., Anaconda)
-2. Python development environment (e.g., Spyder) 
+2. Python development environment (e.g., Spyder pr PyCharm) 
 3. trackpy installed (to install: e.g., 'pip install trackpy')
 
 ### 5.1 sptPALM_main.py
