@@ -4,7 +4,8 @@ Status: living document. Captures decisions made while modernising the analysis
 pipeline so they travel with the code (collaborators, future maintainers, and the
 original author). Last updated: 2026-06-27.
 
-Progress: MSD bug fix done; **Step 1 done** (§3.1). Next: Step 2 (§3.2).
+Progress: MSD bug fix done; **Step 1 done** (§3.1); faster startup done (§2.2b).
+Next: Step 2 (§3.2).
 
 ## 1. Goals
 
@@ -48,6 +49,19 @@ spurious displacements *across different tracks*.
   `analyse_diffusion_sptPALM` (correct but slow). Downstream diffusion numbers
   flow through the OLD path. The bug would have gone live the moment the OLD
   function is retired (see §3.2).
+
+### 2.2b Faster startup via lazy imports (done 2026-06-27, commit `6f88b5b`)
+
+`sptPALM_main` imported the whole pipeline at module top, pulling in trackpy
+(~1.7s), matplotlib, scipy and skimage just to show the menu (~2.6s before the
+prompt). Each step's import was moved into the menu `case` that uses it. Python's
+`match` runs only the chosen case, and every case imports the name it uses in the
+same block, so order/skipping is irrelevant and the module is cached after first
+use. Launch-to-menu is now ~0.04s; heavy deps load only when their option is
+chosen (e.g. trackpy on first Analyse, once per session).
+
+Note: `simulation_main.py` likely has the same heavy-top-import pattern and could
+get the same treatment if used regularly.
 
 ## 3. Planned work (in priority order)
 
