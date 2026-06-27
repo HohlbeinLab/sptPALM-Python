@@ -4,6 +4,8 @@ Status: living document. Captures decisions made while modernising the analysis
 pipeline so they travel with the code (collaborators, future maintainers, and the
 original author). Last updated: 2026-06-27.
 
+Progress: MSD bug fix done; **Step 1 done** (§3.1). Next: Step 2 (§3.2).
+
 ## 1. Goals
 
 Evolve the codebase (originally translated fairly literally from MATLAB) toward a
@@ -49,15 +51,25 @@ spurious displacements *across different tracks*.
 
 ## 3. Planned work (in priority order)
 
-### 3.1 External JSON config + remove hardcoded paths
+### 3.1 External JSON config + remove hardcoded paths — DONE (2026-06-27)
 
-- Move parameters from pickle to **JSON** (parameters only; bulk data may stay
-  pickle/parquet).
-- Remove hardcoded personal paths committed in `set_parameters_sptPALM.py`
-  (e.g. the `data_dir` absolute path). Replace with a **gitignored local config**
-  so each user/machine sets its own paths without editing tracked source.
-- Remove the `os.chdir()` side effect in `analyse_movies_sptPALM.py` (changes the
-  global working directory; unnecessary since paths are built with `os.path.join`).
+Commits: `fa921ca` (main change), `65efb28` (untrack build/OS artifacts).
+
+- DONE: analysis parameters now save/load as **human-readable JSON**
+  (`helper_functions.save_parameters` / `load_parameters`). Derived
+  `tracklengths_steps` is dropped on save and recomputed on load; legacy `.pkl`
+  parameter files still load (backward compatible). GUI Save/Load switched to
+  JSON.
+- DONE: removed the hardcoded absolute `data_dir` in `set_parameters_sptPALM.py`;
+  the default now resolves relative to the repo (bundled `experimental_data`), so
+  the example works on any machine after cloning. (Johannes's commented dataset
+  presets were intentionally kept for quick source-edit switching.)
+- DONE: removed the `os.chdir()` side effect in `analyse_movies_sptPALM.py` (all
+  file I/O already uses absolute paths).
+- DONE: added `.gitignore`; untracked `__pycache__` and `.DS_Store`.
+- NOT YET (deferred sub-task): `sim_input` (simulation parameters) still uses
+  pickle — its nested numpy arrays (per-species `diff_quot`, 2D `rates_lb_ub`,
+  etc.) need explicit reconstruction on load. Convert in a focused later step.
 
 ### 3.2 Retire the OLD diffusion function
 
