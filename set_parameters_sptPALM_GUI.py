@@ -177,9 +177,12 @@ def set_parameters_sptPALM_GUI(para = None):
             raise ValueError("No file selected!")
 
     def exit_GUI():
-        para_function()
-        root.destroy()  # Destroys the Tkinter window
-        root.mainloop()
+        para_function()        # collect the edited values into 'para'
+        # Use quit() (not destroy()) here: it breaks out of root.mainloop() below
+        # without tearing down the window from inside the callback. On macOS,
+        # destroy()-from-callback can hang (spinning beachball). The window is
+        # destroyed after mainloop() returns instead.
+        root.quit()
 
     
     # Collect all parameters from the GUI
@@ -656,6 +659,22 @@ def set_parameters_sptPALM_GUI(para = None):
 
     tk.Button(button_frame, text="Close GUI",
               command=exit_GUI).grid(row=0, column=4, padx=5)
+
+    # Block here until the window is closed (via "Close GUI" or the window's X,
+    # both routed to exit_GUI). Without this the function would return immediately
+    # and discard the user's edits. exit_GUI populates 'para' and calls quit(),
+    # which makes mainloop() return; we then tear the window down here.
+    root.mainloop()
+    # macOS: control is about to return to the blocking CLI input() prompt, which
+    # no longer services Tk events. Hide and flush the window *now* so it actually
+    # disappears instead of lingering as an unresponsive (beachball) window until
+    # the process exits.
+    try:
+        root.withdraw()          # hide immediately
+        root.update()            # process the hide so it takes visual effect now
+        root.destroy()           # tear down widgets
+    except tk.TclError:
+        pass                     # already torn down (e.g. window X on some platforms)
 
     # Return collected parameters after window closes
     return para
