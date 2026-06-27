@@ -79,7 +79,8 @@ def initiate_simulation(sim_input):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         ax.scatter(particle_data['xPos'], particle_data['yPos'], particle_data['zPos'])
-        plt.show()
+        plt.show(block=False)  # non-blocking so the pipeline continues (esp. from a terminal)
+        plt.pause(0.1)
 
     # Define states for each species
     for ii in range(sim_input['#_species']):

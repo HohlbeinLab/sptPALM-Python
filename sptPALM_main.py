@@ -81,20 +81,23 @@ def sptPALM_main():
                 print('  Show input_parameter:') # Display analysis parameters
                 for key, value in input_parameter.items():
                     print(f"    .{key}: {value}")
+                print("'input_parameter' in memory, return to selection menu...")
             case 2:  # analyse_movies_sptPALM,py
                 from analyse_movies_sptPALM import analyse_movies_sptPALM
                 [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
-                print("'data' now available in memory\n")
+                print("'data' in memory, return to selection menu...")
             case 3:  # combine_analysed_data_sptPALM.py
                 from combine_analysed_data_sptPALM import combine_analysed_data_sptPALM
                 comb_data, input_parameter = combine_analysed_data_sptPALM(data, input_parameter)
-                print("Combined data 'comb_data' now available in memory\n")
+                print("Combined data 'comb_data' in memory, return to selection menu...")
             case 4:  # plot_combined_data_sptPALM.py
                 from plot_combined_data_sptPALM import plot_combined_data_sptPALM
                 comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
+                print("Combined data plotted, return to selection menu...")
             case 5:  # MCDDA
                 from MC_diffusion_distribution_analysis_sptPALM import MC_diffusion_distribution_analysis_sptPALM
                 comb_data, input_parameter = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
+                print("MCDDA performed, return to selection menu...")
             case 6:  # Combine_ThunderSTORM_csv_files
                 while True:
                     print('--')

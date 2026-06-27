@@ -126,9 +126,9 @@ def tracking_sptPALM(para):
     print(f"  Time for tracking: {rounded_time} seconds")
     
     # Plot all tracks
-    print('  Plot and analyse first 50000 tracks using trackpy')
+    print('  Plot and analyse first 5000 tracks using trackpy')
     temp_linked = tracks.rename(columns={'track_id': 'particle'}) # naming back...
-    plot_trackPy_data(temp_linked.iloc[:50000], para) #Take only the first 50k entries
+    plot_trackPy_data(temp_linked.iloc[:5000], para) #Take only the first 50k entries
 
     # Update CSV file with track_ids
     csv_data.to_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'], index=False, quoting=0)
@@ -181,8 +181,9 @@ def plot_trackPy_data(linked, para):
 
     temp_path =  os.path.join(para['data_dir'], para['default_output_dir'])
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig02_track.' + para['plot_option_save'], dpi = para['dpi'])
-    
-    plt.show()
+
+    plt.show(block=False)  # non-blocking so the pipeline continues (esp. from a terminal)
+    plt.pause(0.1)
     return ()
 
 def MSD_fitting(ax, msd):
