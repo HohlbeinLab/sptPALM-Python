@@ -4,8 +4,8 @@ Status: living document. Captures decisions made while modernising the analysis
 pipeline so they travel with the code (collaborators, future maintainers, and the
 original author). Last updated: 2026-06-27.
 
-Progress: MSD bug fix done; **Step 1 done** (§3.1); faster startup done (§2.2b).
-Next: Step 2 (§3.2).
+Progress: MSD bug fix done; **Step 1 done** (§3.1); faster startup done (§2.2b);
+terminal/macOS runtime fixes done (§2.3). Next: Step 2 (§3.2).
 
 ## 1. Goals
 
@@ -62,6 +62,35 @@ chosen (e.g. trackpy on first Analyse, once per session).
 
 Note: `simulation_main.py` likely has the same heavy-top-import pattern and could
 get the same treatment if used regularly.
+
+### 2.3 Terminal / macOS runtime fixes (done 2026-06-27)
+
+Surfaced when running from a plain terminal (the code was originally designed for
+Spyder, where an integrated Tk/event loop hid these issues).
+
+- Non-blocking plots (commit `d2fa3e7`): every `plt.show()` is now
+  `plt.show(block=False)` + `plt.pause(0.1)`. With the `macosx` backend a plain
+  `plt.show()` blocks until the window is closed by hand, which stalled the
+  pipeline right after the tracking figure. Fixed in `tracking_sptPALM.py`,
+  `plot_single_cell_analysis_sptPALM.py`, `plot_combined_data_sptPALM.py` (x2),
+  `initiate_simulation.py`.
+- Parameter GUI behaviour + macOS teardown (commits `56a7920`, `ea3f20a`):
+  `set_parameters_sptPALM_GUI` was missing `root.mainloop()` in its body, so it
+  returned immediately — the menu reappeared at once AND the user's edits were
+  discarded (it returned the pre-edit defaults). Now it blocks until closed and
+  returns the edited values. exit_GUI uses `root.quit()` (destroy-in-callback
+  hangs/beachballs on macOS); after `mainloop()` the window is
+  `withdraw()`+`update()`+`destroy()`-ed so it doesn't linger as a beachball
+  before control returns to the blocking CLI prompt. Same fix applied to
+  `set_parameters_simulation_GUI` (which also gained the missing
+  `WM_DELETE_WINDOW` protocol).
+- Stopped tracking generated outputs (commit `9bd8526`):
+  `experimental_data/output_python/` and locally-saved `input_parameter.json` are
+  gitignored; previously-tracked outputs were untracked.
+
+Underlying takeaway: tkinter + a blocking terminal `input()` loop is fragile on
+macOS. Spyder remains the smoother interactive environment; a browser-based GUI
+(see §3.x ideas) would remove this fragility for good.
 
 ## 3. Planned work (in priority order)
 
