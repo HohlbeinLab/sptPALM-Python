@@ -106,8 +106,6 @@ def analyse_movies_sptPALM(input_parameter = None):
         else:
             para['fn_proc_brightfield'] = None
 
-        os.chdir(para['data_dir'])
-
         """ 2.2 Loading and preparing localisation data """
         para = load_localisations_from_csv(para)
 

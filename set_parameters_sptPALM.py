@@ -79,10 +79,12 @@ def set_parameters_sptPALM():
     input_parameter['tracklengths_steps'] = np.arange(input_parameter['tracklength_locs_min']-1,
                                             input_parameter['tracklength_locs_max'])
     
-   # DO NOT REMOVE THE FOLLOWING LINES! (GITHUB SETTING HERE)
-    # Directory containing your data (make sure you end with a '/' or '\')
-    input_parameter['data_dir'] = '/Users/hohlbein/Documents/GitHub/sptPALM-Python/experimental_data/'
-    input_parameter['data_dir']  = os.path.join(input_parameter['data_dir'] , '')
+    # Default data directory points at the bundled example dataset, resolved
+    # relative to this file so it works on any machine after cloning. To analyse
+    # your own data, change the paths via the GUI and Save/Load a JSON parameter
+    # file (no need to edit this source file).
+    repo_dir = os.path.dirname(os.path.abspath(__file__))
+    input_parameter['data_dir'] = os.path.join(repo_dir, 'experimental_data', '')
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [
         'Cas12aScrambled_localisations_part1_MLE_thunder.csv',

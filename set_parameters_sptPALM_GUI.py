@@ -15,7 +15,7 @@ import os
 from tkinter import filedialog
 from set_parameters_sptPALM import set_parameters_sptPALM
 from ast import literal_eval # Safely parse the string back to a list of lists
-import pickle
+from helper_functions import save_parameters, load_parameters
 import numpy as np
 
 def set_parameters_sptPALM_GUI(para = None):
@@ -48,13 +48,17 @@ def set_parameters_sptPALM_GUI(para = None):
 
     def load_params(): #careful, we need to overwrite all default parameters
         filename = filedialog.askopenfilename(
-                                    filetypes = [("pickle file", "*.pkl")],
-                                    title = "Select input_parameter.pkl file obtained from running 'set_parameters_sptPALM.py + GUI'")
+                                    filetypes = [("parameter file", "*.json *.pkl"),
+                                                 ("JSON file", "*.json"),
+                                                 ("pickle file", "*.pkl")],
+                                    title = "Select input_parameter.json (or legacy .pkl) from 'set_parameters_sptPALM.py + GUI'")
         if filename:
-            with open(filename, 'rb') as f:
-                new_para = pickle.load(f)
-                print("Input parameters loaded")
-                    
+            # Start from current defaults, then override with the loaded file,
+            # so missing keys in older files fall back to sensible defaults.
+            new_para = set_parameters_sptPALM()
+            new_para.update(load_parameters(filename))
+            print("Input parameters loaded")
+
             # Update the entries with the newly loaded parameters
             data_dir_entry.delete(0, tk.END)
             data_dir_entry.insert(0, new_para['data_dir'])
@@ -240,18 +244,17 @@ def set_parameters_sptPALM_GUI(para = None):
         # Get data from GUI
         para_function()
         
-        # Ask the user where to save the file, default filename is input_parameter.pkl
+        # Ask the user where to save the file, default filename is input_parameter.json
         save_file_path = filedialog.asksaveasfilename(
-            defaultextension=".pkl",
+            defaultextension=".json",
             initialdir=para['data_dir'],  # Set the initial directory if provided
-            filetypes=[("Pickle files", "*.pkl")],
-            initialfile="input_parameter.pkl",
+            filetypes=[("JSON files", "*.json")],
+            initialfile="input_parameter.json",
             title="Save input_parameter as"
         )
-        
+
         if save_file_path:  # If the user selects a file path
-            with open(save_file_path, 'wb') as file:
-                pickle.dump(para, file)  # Save the dictionary to the file
+            save_parameters(para, save_file_path)  # human-readable JSON
             print(f"input_parameter saved to {save_file_path}")
         else:
             print("Save operation canceled.")
