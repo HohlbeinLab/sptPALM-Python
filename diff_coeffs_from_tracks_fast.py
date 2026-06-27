@@ -56,7 +56,9 @@ def diff_coeffs_from_tracks_fast(tracks, para):
         # If idx is not empty/false
         if idx: # implicit booleanness
             tracks_data.loc[idx,'MSD'] = calculate_MSD(tracks_data.loc[idx,:],
-                                                       'x [µm]', 'y [µm]', track_len + 1)
+                                                       'x [µm]', 'y [µm]', track_len + 1,
+                                                       frame_col='frame',
+                                                       track_memory=para.get('track_memory', 0))
     
     # How long did the MSD calculation take?
     end = time.time()
@@ -128,41 +130,63 @@ def diff_coeffs_from_tracks_fast(tracks, para):
     return tracks_data, D_track_length_matrix
 
 # Generalized function to calculate differences between two columns in groups of rows
-def calculate_MSD(df, col_name1, col_name2, group_size):
-    
+def calculate_MSD(df, col_name1, col_name2, group_size, frame_col='frame', track_memory=0):
+
     """
-    Calculates the differences between two columns within non-overlapping groups of rows.
-    
+    Mean single-frame squared displacement (MSD) for each track, where all tracks
+    in `df` share the same length `group_size`.
+
+    `df` is assumed sorted by (track_id, frame) so that each consecutive block of
+    `group_size` rows is one track in time order. Rows are reshaped into
+    (num_groups, group_size) and squared step displacements are averaged per track.
+
+    Track-memory / frame-gap correction: when `track_memory > 0` a track may skip
+    frames (a localisation missing but bridged by tracking). A step spanning `con`
+    frames covers `con` single-frame intervals, so its squared displacement is
+    divided by `con` to normalise it to a single-frame value. This matches the
+    OLD analyse_diffusion_sptPALM behaviour (divide when 0 < con <= track_memory+1,
+    leave raw otherwise). With the default track_memory=0 every step is 1 frame
+    apart, so the correction divides by 1 and is a no-op.
+
     Parameters:
-    df (DataFrame): The DataFrame containing the data.
-    col_name1 (str): The first column name.
-    col_name2 (str): The second column name.
-    group_size (int): The number of rows per group to calculate differences for.
-    
+    df (DataFrame): data (sorted by track_id, frame), one track per group_size rows.
+    col_name1, col_name2 (str): x and y position column names.
+    group_size (int): localisations per track (= track length in locs).
+    frame_col (str): column holding the frame number (for gap detection).
+    track_memory (int): tracking memory in frames; gaps up to track_memory+1 are
+        normalised, larger gaps are left raw (matches OLD).
+
     Returns:
-    MSD (array): A 2D array where each row contains the differences for one group.
+    MSD (array): per-localisation MSD (the track's mean repeated group_size times).
     """
-    # Extract the two columns as NumPy arrays
+    # Extract the columns as NumPy arrays
     x_positions = df[col_name1].values
     y_positions = df[col_name2].values
-    
+    frames = df[frame_col].values
+
     # Determine the number of complete groups
     num_groups = len(x_positions) // group_size
-    
+
     # Reshape the values into a matrix of shape (num_groups, group_size)
     reshaped_x_positions = x_positions[:num_groups * group_size].reshape(num_groups, group_size)
     reshaped_y_positions = y_positions[:num_groups * group_size].reshape(num_groups, group_size)
-    
+    reshaped_frames = frames[:num_groups * group_size].reshape(num_groups, group_size)
+
     squared_displacements = np.diff(reshaped_x_positions)**2 + np.diff(reshaped_y_positions)**2
-    # breakpoint()
-# Careful some checks missing!
-# Adjust based on frame differences
-#     D_coeff_contribution = np.where(frame_diff == 2, squared_displacements / 2, squared_displacements)
+
+    # Normalise gapped steps to a single-frame squared displacement (see docstring).
+    frame_diff = np.diff(reshaped_frames)                       # 'con' per step
+    normalise = (frame_diff > 0) & (frame_diff <= track_memory + 1)
+    denom = np.where(normalise, frame_diff, 1)                  # avoid div-by-zero
+    squared_displacements = np.where(normalise,
+                                     squared_displacements / denom,
+                                     squared_displacements)
+
     MSD = squared_displacements.mean(axis = 1)
-    
+
     #Ensure that D_coff is showing up behind each localisation later
     MSD = np.repeat(MSD, group_size, axis = None)
-    
-    
+
+
     return MSD
 

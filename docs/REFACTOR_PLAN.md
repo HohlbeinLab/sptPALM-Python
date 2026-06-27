@@ -130,6 +130,26 @@ Commits: `fa921ca` (main change), `65efb28` (untrack build/OS artifacts).
   (`single_cell_analysis`, combine, MCDDA) expect. Remove the now-redundant manual
   `sort_values(['track_id','frame'])` in `MC_diffusion_distribution_analysis_sptPALM.py`.
 
+- **Sub-task 3.2a — port the track-memory / frame-gap correction into the FAST
+  function (prerequisite).** The OLD function normalises a step that spans `con`
+  frames (a localisation missing but bridged by `track_memory`) by dividing its
+  squared displacement by `con`
+  (`analyse_diffusion_sptPALM.py:45-51`, condition `0 < con <= track_memory+1`).
+  The FAST `calculate_MSD` dropped this — it ignores the `frame` column entirely
+  and treats every consecutive pair as 1 frame apart; the correction is only a
+  commented TODO (`diff_coeffs_from_tracks_fast.py:158-160`, and even that stub
+  only handled `con == 2`). With the current default `track_memory = 0` there are
+  no gaps so the two agree, but enabling `track_memory > 0` would make FAST
+  **overestimate** D on gapped steps. Fix: vectorise it — reshape the `frame`
+  column too, `np.diff` to get per-step `con`, and divide the squared
+  displacements by `con` where `0 < con <= track_memory+1` (raw otherwise).
+  Read `track_memory` via `para.get('track_memory', 0)` since the simulation
+  caller's `sim_input` has no such key (simulated tracks have no gaps).
+  Verify: (a) regression — identical output to before when `track_memory = 0`;
+  (b) synthetic — a deliberate frame gap divides that step's displacement by the
+  gap. NOTE: OLD vs FAST still differ as estimators (first-N vs all-steps); this
+  sub-task is only about the gap correction, not making the two numerically equal.
+
 ### 3.3 Untangle the `para` god-dict + documentation
 
 - Separate *settings* (and file references) from *data* (raw DataFrames, results).
