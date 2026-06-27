@@ -11,13 +11,10 @@ Date of Creation: September, 2024
 Full license details can be found at https://creativecommons.org/licenses/by/4.0/
 """
 
-from analyse_movies_sptPALM import analyse_movies_sptPALM
-from combine_analysed_data_sptPALM import combine_analysed_data_sptPALM
-from plot_combined_data_sptPALM import plot_combined_data_sptPALM
-from MC_diffusion_distribution_analysis_sptPALM import MC_diffusion_distribution_analysis_sptPALM
-from set_parameters_sptPALM import set_parameters_sptPALM
-from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI 
-from combine_thunderstorm_csv_files import combine_thunderstorm_csv_files
+# NOTE: heavy dependencies (trackpy ~1.7s, matplotlib, scipy, skimage) are
+# imported lazily inside each menu option below, not at module top level. This
+# keeps the menu near-instant and only loads what a chosen option actually needs.
+# Within one session Python caches imports, so each option pays its cost once.
 
 def sptPALM_main():
     """
@@ -76,21 +73,27 @@ def sptPALM_main():
             case 0:
                 print('Exit!')
                 break
-            case 1: 
+            case 1:
+                from set_parameters_sptPALM import set_parameters_sptPALM
+                from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
                 input_parameter = set_parameters_sptPALM()
-                input_parameter = set_parameters_sptPALM_GUI(input_parameter)           
+                input_parameter = set_parameters_sptPALM_GUI(input_parameter)
                 print('  Show input_parameter:') # Display analysis parameters
                 for key, value in input_parameter.items():
                     print(f"    .{key}: {value}")
             case 2:  # analyse_movies_sptPALM,py
+                from analyse_movies_sptPALM import analyse_movies_sptPALM
                 [data, input_parameter] = analyse_movies_sptPALM(input_parameter)
                 print("'data' now available in memory\n")
             case 3:  # combine_analysed_data_sptPALM.py
+                from combine_analysed_data_sptPALM import combine_analysed_data_sptPALM
                 comb_data, input_parameter = combine_analysed_data_sptPALM(data, input_parameter)
                 print("Combined data 'comb_data' now available in memory\n")
             case 4:  # plot_combined_data_sptPALM.py
+                from plot_combined_data_sptPALM import plot_combined_data_sptPALM
                 comb_data = plot_combined_data_sptPALM(comb_data, input_parameter)
             case 5:  # MCDDA
+                from MC_diffusion_distribution_analysis_sptPALM import MC_diffusion_distribution_analysis_sptPALM
                 comb_data, input_parameter = MC_diffusion_distribution_analysis_sptPALM(comb_data, input_parameter, sim_input)
             case 6:  # Combine_ThunderSTORM_csv_files
                 while True:
@@ -110,6 +113,7 @@ def sptPALM_main():
                            print('Exit sub!')
                            break
                         case 1: # combine_thunderstorm_csv_files
+                            from combine_thunderstorm_csv_files import combine_thunderstorm_csv_files
                             print('Run Combine_ThunderSTORM_csv_files')
                             combine_thunderstorm_csv_files()
                         case 2:
