@@ -32,9 +32,14 @@ def diff_coeffs_from_tracks_fast(tracks, para):
     print("\nRun 'diff_coeffs_from_tracks_fast.py'")
 
 
-    tracks_data = tracks.copy()
+    # Sort by track_id then frame so each track's localisations are contiguous
+    # and in time order. calculate_MSD() reshapes rows into groups of group_size
+    # and uses np.diff; without this sort, rows from different tracks interleave
+    # and np.diff computes spurious cross-track displacements (verified: produces
+    # unphysical D up to ~250 um^2/s). Both call sites now rely on this.
+    tracks_data = tracks.copy().sort_values(['track_id', 'frame']).reset_index(drop=True)
     # Count occurrences of each unique track_ids
-    tracklength_counts = tracks_data['track_id'].value_counts()    
+    tracklength_counts = tracks_data['track_id'].value_counts()
     
     # Map these counts back to the DataFrame as a new column '#_loc'
     tracks_data['#_locs'] = tracks_data['track_id'].map(tracklength_counts)
