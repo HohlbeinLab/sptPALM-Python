@@ -322,73 +322,57 @@ def set_parameters_sptPALM_GUI(para = None):
     row_index+=1
     # Name of conditions
     tk.Label(file_frame, text="Name(s) of conditions", width = width_text_labels,
-             anchor="w").grid(row=3, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     condition_names_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    condition_names_entry.grid(row=3, column=1)
+    condition_names_entry.grid(row=row_index, column=1)
     condition_names_entry.insert(0, ', '.join(map(str, para['condition_names'])))
 
     row_index+=1
     # Condition files
     tk.Label(file_frame, text="Condition files, e.g., [0,1],[2,3]", width = width_text_labels,
-             anchor="w").grid(row=4, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     condition_files_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    condition_files_entry.grid(row=4, column=1)
+    condition_files_entry.grid(row=row_index, column=1)
     condition_files_entry.insert(0, ', '.join(map(str, para['condition_files'])))
 
-    row_index+=1    
+    row_index+=1
     # Histogramming of diffusion coefficients per copynumber
     tk.Label(file_frame, text="Copy number intervals", width = width_text_labels,
-             anchor="w").grid(row=5, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     copynumber_intervals_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    copynumber_intervals_entry.grid(row=5, column=1)
+    copynumber_intervals_entry.grid(row=row_index, column=1)
     copynumber_intervals_entry.insert(0, ', '.join(map(str, para['copynumber_intervals'])))
 
-    row_index+=1    
+    row_index+=1
     # Handle: output directory
     tk.Label(file_frame, text="Handle: output directory", width = width_text_labels,
-             anchor="w").grid(row=6, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     default_output_dir_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    default_output_dir_entry.grid(row=6, column=1)
+    default_output_dir_entry.grid(row=row_index, column=1)
     default_output_dir_entry.insert(0, para['default_output_dir'])
 
     row_index+=1
-    # Handle: CSV File 
+    # Handle: CSV File
     tk.Label(file_frame, text="Handle: csv files", width = width_text_labels,
-             anchor="w").grid(row=7, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_csv_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_csv_handle_entry.grid(row=7, column=1)
+    fn_csv_handle_entry.grid(row=row_index, column=1)
     fn_csv_handle_entry.insert(0, para['fn_csv_handle'])
 
-    # row_index+=1
-    # # Handle: fn_dict_handle 
-    # tk.Label(file_frame, text="Handle: dictionary ", width = width_text_labels,
-    #          anchor="w").grid(row=8, column=0, sticky=tk.W)
-    # fn_dict_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    # fn_dict_handle_entry.grid(row=8, column=1)
-    # fn_dict_handle_entry.insert(0, para['fn_dict_handle'])
-
-    # row_index+=1
-    # # Handle: fn_diffs_handle 
-    # tk.Label(file_frame, text="Handle: diffusion coeff. ", width = width_text_labels,
-    #          anchor="w").grid(row=9, column=0, sticky=tk.W)
-    # fn_diffs_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    # fn_diffs_handle_entry.grid(row=9, column=1)
-    # fn_diffs_handle_entry.insert(0, para['fn_diffs_handle'])
-
     row_index+=1
-    # Handle: fn_movies     
+    # Handle: fn_movies
     tk.Label(file_frame, text="Handle: movies", width = width_text_labels,
-             anchor="w").grid(row=10, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_movies_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_movies_entry.grid(row=10, column=1)
+    fn_movies_entry.grid(row=row_index, column=1)
     fn_movies_entry.insert(0, para['fn_movies'])
 
     row_index+=1
-    # Handle: fn_combined_movies     
+    # Handle: fn_combined_movies
     tk.Label(file_frame, text="Handle: combined-movies", width = width_text_labels,
-             anchor="w").grid(row=11, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_combined_movies_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_combined_movies_entry.grid(row=11, column=1)
+    fn_combined_movies_entry.grid(row=row_index, column=1)
     fn_combined_movies_entry.insert(0, para['fn_combined_movies'])
     
 

@@ -24,22 +24,6 @@ from helper_functions import string_input_with_default
 
 def combine_analysed_data_sptPALM(data=None, input_parameter=None):
     print('\nRun combine_analysed_data_sptPALM.py')
-    
-    """
-    Following lines can be used for loading data bypassing the GUIs 
-    """
-    # # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
-    # with open(filename, 'rb') as f:
-    #     input_parameter = pickle.load(f)  
-        
-    # print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")    
-    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/output_python/sptData_movies.pkl'
-    # with open(filename, 'rb') as f:
-    #     data = pickle.load(f)
-
 
     if not input_parameter:
         input_parameter = set_parameters_sptPALM()

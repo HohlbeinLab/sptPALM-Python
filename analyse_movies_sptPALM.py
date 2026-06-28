@@ -51,14 +51,7 @@ def analyse_movies_sptPALM(input_parameter = None):
     """
        
     print('\nRun analyse_movies_sptPALM.py')
-    
-    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
-    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter_single.pkl'
-    # with open(filename, 'rb') as f:
-    #     input_parameter = pickle.load(f)    
- 
-       
+
     """ 1. Define input parameters """
     if not input_parameter:
         print("  Re-run set_parameters_sptPALM.py + GUI")
