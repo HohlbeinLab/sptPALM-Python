@@ -191,29 +191,28 @@ def calculate_MSD(df, col_name1, col_name2, group_size, frame_col='frame', track
     return MSD
 
 
-def diff_coeffs_per_track(tracks, para):
+def diff_coeffs_per_track(tracks, para, locs_min=None, locs_max=None):
     """One diffusion coefficient per track (for single-cell & combined analyses).
 
     For each track, D is computed from the gap-corrected mean single-frame MSD over
-    the FIRST min(locs, tracklength_locs_max) localisations:
-      - tracks with locs in [tracklength_locs_min .. tracklength_locs_max] use all
-        their steps (identical to the per-length values from
-        diff_coeffs_from_tracks_fast);
-      - longer tracks are TRUNCATED to their first tracklength_locs_max
-        localisations (kept, not dropped, but capped so every track has equal
-        weight);
-      - tracks with fewer than tracklength_locs_min localisations are excluded.
+    the FIRST min(locs, locs_max) localisations:
+      - tracks with locs in [locs_min .. locs_max] use all their steps (identical to
+        the per-length values from diff_coeffs_from_tracks_fast);
+      - longer tracks are TRUNCATED to their first locs_max localisations (kept, not
+        dropped, but capped so every track has equal weight);
+      - tracks with fewer than locs_min localisations are excluded.
 
-    This is the replacement for the OLD analyse_diffusion_sptPALM output. Note the
-    track-length-resolved histogram (D_track_length_matrix) stays length-exact and
-    is unaffected by the truncation here.
+    locs_min / locs_max default to para['tracklength_locs_min'/'max']. They can be
+    overridden so the single-cell analysis can use a higher minimum (more robust
+    per-cell averages) than the track-length-resolved histogram. Note that
+    histogram (D_track_length_matrix) stays length-exact and is unaffected here.
 
     Returns a DataFrame with columns: 'diff_coeffs_filtered', 'track_length_filtered'
     (the true, un-truncated track length in localisations), 'track_id'; ordered by
     track_id.
     """
-    locs_min = int(para['tracklength_locs_min'])
-    locs_max = int(para['tracklength_locs_max'])
+    locs_min = int(para['tracklength_locs_min']) if locs_min is None else int(locs_min)
+    locs_max = int(para['tracklength_locs_max']) if locs_max is None else int(locs_max)
     track_memory = int(para.get('track_memory', 0))
     frametime = para['frametime']
     loc_error = para['loc_error']

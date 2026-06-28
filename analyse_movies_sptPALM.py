@@ -20,11 +20,10 @@ from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
 from load_localisations_from_csv import load_localisations_from_csv
 from apply_cell_segmentation_sptPALM import apply_cell_segmentation_sptPALM
 from tracking_sptPALM import tracking_sptPALM
-from analyse_diffusion_sptPALM import analyse_diffusion_sptPALM
 from plot_diffusion_tracklengths_sptPALM import plot_diffusion_tracklengths_sptPALM
 from single_cell_analysis_sptPALM import single_cell_analysis_sptPALM
 from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
-from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
+from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast, diff_coeffs_per_track
 from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
 from helper_functions import yes_no_input
 
@@ -126,13 +125,20 @@ def analyse_movies_sptPALM(input_parameter = None):
         # tracks: x[µm), y[µm]], frame, track_id, frametime
         # D: tracks + #_loc, MSD, D_coeff
         # D_track_length_matrix: Bins, steps[2-3]
-        [para['tracks'], para['D_tracklengths_matrix']] = diff_coeffs_from_tracks_fast(para['tracks'], para);
-        para['diff_coeffs_filtered_list']  = analyse_diffusion_sptPALM(para) # OLD
+        [para['tracks'], para['D_tracklengths_matrix']] = diff_coeffs_from_tracks_fast(para['tracks'], para)
 
-        
+        # Per-track diffusion coefficients for the single-cell & combined analyses.
+        # Option B: use a higher minimum (locs > diff_avg_steps_min) than the
+        # track-length-resolved histogram, for more robust per-cell averages; long
+        # tracks are truncated to their first tracklength_locs_max localisations.
+        para['diff_coeffs_filtered_list'] = diff_coeffs_per_track(
+            para['tracks'], para,
+            locs_min=para['diff_avg_steps_min'] + 1,
+            locs_max=para['tracklength_locs_max'])
+
         # Plot experimental data
         plot_diff_histograms_tracklength_resolved(para['D_tracklengths_matrix'], para, para['tracks'])
-        para = plot_diffusion_tracklengths_sptPALM(para)  # OLD
+        para = plot_diffusion_tracklengths_sptPALM(para)
 
         """ 2.6 [Optional] SCTA Single Cell Tracking Analysis """
         if input_parameter['use_segmentations']:
