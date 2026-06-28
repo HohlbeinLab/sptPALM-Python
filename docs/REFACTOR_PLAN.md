@@ -5,7 +5,8 @@ pipeline so they travel with the code (collaborators, future maintainers, and th
 original author). Last updated: 2026-06-27.
 
 Progress: MSD bug fix done; **Step 1 done** (§3.1); faster startup done (§2.2b);
-terminal/macOS runtime fixes done (§2.3). Next: Step 2 (§3.2).
+terminal/macOS runtime fixes done (§2.3); **Step 2 done** (§3.2, incl. gap
+correction 3.2a). Next: Step 3 (§3.3, untangle the `para` god-dict).
 
 ## 1. Goals
 
@@ -114,21 +115,37 @@ Commits: `fa921ca` (main change), `65efb28` (untrack build/OS artifacts).
   pickle — its nested numpy arrays (per-species `diff_quot`, 2D `rates_lb_ub`,
   etc.) need explicit reconstruction on load. Convert in a focused later step.
 
-### 3.2 Retire the OLD diffusion function
+### 3.2 Retire the OLD diffusion function — DONE (2026-06-28)
 
-- `analyse_diffusion_sptPALM` (fixed first-N-steps estimator) is to be **replaced**
-  by `diff_coeffs_from_tracks_fast` (track-length-resolved, all-steps estimator).
-- **Note these are different estimators**, not just fast vs slow:
-  - OLD averages MSD over only the first `diff_avg_steps_min` steps (fixed count).
-  - FAST bins tracks by exact length and averages over all steps of the track.
-  - They also filter different track populations.
-- **Decision:** keep FAST as the foundation — it is the track-length-resolved form
-  the MCDDA / anaDDA machinery consumes, and the right approach given the
-  exponential track-length distribution (photobleaching).
-- **Prerequisite before deleting OLD:** confirm the fast outputs
-  (`D_coeff` / `diff_coeffs_filtered_list`) are what downstream steps
-  (`single_cell_analysis`, combine, MCDDA) expect. Remove the now-redundant manual
-  `sort_values(['track_id','frame'])` in `MC_diffusion_distribution_analysis_sptPALM.py`.
+Commits: `f94fbf6` (drop redundant MCDDA sort), `31b669d` (add
+`diff_coeffs_per_track`), `6cc1215` (rewrite single_cell + wire in + delete OLD).
+Plus sub-task 3.2a `d99a1d6` (gap correction).
+
+- DONE: `analyse_diffusion_sptPALM` (fixed first-N-steps estimator) replaced by
+  `diff_coeffs_from_tracks_fast.diff_coeffs_per_track` and the file deleted. These
+  are different estimators (OLD = first `diff_avg_steps_min` steps; FAST =
+  gap-corrected mean single-frame MSD over the first `min(locs, locs_max)`
+  localisations); FAST kept as the foundation (track-length-resolved form the
+  MCDDA/anaDDA machinery consumes; right given the exponential track-length
+  distribution).
+- DONE (Option B, chosen by Johannes): the per-cell/combined analyses use a higher
+  minimum (`locs > diff_avg_steps_min`) than the track-length-resolved histogram
+  (locs 2-8), keeping per-cell averages robust; long tracks are truncated to the
+  first `tracklength_locs_max` localisations (kept, not dropped). `diff_coeffs_per_track`
+  takes optional `locs_min`/`locs_max` overrides for this.
+- DONE: `single_cell_analysis_sptPALM` rewritten to assign tracks to cells by a
+  direct `track_id -> cell_id` lookup + groupby, replacing the fragile positional
+  alignment (which silently broke if the diffusion list and cumulative per-cell
+  track counts were filtered/ordered differently, and mismatched lengths once
+  `number_tracks_per_cell` excluded cells).
+- DONE: removed the redundant manual `sort_values(['track_id','frame'])` in
+  `MC_diffusion_distribution_analysis_sptPALM.py`.
+- VALIDATION (Cas12aScrambled_part1, reconstructed from `_py_out.csv`): new cell_id
+  100% correct; per-cell avg D == groupby mean; Option B reproduces the OLD
+  population exactly (2558 tracks, 273 kept cells) with per-cell D essentially
+  unchanged (mean 0.612 -> 0.615, r=0.977, median |delta|=0.028).
+- NOT YET re-verified through the live GUI pipeline end-to-end (case 2 -> combine ->
+  plot). Worth a manual run to confirm plots render.
 
 - **Sub-task 3.2a — port the track-memory / frame-gap correction into the FAST
   function (prerequisite).** The OLD function normalises a step that spans `con`
