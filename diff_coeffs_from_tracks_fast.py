@@ -32,9 +32,14 @@ def diff_coeffs_from_tracks_fast(tracks, para):
     print("\nRun 'diff_coeffs_from_tracks_fast.py'")
 
 
-    tracks_data = tracks.copy()
+    # Sort by track_id then frame so each track's localisations are contiguous
+    # and in time order. calculate_MSD() reshapes rows into groups of group_size
+    # and uses np.diff; without this sort, rows from different tracks interleave
+    # and np.diff computes spurious cross-track displacements (verified: produces
+    # unphysical D up to ~250 um^2/s). Both call sites now rely on this.
+    tracks_data = tracks.copy().sort_values(['track_id', 'frame']).reset_index(drop=True)
     # Count occurrences of each unique track_ids
-    tracklength_counts = tracks_data['track_id'].value_counts()    
+    tracklength_counts = tracks_data['track_id'].value_counts()
     
     # Map these counts back to the DataFrame as a new column '#_loc'
     tracks_data['#_locs'] = tracks_data['track_id'].map(tracklength_counts)
@@ -51,7 +56,9 @@ def diff_coeffs_from_tracks_fast(tracks, para):
         # If idx is not empty/false
         if idx: # implicit booleanness
             tracks_data.loc[idx,'MSD'] = calculate_MSD(tracks_data.loc[idx,:],
-                                                       'x [µm]', 'y [µm]', track_len + 1)
+                                                       'x [µm]', 'y [µm]', track_len + 1,
+                                                       frame_col='frame',
+                                                       track_memory=para.get('track_memory', 0))
     
     # How long did the MSD calculation take?
     end = time.time()
@@ -123,41 +130,126 @@ def diff_coeffs_from_tracks_fast(tracks, para):
     return tracks_data, D_track_length_matrix
 
 # Generalized function to calculate differences between two columns in groups of rows
-def calculate_MSD(df, col_name1, col_name2, group_size):
-    
+def calculate_MSD(df, col_name1, col_name2, group_size, frame_col='frame', track_memory=0):
+
     """
-    Calculates the differences between two columns within non-overlapping groups of rows.
-    
+    Mean single-frame squared displacement (MSD) for each track, where all tracks
+    in `df` share the same length `group_size`.
+
+    `df` is assumed sorted by (track_id, frame) so that each consecutive block of
+    `group_size` rows is one track in time order. Rows are reshaped into
+    (num_groups, group_size) and squared step displacements are averaged per track.
+
+    Track-memory / frame-gap correction: when `track_memory > 0` a track may skip
+    frames (a localisation missing but bridged by tracking). A step spanning `con`
+    frames covers `con` single-frame intervals, so its squared displacement is
+    divided by `con` to normalise it to a single-frame value. This matches the
+    OLD analyse_diffusion_sptPALM behaviour (divide when 0 < con <= track_memory+1,
+    leave raw otherwise). With the default track_memory=0 every step is 1 frame
+    apart, so the correction divides by 1 and is a no-op.
+
     Parameters:
-    df (DataFrame): The DataFrame containing the data.
-    col_name1 (str): The first column name.
-    col_name2 (str): The second column name.
-    group_size (int): The number of rows per group to calculate differences for.
-    
+    df (DataFrame): data (sorted by track_id, frame), one track per group_size rows.
+    col_name1, col_name2 (str): x and y position column names.
+    group_size (int): localisations per track (= track length in locs).
+    frame_col (str): column holding the frame number (for gap detection).
+    track_memory (int): tracking memory in frames; gaps up to track_memory+1 are
+        normalised, larger gaps are left raw (matches OLD).
+
     Returns:
-    MSD (array): A 2D array where each row contains the differences for one group.
+    MSD (array): per-localisation MSD (the track's mean repeated group_size times).
     """
-    # Extract the two columns as NumPy arrays
+    # Extract the columns as NumPy arrays
     x_positions = df[col_name1].values
     y_positions = df[col_name2].values
-    
+    frames = df[frame_col].values
+
     # Determine the number of complete groups
     num_groups = len(x_positions) // group_size
-    
+
     # Reshape the values into a matrix of shape (num_groups, group_size)
     reshaped_x_positions = x_positions[:num_groups * group_size].reshape(num_groups, group_size)
     reshaped_y_positions = y_positions[:num_groups * group_size].reshape(num_groups, group_size)
-    
+    reshaped_frames = frames[:num_groups * group_size].reshape(num_groups, group_size)
+
     squared_displacements = np.diff(reshaped_x_positions)**2 + np.diff(reshaped_y_positions)**2
-    # breakpoint()
-# Careful some checks missing!
-# Adjust based on frame differences
-#     D_coeff_contribution = np.where(frame_diff == 2, squared_displacements / 2, squared_displacements)
+
+    # Normalise gapped steps to a single-frame squared displacement (see docstring).
+    frame_diff = np.diff(reshaped_frames)                       # 'con' per step
+    normalise = (frame_diff > 0) & (frame_diff <= track_memory + 1)
+    denom = np.where(normalise, frame_diff, 1)                  # avoid div-by-zero
+    squared_displacements = np.where(normalise,
+                                     squared_displacements / denom,
+                                     squared_displacements)
+
     MSD = squared_displacements.mean(axis = 1)
-    
+
     #Ensure that D_coff is showing up behind each localisation later
     MSD = np.repeat(MSD, group_size, axis = None)
-    
-    
+
+
     return MSD
+
+
+def diff_coeffs_per_track(tracks, para, locs_min=None, locs_max=None):
+    """One diffusion coefficient per track (for single-cell & combined analyses).
+
+    For each track, D is computed from the gap-corrected mean single-frame MSD over
+    the FIRST min(locs, locs_max) localisations:
+      - tracks with locs in [locs_min .. locs_max] use all their steps (identical to
+        the per-length values from diff_coeffs_from_tracks_fast);
+      - longer tracks are TRUNCATED to their first locs_max localisations (kept, not
+        dropped, but capped so every track has equal weight);
+      - tracks with fewer than locs_min localisations are excluded.
+
+    locs_min / locs_max default to para['tracklength_locs_min'/'max']. They can be
+    overridden so the single-cell analysis can use a higher minimum (more robust
+    per-cell averages) than the track-length-resolved histogram. Note that
+    histogram (D_track_length_matrix) stays length-exact and is unaffected here.
+
+    Returns a DataFrame with columns: 'diff_coeffs_filtered', 'track_length_filtered'
+    (the true, un-truncated track length in localisations), 'track_id'; ordered by
+    track_id.
+    """
+    locs_min = int(para['tracklength_locs_min']) if locs_min is None else int(locs_min)
+    locs_max = int(para['tracklength_locs_max']) if locs_max is None else int(locs_max)
+    track_memory = int(para.get('track_memory', 0))
+    frametime = para['frametime']
+    loc_error = para['loc_error']
+
+    # Order so each track's localisations are contiguous and in time order.
+    df = tracks.sort_values(['track_id', 'frame']).copy()
+
+    # True track length (localisations) per track, before truncation.
+    locs = df.groupby('track_id').size()
+
+    # Truncate long tracks to their first locs_max localisations.
+    df['_pos'] = df.groupby('track_id').cumcount()
+    trunc = df[df['_pos'] < locs_max]
+
+    # Per-step squared displacement within each track (first row per track -> NaN).
+    g = trunc.groupby('track_id')
+    sq = g['x [µm]'].diff()**2 + g['y [µm]'].diff()**2
+    con = g['frame'].diff()  # frames spanned by each step ('con' in the OLD code)
+
+    # Gap correction: normalise a step spanning 'con' frames to a single frame by
+    # dividing by con (only when 0 < con <= track_memory+1; raw otherwise).
+    normalise = (con > 0) & (con <= track_memory + 1)
+    sq = sq.where(~normalise, sq / con)
+
+    # Mean single-frame MSD per track (skipna drops the first-row NaN step).
+    msd_per_track = sq.groupby(trunc['track_id']).mean()
+
+    # Diffusion coefficient with localisation-error correction.
+    diff_coeffs = msd_per_track / (4 * frametime) - (loc_error ** 2) / frametime
+
+    # Keep only tracks with at least locs_min localisations.
+    keep = locs.index[locs >= locs_min]
+
+    diffs_df = pd.DataFrame({
+        'diff_coeffs_filtered': diff_coeffs.reindex(keep).to_numpy(),
+        'track_length_filtered': locs.reindex(keep).to_numpy(),
+        'track_id': keep.to_numpy(),
+    })
+    return diffs_df
 

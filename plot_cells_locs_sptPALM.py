@@ -75,6 +75,7 @@ def plot_cells_locs_sptPALM(para, bf_dict):
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig01_segm.' + para['plot_option_save'], dpi = para['dpi'])
     
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
 
     return

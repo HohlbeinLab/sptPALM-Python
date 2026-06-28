@@ -133,7 +133,8 @@ def diffusion_simulation(sim_input, particle_data):
         # Manually close the video writer
         writer.finish()
         plt.close(fig)
-        plt.show()
+        plt.show(block=False)
+        plt.pause(0.1)
 
     # How long did the tracking take?
     end = time.time()

@@ -7,7 +7,7 @@
 // multiply 1000 to go from µm to nm, for a specific file:
 
 Pixel_nm = 119; //used to rescale the brightfield images from pixels/µms to nm
-nCopies = 10000; //prepare a stack of nCopies of the brightfield image
+nCopies = 1000; //prepare a stack of nCopies of the brightfield image
 frame_time = 10; //probably not necessary, frame time in ms between the frames of the stack
 
 // Open processed brightfield files(s)
@@ -82,7 +82,8 @@ for (ii = 0; ii < files.length; ii++) {
 // press 'next' and select display options (keep 'display spots' and 'display tracks' checked
 // 		=> change 'show entire tracks' into 'show tracks backward in time'
 //		=> uncheck 'fade tracks in time'
+// 		(in "Edit settings" track widths etc can be adjusted
 // press 'next' a few times until you arrive at 'select an action'
 // 		=> select 'capture overlay'
 //		=> press execute and select a range of frames (computation will take a long time for, say 10000 frames)
-// new stack can be saved as *.avi etc.
+// new stack can be saved as *.avi uncompressed then use https://cloudconvert.com/avi-to-mp4

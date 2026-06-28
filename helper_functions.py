@@ -13,6 +13,75 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 
 # import threading
 
+import json
+import pickle
+import numpy as np
+
+
+def _json_default(obj):
+    """Fallback encoder so numpy types (which json can't handle) round-trip as
+    native Python lists/numbers."""
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.floating):
+        return float(obj)
+    if isinstance(obj, np.bool_):
+        return bool(obj)
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
+# Keys that are derived from other parameters and recomputed on load, so we do
+# not store them (avoids saving non-portable numpy arrays and stale values).
+_DERIVED_PARAM_KEYS = ('tracklengths_steps', 'movie_number')
+
+
+def save_parameters(para, filepath):
+    """Save an analysis parameter dictionary to a human-readable JSON file.
+
+    Derived keys (see _DERIVED_PARAM_KEYS) are dropped; they are recomputed by
+    load_parameters(). JSON was chosen over pickle so parameter files are
+    readable, diffable in git, and not tied to a Python/library version.
+    """
+    out = {k: v for k, v in para.items() if k not in _DERIVED_PARAM_KEYS}
+    with open(filepath, 'w') as f:
+        json.dump(out, f, indent=2, default=_json_default)
+
+
+def load_parameters(filepath):
+    """Load an analysis parameter dictionary.
+
+    Accepts JSON (new format) and, for backward compatibility, legacy pickle
+    (.pkl) files. Recomputes derived keys after loading.
+    """
+    if filepath.lower().endswith('.pkl'):
+        with open(filepath, 'rb') as f:
+            para = pickle.load(f)
+    else:
+        with open(filepath, 'r') as f:
+            para = json.load(f)
+
+    # Recompute derived fields from their source parameters.
+    if 'tracklength_locs_min' in para and 'tracklength_locs_max' in para:
+        para['tracklengths_steps'] = np.arange(para['tracklength_locs_min'] - 1,
+                                               para['tracklength_locs_max'])
+    return para
+
+
+def apply_caption_fontsize(para):
+    """Make all matplotlib figure titles/suptitles use para['fontsize'].
+
+    Call once at a plotting entry point: matplotlib rcParams persist for the
+    session, so every figure created afterwards inherits the configured (smaller)
+    caption size without having to set fontsize on each individual title.
+    """
+    import matplotlib.pyplot as plt
+    fs = para.get('fontsize', 10)
+    plt.rcParams['axes.titlesize'] = fs     # subplot titles (ax.set_title)
+    plt.rcParams['figure.titlesize'] = fs   # figure suptitles (fig.suptitle)
+
+
 def yes_no_input(prompt, default="yes"):
     # Define default options based on the default value
     if default == "yes":

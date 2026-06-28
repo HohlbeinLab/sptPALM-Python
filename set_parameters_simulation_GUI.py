@@ -232,17 +232,25 @@ def set_parameters_simulation_GUI(sim_input=None):
         return structure
 
     def exit_GUI():
-        transfer_params()
+        transfer_params()      # collect the edited values into 'sim_input'
+        # quit() breaks out of root.mainloop() below; the window is destroyed
+        # afterwards. Destroying from inside the callback hangs on macOS.
         root.quit()
-        root.destroy()
-        return sim_input
 
 
     root = tk.Tk()
+    # Route the window's X button through exit_GUI too, so closing that way also
+    # collects the edited values and exits mainloop cleanly.
+    root.protocol("WM_DELETE_WINDOW", exit_GUI)
     # Disable window resizing in both horizontal and vertical directions
     root.resizable(False, False)
 
-    root.title("sptPALM simulation GUI (defaults imported from set_parameter_simulation.py)")
+    # Make Sure the GUI is fully on screen: First, let Tk calculate the window size
+    root.geometry("+50+50")
+    root.lift()          # raise window to top of stacking order
+    root.focus_force()   # force keyboard focus to this window
+
+    root.title("sptPALM simulation GUI (defaults values imported from 'set_parameter_simulation.py')")
 
     root.grid_columnconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
@@ -430,11 +438,20 @@ def set_parameters_simulation_GUI(sim_input=None):
               command=load_params).grid(row=0, column=0, padx=5)
     tk.Button(button_frame, text="Save...",
               command=save_params).grid(row=0, column=2, padx=5)
-    tk.Button(button_frame, text="Exit",
+    tk.Button(button_frame, text="Close GUI",
               command=exit_GUI).grid(row=0, column=4, padx=5)
 
     root.mainloop()
-    
+    # macOS: hide and flush the window before returning to the blocking CLI prompt
+    # so it doesn't linger as an unresponsive (beachball) window until the program
+    # exits. See set_parameters_sptPALM_GUI.py for the matching rationale.
+    try:
+        root.withdraw()
+        root.update()
+        root.destroy()
+    except tk.TclError:
+        pass
+
     # Return collected parameters after window closes
     return sim_input
 

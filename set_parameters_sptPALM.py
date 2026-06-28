@@ -79,10 +79,14 @@ def set_parameters_sptPALM():
     input_parameter['tracklengths_steps'] = np.arange(input_parameter['tracklength_locs_min']-1,
                                             input_parameter['tracklength_locs_max'])
     
-   # DO NOT REMOVE THE FOLLOWING LINES! (GITHUB SETTING HERE)
-    # Directory containing your data (make sure you end with a '/' or '\')
-    input_parameter['data_dir'] = '/Users/hohlbein/Documents/GitHub/sptPALM-Python/experimental_data/'
-    input_parameter['data_dir']  = os.path.join(input_parameter['data_dir'] , '')
+    # Default data directory points at the bundled example dataset, resolved
+    # relative to this file so it works on any machine after cloning. To analyse
+    # your own data, change the paths via the GUI and Save/Load a JSON parameter
+    # file (no need to edit this source file).
+    repo_dir = os.path.dirname(os.path.abspath(__file__))
+    input_parameter['data_dir'] = os.path.join(repo_dir, 'experimental_data', '')
+    
+    
     # Name(s) of "_thunder.csv" files to be analyzed, separate with "," and start new line if required
     input_parameter['fn_locs'] = [
         'Cas12aScrambled_localisations_part1_MLE_thunder.csv',
@@ -102,7 +106,20 @@ def set_parameters_sptPALM():
     input_parameter['condition_names'] = ['Cas12a_scrambled', 'Cas12a_targetting']
     input_parameter['condition_files'] = [[0,1],[2,3]]  # refers to the order of files defined above
     
-    
+# JH 28.06.2028: Temporary selection for faster testing
+    input_parameter['fn_locs'] = [
+        'Cas12aScrambled_localisations_part2_MLE_thunder.csv',
+    ]
+    #name(s) of processed brightfield images for cell segmentation "*_procBrightfield.tif"
+    #filename is also used to locate the segmented image and corresponding csv-table!)
+    input_parameter['fn_proc_brightfield'] = [
+        'Cas12aScrambled_procBrightfield.tif',
+    ]
+
+    input_parameter['condition_names'] = ['Cas12a_scrambled']
+    input_parameter['condition_files'] = [0]  # refers to the order of files defined above
+ 
+  
     # # Directory containing your data
     # input_parameter['data_dir'] = '/Users/hohlbein/Documents/WORK-DATA-local/TestData_CRISPR-Cas/'
     # input_parameter['data_dir']  = os.path.join(input_parameter['data_dir'] , '')

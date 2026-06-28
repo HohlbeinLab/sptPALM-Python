@@ -25,6 +25,7 @@ from initiate_simulation import initiate_simulation
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
 from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
 from fit_data_with_MCDDA_sptPALM import fit_data_with_MCDDA_sptPALM
+from helper_functions import apply_caption_fontsize
 
  # Assuming Para1 is a dictionary-like object
 def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=None, sim_input=None):
@@ -39,26 +40,6 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
         
     print('\nRun MC_diffusion_distribution_analysis_sptPALM.py')
 
-    """
-    TEMPORARY: For bugfixing - Replace the following line with your file path if needed
-    """
-    
-    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")    
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/input_parameter.pkl'
-    # with open(filename, 'rb') as f:
-    #     input_parameter = pickle.load(f)  
-        
-    # print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")    
-    # # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Cas12a-data-JH/output_python/sptData_combined_movies.pkl'
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/Data_Finland/output_python/sptData_combined_movies.pkl'
-    # with open(filename, 'rb') as f:
-    #     comb_data = pickle.load(f)
-
-      
-    """
-    Actual start of the function
-    """    
- 
     # Check whether 'input_parameter' was passed to the function
     if not input_parameter:
         print("  Run set_parameters_sptPALM.py + GUI")
@@ -97,16 +78,19 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
    
     print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][sim_input['species_to_select']]}\n")
     
+    # Apply the configured caption (title) font size to all figures produced below
+    apply_caption_fontsize(input_parameter)
+
     # Use tracks from anaDDA style of plotting tracks
     # tracks: x[µm), y[µm]], frame, track_id, frametime
     tracks = comb_data['anaDDA_tracks'][sim_input['species_to_select']]
-    
-    # Generate average diffusion coefficients for each track
-    sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
 
+    # Generate average diffusion coefficients for each track.
+    # (diff_coeffs_from_tracks_fast sorts by ['track_id','frame'] internally, so no
+    # pre-sort is needed here.)
     # D: tracks + #_loc, MSD, D_coeff
     # D_track_length_matrix: Bins, steps[2-3]
-    [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input);
+    [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(tracks, sim_input);
     
     # Plot experimental data
     plot_diff_histograms_tracklength_resolved(D_track_length_matrix, sim_input, D)

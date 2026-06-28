@@ -14,139 +14,103 @@ Full license details can be found at https://creativecommons.org/licenses/by/4.0
 import pandas as pd
 import numpy as np
 
+
 def single_cell_analysis_sptPALM(para):
+    """Link per-track diffusion coefficients to individual cells.
+
+    Consumes para['diff_coeffs_filtered_list'] (one row per valid track, produced
+    by diff_coeffs_from_tracks_fast.diff_coeffs_per_track: columns
+    'diff_coeffs_filtered', 'track_length_filtered', 'track_id'). Each track is
+    assigned to its cell via a direct track_id -> cell_id lookup from csv_data, and
+    per-cell statistics are computed by grouping on cell_id.
+
+    (This replaces an earlier version that relied on positional alignment between
+    the diffusion-coefficient list and cumulative per-cell track counts, which
+    silently broke if the two were filtered or ordered differently.)
+
+    Produces:
+      para['scta_table']                per-cell summary table
+      para['diff_coeffs_filtered_list'] with 'cell_id' and 'copynumber' added
+      para['scta_tracks_csv']           localisations of valid tracks in kept cells
+      para['tracks_filtered']           subset of columns of the above
+    """
     print('\nRun single_cell_analysis_sptPALM.py')
 
-    # csv_data = para['csv_data'] but only take rows in which 'cell_id_ != -1
-    csv_data = para['csv_data'][para['csv_data']['cell_id'] != -1]
-     
-    # Check whether tracks_ids have been assigned
-    if (para['csv_data']['track_id'] == -1).sum() == len(para['csv_data']['track_id'] ):
+    csv_data_all = para['csv_data']
+
+    # Warn if tracking has not been run yet
+    if (csv_data_all['track_id'] == -1).sum() == len(csv_data_all['track_id']):
         print('Warning: ...tracks do not seem to be assigned yet. Please run tracking!')
 
-    # Return ids of valid cells and count the number of localisations per cell
+    # Localisations that fall inside a segmented cell
+    csv_data = csv_data_all[csv_data_all['cell_id'] != -1]
+
+    # Per-cell localisation count and area (one row per cell, sorted by cell_id)
     cell_ids, cell_locs = np.unique(csv_data['cell_id'], return_counts=True)
+    cell_areas = (csv_data.drop_duplicates(subset='cell_id', keep='first')
+                          .sort_values('cell_id')['cell_area'].to_numpy())
 
-    # Get the first occurrence of 'cell_area' for each 'cell_id'
-    cell_areas = csv_data.drop_duplicates(subset='cell_id', 
-                                          keep='first').sort_values(by='cell_id').loc[:, 'cell_area'].to_numpy()
+    # --- Assign each valid track to its cell via a direct lookup (robust) -------
+    diffs = para['diff_coeffs_filtered_list'].copy()
+    track_to_cell = csv_data.drop_duplicates('track_id').set_index('track_id')['cell_id']
+    diffs['cell_id'] = diffs['track_id'].map(track_to_cell)
+    # Keep only tracks that map to a cell (all should, since they came from in-cell tracking)
+    diffs = diffs[diffs['cell_id'].notna()].copy()
+    diffs['cell_id'] = diffs['cell_id'].astype(int)
 
-    # Prepare a table with remaining cell_ids, number of localizations per cell, and cumulative sum
+    # Number of valid tracks per cell, and copynumber per track (= tracks in its cell)
+    tracks_per_cell = diffs.groupby('cell_id').size()
+    diffs['copynumber'] = diffs['cell_id'].map(tracks_per_cell).astype(int)
+
+    # --- Per-cell summary table ------------------------------------------------
     cell_df = pd.DataFrame({
         'movie': -1.0,
         'cell_id': cell_ids,
         'cell_locs': cell_locs,
         'cell_area': cell_areas,
-        '#tracks (filtered for #tracks per cell)': 0,
-        'cum. #tracks (filtered for #tracks per cell)': 0,
-        '#tracks (unfiltered for #tracks per cell)': 0, 
-        'cum. #tracks (unfiltered for #tracks per cell)': 0,
-        'keep_cells': np.nan,
-        'average_diff_coeff_per_cell': np.nan,
     })
-    
-    # Initialize additional columns in the DiffCoeffsList dataframe
-    para['diff_coeffs_filtered_list']['cell_id'] = -1
-    para['diff_coeffs_filtered_list']['copynumber'] = -1
+    n_tracks = cell_df['cell_id'].map(tracks_per_cell).fillna(0).astype(int)
+    cell_df['#tracks (unfiltered for #tracks per cell)'] = n_tracks
 
-    # Predefine some DataFrames
-    para['scta_tracks_csv'] =  para['csv_data'].iloc[0:0].copy()
-    para['tracks_filtered'] =  para['tracks'].iloc[0:0].copy()
-   
-    # Loop through each valid cell
-    for jj in range(len(cell_ids)):
-        # Select data from a particular cell_id
-        part_csv_data = csv_data[csv_data['cell_id'] == cell_ids[jj]]       
+    # Keep cells whose number of valid tracks is within [min, max]
+    keep = ((n_tracks >= para['number_tracks_per_cell_min']) &
+            (n_tracks <= para['number_tracks_per_cell_max']) &
+            (n_tracks > 0))
+    cell_df['keep_cells'] = keep
+    cell_df['#tracks (filtered for #tracks per cell)'] = np.where(keep, n_tracks, 0)
+    cell_df['cum. #tracks (filtered for #tracks per cell)'] = \
+        cell_df['#tracks (filtered for #tracks per cell)'].cumsum()
+    cell_df['cum. #tracks (unfiltered for #tracks per cell)'] = \
+        cell_df['#tracks (unfiltered for #tracks per cell)'].cumsum()
 
-        # Find unique track_ids and total number of trackslocalisations per track
-        track_ids, track_locs = np.unique(part_csv_data['track_id'], return_counts=True)
-        
-        # Write data into DataFrame
-        track_df = pd.DataFrame({'track_id': track_ids, 'locs': track_locs})
+    # Average diffusion coefficient per kept cell
+    kept_ids = set(cell_df.loc[cell_df['keep_cells'], 'cell_id'])
+    avg_d = (diffs[diffs['cell_id'].isin(kept_ids)]
+             .groupby('cell_id')['diff_coeffs_filtered'].mean())
+    cell_df['average_diff_coeff_per_cell'] = cell_df['cell_id'].map(avg_d)
 
-        # Select tracks that have neither too few or too many localizations
-        track_df = track_df[(track_df['locs'] > para['diff_avg_steps_min']) &
-                                            (track_df['locs'] < para['diff_avg_steps_max'])]
-     
-        # Check for presence of tracks in particular cell              
-        if track_df.empty == False:
-            # If we found tracks, write number of tracks
-            cell_df.loc[jj,'#tracks (unfiltered for #tracks per cell)'] = len(track_df)
-            
-            # Filter for number of tracks per cell
-            if para['number_tracks_per_cell_min'] <= len(track_df) <= para['number_tracks_per_cell_max']:
-                cell_df.loc[jj,'#tracks (filtered for #tracks per cell)'] = len(track_df)
-                
-                # Probably not needed later?!
-                para['scta_tracks_csv'] = pd.concat(
-                    [para['scta_tracks_csv'],
-                    part_csv_data[part_csv_data['track_id'].isin(track_df['track_id'])]],
-                    ignore_index=True
-                    )
-                
-                # List of columns to select from part_csv_data for concatenation
-                columns_to_concatenate = ['track_id', 'frame', 'x [µm]', 'y [µm]', 'loc_id']  # Example columns
+    # Column order kept consistent with the historical table layout
+    cell_df = cell_df[['movie', 'cell_id', 'cell_locs', 'cell_area',
+                       '#tracks (filtered for #tracks per cell)',
+                       'cum. #tracks (filtered for #tracks per cell)',
+                       '#tracks (unfiltered for #tracks per cell)',
+                       'cum. #tracks (unfiltered for #tracks per cell)',
+                       'keep_cells', 'average_diff_coeff_per_cell']]
 
-                # Concatenate only the selected columns
-                para['tracks_filtered'] = pd.concat(
-                   [para['tracks_filtered'],
-                    part_csv_data.loc[part_csv_data['track_id'].isin(track_df['track_id']), columns_to_concatenate]],
-                   ignore_index=True
-                   )   
-     
-            else:
-                cell_df.loc[jj,'#tracks (filtered for #tracks per cell)'] = 0
-                cell_df.loc[jj, '#tracks (unfiltered for #tracks per cell)'] = 0
-    
-    # Extend cellTrackAnalysis_table
-    cell_df['cum. #tracks (filtered for #tracks per cell)'] = np.cumsum(cell_df.loc[:,'#tracks (filtered for #tracks per cell)'])
-    cell_df['cum. #tracks (unfiltered for #tracks per cell)'] = np.cumsum(cell_df.loc[:,'#tracks (unfiltered for #tracks per cell)'])
+    # --- Localisations of valid tracks in kept cells (for plotting/downstream) --
+    valid_track_ids = diffs.loc[diffs['cell_id'].isin(kept_ids), 'track_id']
+    scta_tracks_csv = csv_data[csv_data['track_id'].isin(valid_track_ids)].reset_index(drop=True)
+    para['scta_tracks_csv'] = scta_tracks_csv
+    para['tracks_filtered'] = scta_tracks_csv[['track_id', 'frame', 'x [µm]', 'y [µm]',
+                                               'loc_id']].reset_index(drop=True)
 
-    # Indicate cells that match minimum/maximum number of tracks
-    cell_df['keep_cells'] = (cell_df['#tracks (filtered for #tracks per cell)'] >= para['number_tracks_per_cell_min']) & \
-                                              (cell_df['cum. #tracks (filtered for #tracks per cell)'] <= para['number_tracks_per_cell_max']
-                                               )
-    difdata_filtered = []
-    res_avgD_cell = []
-    diff_coeffs_temp = para['diff_coeffs_filtered_list']['diff_coeffs_filtered'].values
-    
-    # Calculate average diffusion coefficients per cell
-    for ii in range(len(cell_df)):
-        if cell_df.at[ii, 'keep_cells']:
-            cum_ids_temp = np.concatenate(([0], cell_df['cum. #tracks (unfiltered for #tracks per cell)'].values))
-            cell_diff_coeff_data_temp = diff_coeffs_temp[cum_ids_temp[ii]:cum_ids_temp[ii+1]]
-            res_avgD_cell.append(np.mean(cell_diff_coeff_data_temp))
-            difdata_filtered.extend(cell_diff_coeff_data_temp)
-        else:
-            res_avgD_cell.append(np.nan)
-
-    cell_df['average_diff_coeff_per_cell'] = res_avgD_cell
-
-    # Add copy numbers and cell_ids of respective diffusion coefficients
-    copynumber = []
-    cell_temp = []
-    for ii in range(len(cell_df)):
-        # Get the number of tracks for the current row
-        num_tracks = int(cell_df.iloc[ii]['#tracks (unfiltered for #tracks per cell)'])
-        num_cell_ids = int(cell_df.iloc[ii]['cell_id'])
-        # Create a list of ones of size num_tracks and multiply by num_tracks, then extend copynumber list
-        copynumber.extend(num_tracks*[num_tracks])
-        cell_temp.extend(num_tracks*[num_cell_ids])
-
-    para['diff_coeffs_filtered_list']['copynumber'] = np.array(copynumber) # Number of tracks per cell
-    para['diff_coeffs_filtered_list']['cell_id'] = np.array(cell_temp) # Number of tracks per cell
-
-    # Update Para1 structure
+    # Store updated diffusion list (with cell_id + copynumber) and the cell table
+    para['diff_coeffs_filtered_list'] = diffs[['diff_coeffs_filtered',
+                                               'track_length_filtered', 'track_id',
+                                               'cell_id', 'copynumber']].reset_index(drop=True)
     para['scta_table'] = cell_df
 
-    # Avoid potential issue of returning an empty list (not sure whether it works)
-    if para['tracks_filtered'].empty:
-        para['tracks_filtered'] = para['tracks_filtered'].iloc[:, [-1, -1, -1, -1]]
-
-    print(f"  We sorted out {cell_df['#tracks (unfiltered for #tracks per cell)'].sum() - cell_df['#tracks (filtered for #tracks per cell)'].sum()} tracks that were in cells with too few or too many tracks per cell")
-
+    sorted_out = int(n_tracks.sum() - cell_df['#tracks (filtered for #tracks per cell)'].sum())
+    print(f"  We sorted out {sorted_out} tracks that were in cells with too few or too many tracks per cell")
 
     return para
-
-
-

@@ -52,7 +52,7 @@ def plot_tracks_in_cells(para):
   
     # Show processed brightfield image
     ax.imshow(bf_dict['proc_brightfield_image'], cmap='gray')
-    ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)')
+    ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)', fontsize=para['fontsize'])
     ax.set_xlabel('Pixels')
     ax.set_ylabel('Pixels')
     ax.set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
@@ -98,7 +98,8 @@ def plot_tracks_in_cells(para):
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig05_tracks.' + para['plot_option_save'], dpi = para['dpi'])
 
-    plt.show()
+    plt.show(block=False)  # non-blocking so the pipeline continues (esp. from a terminal)
+    plt.pause(0.1)
 
     return para
 
@@ -107,13 +108,15 @@ def plot_tracks_histograms(para):
     # Plot images initially segmented elsewhere
     fig, ax = plt.subplots(2, 3, figsize=(14, 8)) # 
     circle_spot_size = 2
-    fig.suptitle('Segmentations images and localisations + various histogram for valid cells')
+    fig.suptitle('Segmentations images and localisations + various histogram for valid cells',
+                 fontsize=para['fontsize'])
 
     # Show segmented brightfield image with all localisations
     ax[0, 0].imshow(para['bf_dict']['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
     ax[0, 0].scatter(para['bf_dict']['loc_pixel_table'].loc[:, 'x'], para['bf_dict']['loc_pixel_table'].loc[:, 'y'], circle_spot_size,
                       'black', label='Localisations')
-    ax[0, 0].set_title(f"Segmented image containing {len(para['bf_dict']['loc_pixel_table'])} localisations")
+    ax[0, 0].set_title(f"Segmented image containing {len(para['bf_dict']['loc_pixel_table'])} localisations",
+                       fontsize=para['fontsize'])
     ax[0, 0].set_xlabel('Pixels')
     ax[0, 0].set_ylabel('Pixels')
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
@@ -122,7 +125,9 @@ def plot_tracks_histograms(para):
     ax[0, 1].imshow(para['bf_dict']['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
     ax[0, 1].scatter(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'], para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'], circle_spot_size,
                       'magenta', label='Localisations')
-    ax[0, 1].set_title(f"{len(para['bf_dict']['loc_pixel_table_filt'])} localisations that are parts pf tracks")
+    ax[0, 1].set_title(f"{len(para['bf_dict']['loc_pixel_table_filt'])} localisations in tracks "
+                       f"(≥ {para['diff_avg_steps_min'] + 1} locs/track)",
+                       fontsize=para['fontsize'])
     ax[0, 1].set_xlabel('Pixels')
     ax[0, 1].set_ylabel('Pixels')
     ax[0, 1].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
@@ -135,7 +140,7 @@ def plot_tracks_histograms(para):
     y = para['scta_table']['#tracks (filtered for #tracks per cell)']
     colors = para['scta_table']['average_diff_coeff_per_cell']  # Color based on diffusion coefficient
     sc = ax[1, 0].scatter(x, y, c=colors, s=20, cmap='viridis', edgecolor='k')  # 'cmap' sets the color map
-    ax[1, 0].set_title('Histogram: Number of localisations per cell')
+    ax[1, 0].set_title('Histogram: Number of localisations per cell', fontsize=para['fontsize'])
     ax[1, 0].set_xlabel('Number of localisations per cell')
     ax[1, 0].set_ylabel('Number of tracks per cell')
     ax[1, 0].set_xlim(0, max(x)+max(x)/20)
@@ -149,7 +154,7 @@ def plot_tracks_histograms(para):
     temp_area = para['scta_table']['cell_area']*(para['pixelsize']*para['pixelsize'])
     ax[1, 1].hist( temp_area, bins=np.arange(0, max(temp_area), max(temp_area)/10),
                   edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
-    ax[1, 1].set_title('Histogram: Area per cell')
+    ax[1, 1].set_title('Histogram: Area per cell', fontsize=para['fontsize'])
     ax[1, 1].set_xlabel('Area (µm$^2$) per cell')
     ax[1, 1].set_ylabel('Number of cells')
 
@@ -157,7 +162,7 @@ def plot_tracks_histograms(para):
     temp_tracks = para['scta_table']['#tracks (filtered for #tracks per cell)']
     ax[1, 2].hist(temp_tracks, bins=np.arange(0, max(temp_tracks), max(temp_tracks)/10),
                   edgecolor='#4A75AC', facecolor='#5B9BD5', alpha=0.9)
-    ax[1, 2].set_title('Histogram: Number of tracks per cell')
+    ax[1, 2].set_title('Histogram: Number of tracks per cell', fontsize=para['fontsize'])
     ax[1, 2].set_xlabel('Tracks per cell')
     ax[1, 2].set_ylabel('Number of cells')
     
@@ -168,7 +173,8 @@ def plot_tracks_histograms(para):
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig06_cells.' + para['plot_option_save'], dpi = para['dpi'])
     
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
 
     return para
 

@@ -74,7 +74,8 @@ def plot_diffusion_tracklengths_sptPALM(para):
     plt.savefig(temp_path + para['fn_locs'][:-4] + '_Fig04_diff.' + para['plot_option_save'], dpi = para['dpi'])
 
     
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
     
     return para
 

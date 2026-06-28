@@ -15,7 +15,7 @@ import os
 from tkinter import filedialog
 from set_parameters_sptPALM import set_parameters_sptPALM
 from ast import literal_eval # Safely parse the string back to a list of lists
-import pickle
+from helper_functions import save_parameters, load_parameters
 import numpy as np
 
 def set_parameters_sptPALM_GUI(para = None):
@@ -48,13 +48,17 @@ def set_parameters_sptPALM_GUI(para = None):
 
     def load_params(): #careful, we need to overwrite all default parameters
         filename = filedialog.askopenfilename(
-                                    filetypes = [("pickle file", "*.pkl")],
-                                    title = "Select input_parameter.pkl file obtained from running 'set_parameters_sptPALM.py + GUI'")
+                                    filetypes = [("parameter file", "*.json *.pkl"),
+                                                 ("JSON file", "*.json"),
+                                                 ("pickle file", "*.pkl")],
+                                    title = "Select input_parameter.json (or legacy .pkl) from 'set_parameters_sptPALM.py + GUI'")
         if filename:
-            with open(filename, 'rb') as f:
-                new_para = pickle.load(f)
-                print("Input parameters loaded")
-                    
+            # Start from current defaults, then override with the loaded file,
+            # so missing keys in older files fall back to sensible defaults.
+            new_para = set_parameters_sptPALM()
+            new_para.update(load_parameters(filename))
+            print("Input parameters loaded")
+
             # Update the entries with the newly loaded parameters
             data_dir_entry.delete(0, tk.END)
             data_dir_entry.insert(0, new_para['data_dir'])
@@ -173,12 +177,16 @@ def set_parameters_sptPALM_GUI(para = None):
             raise ValueError("No file selected!")
 
     def exit_GUI():
-        para_function()
-        root.quit()  # Exits the Tkinter event loop
-        root.destroy()  # Destroys the Tkinter window
+        para_function()        # collect the edited values into 'para'
+        # Use quit() (not destroy()) here: it breaks out of root.mainloop() below
+        # without tearing down the window from inside the callback. On macOS,
+        # destroy()-from-callback can hang (spinning beachball). The window is
+        # destroyed after mainloop() returns instead.
+        root.quit()
+
     
     # Collect all parameters from the GUI
-    # required to fill in new variables into para after pressing "Save" or "Exit"
+    # required to fill in new variables into para after pressing "Save" or "Exit/Continue"
     def para_function():
         nonlocal para
         para = {
@@ -239,25 +247,30 @@ def set_parameters_sptPALM_GUI(para = None):
         # Get data from GUI
         para_function()
         
-        # Ask the user where to save the file, default filename is input_parameter.pkl
+        # Ask the user where to save the file, default filename is input_parameter.json
         save_file_path = filedialog.asksaveasfilename(
-            defaultextension=".pkl",
+            defaultextension=".json",
             initialdir=para['data_dir'],  # Set the initial directory if provided
-            filetypes=[("Pickle files", "*.pkl")],
-            initialfile="input_parameter.pkl",
+            filetypes=[("JSON files", "*.json")],
+            initialfile="input_parameter.json",
             title="Save input_parameter as"
         )
-        
+
         if save_file_path:  # If the user selects a file path
-            with open(save_file_path, 'wb') as file:
-                pickle.dump(para, file)  # Save the dictionary to the file
+            save_parameters(para, save_file_path)  # human-readable JSON
             print(f"input_parameter saved to {save_file_path}")
         else:
             print("Save operation canceled.")
         
     root = tk.Tk()
-    root.title("SPT-PALM Parameter GUI (defaults imported from set_parameter_sptPALM.py)")
-    
+    root.title("sptPALM parameter GUI (Default values imported from set_parameter_sptPALM.py)")
+
+    # Place GUI to the top left corner of the screen and make sure it is on top
+    root.geometry("+50+50")
+    root.lift()          # raise window to top of stacking order
+    root.focus_force()   # force keyboard focus to this window
+
+    root.protocol("WM_DELETE_WINDOW", exit_GUI)
     # Adjust the column configuration of the root window to split into two
     root.grid_columnconfigure(0, weight=1)  # First column gets full width (file_frame)
     root.grid_columnconfigure(1, weight=1)  # Second column (numeric_frame) gets half width
@@ -309,73 +322,57 @@ def set_parameters_sptPALM_GUI(para = None):
     row_index+=1
     # Name of conditions
     tk.Label(file_frame, text="Name(s) of conditions", width = width_text_labels,
-             anchor="w").grid(row=3, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     condition_names_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    condition_names_entry.grid(row=3, column=1)
+    condition_names_entry.grid(row=row_index, column=1)
     condition_names_entry.insert(0, ', '.join(map(str, para['condition_names'])))
 
     row_index+=1
     # Condition files
     tk.Label(file_frame, text="Condition files, e.g., [0,1],[2,3]", width = width_text_labels,
-             anchor="w").grid(row=4, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     condition_files_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    condition_files_entry.grid(row=4, column=1)
+    condition_files_entry.grid(row=row_index, column=1)
     condition_files_entry.insert(0, ', '.join(map(str, para['condition_files'])))
 
-    row_index+=1    
+    row_index+=1
     # Histogramming of diffusion coefficients per copynumber
     tk.Label(file_frame, text="Copy number intervals", width = width_text_labels,
-             anchor="w").grid(row=5, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     copynumber_intervals_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    copynumber_intervals_entry.grid(row=5, column=1)
+    copynumber_intervals_entry.grid(row=row_index, column=1)
     copynumber_intervals_entry.insert(0, ', '.join(map(str, para['copynumber_intervals'])))
 
-    row_index+=1    
+    row_index+=1
     # Handle: output directory
     tk.Label(file_frame, text="Handle: output directory", width = width_text_labels,
-             anchor="w").grid(row=6, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     default_output_dir_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    default_output_dir_entry.grid(row=6, column=1)
+    default_output_dir_entry.grid(row=row_index, column=1)
     default_output_dir_entry.insert(0, para['default_output_dir'])
 
     row_index+=1
-    # Handle: CSV File 
+    # Handle: CSV File
     tk.Label(file_frame, text="Handle: csv files", width = width_text_labels,
-             anchor="w").grid(row=7, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_csv_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_csv_handle_entry.grid(row=7, column=1)
+    fn_csv_handle_entry.grid(row=row_index, column=1)
     fn_csv_handle_entry.insert(0, para['fn_csv_handle'])
 
-    # row_index+=1
-    # # Handle: fn_dict_handle 
-    # tk.Label(file_frame, text="Handle: dictionary ", width = width_text_labels,
-    #          anchor="w").grid(row=8, column=0, sticky=tk.W)
-    # fn_dict_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    # fn_dict_handle_entry.grid(row=8, column=1)
-    # fn_dict_handle_entry.insert(0, para['fn_dict_handle'])
-
-    # row_index+=1
-    # # Handle: fn_diffs_handle 
-    # tk.Label(file_frame, text="Handle: diffusion coeff. ", width = width_text_labels,
-    #          anchor="w").grid(row=9, column=0, sticky=tk.W)
-    # fn_diffs_handle_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    # fn_diffs_handle_entry.grid(row=9, column=1)
-    # fn_diffs_handle_entry.insert(0, para['fn_diffs_handle'])
-
     row_index+=1
-    # Handle: fn_movies     
+    # Handle: fn_movies
     tk.Label(file_frame, text="Handle: movies", width = width_text_labels,
-             anchor="w").grid(row=10, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_movies_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_movies_entry.grid(row=10, column=1)
+    fn_movies_entry.grid(row=row_index, column=1)
     fn_movies_entry.insert(0, para['fn_movies'])
 
     row_index+=1
-    # Handle: fn_combined_movies     
+    # Handle: fn_combined_movies
     tk.Label(file_frame, text="Handle: combined-movies", width = width_text_labels,
-             anchor="w").grid(row=11, column=0, sticky=tk.W)
+             anchor="w").grid(row=row_index, column=0, sticky=tk.W)
     fn_combined_movies_entry = tk.Entry(file_frame, width=width_text_fileIO)
-    fn_combined_movies_entry.grid(row=11, column=1)
+    fn_combined_movies_entry.grid(row=row_index, column=1)
     fn_combined_movies_entry.insert(0, para['fn_combined_movies'])
     
 
@@ -644,10 +641,24 @@ def set_parameters_sptPALM_GUI(para = None):
     tk.Button(button_frame, text="Save...",
               command=save_params).grid(row=0, column=1, padx=5)
 
-    tk.Button(button_frame, text="Exit",
+    tk.Button(button_frame, text="Close GUI",
               command=exit_GUI).grid(row=0, column=4, padx=5)
 
+    # Block here until the window is closed (via "Close GUI" or the window's X,
+    # both routed to exit_GUI). Without this the function would return immediately
+    # and discard the user's edits. exit_GUI populates 'para' and calls quit(),
+    # which makes mainloop() return; we then tear the window down here.
     root.mainloop()
+    # macOS: control is about to return to the blocking CLI input() prompt, which
+    # no longer services Tk events. Hide and flush the window *now* so it actually
+    # disappears instead of lingering as an unresponsive (beachball) window until
+    # the process exits.
+    try:
+        root.withdraw()          # hide immediately
+        root.update()            # process the hide so it takes visual effect now
+        root.destroy()           # tear down widgets
+    except tk.TclError:
+        pass                     # already torn down (e.g. window X on some platforms)
 
     # Return collected parameters after window closes
     return para

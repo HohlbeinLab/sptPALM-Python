@@ -19,6 +19,7 @@ import pandas as pd
 import pickle
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
+from helper_functions import apply_caption_fontsize
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.simpledialog import askstring
@@ -28,18 +29,6 @@ import seaborn as sns
 # Assuming Para1 is a dictionary-like object
 def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
     print('\nRun plot_combined_data_sptPALM.py')
-  
-    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # print("  TEMP! SPECIFIC FILE is being loaded: input_parameter.pkl!")  
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter.pkl'
-    # with open(filename, 'rb') as f:
-    #     input_parameter = pickle.load(f)
-
-    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # print("  TEMP! SPECIFIC FILE is being loaded: sptData_combined_movies.pkl!")  
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
-    # with open(filename, 'rb') as f:
-    #     comb_data = pickle.load(f)
 
     #  Check whether data was passed to the function
     if not input_parameter:
@@ -58,7 +47,10 @@ def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
                 comb_data = pickle.load(f)
         else:
             raise ValueError("No file selected!")
-    
+
+    # Apply the configured caption (title) font size to all figures produced below
+    apply_caption_fontsize(input_parameter)
+
     # Figure A: plot stack plot with diffusion coefficients)
     if input_parameter['use_segmentations']:
         plot_diff_tracklength_combined(comb_data,input_parameter)
@@ -117,8 +109,8 @@ def plot_diff_tracklength_combined(comb_data, input_parameter):
         temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
         plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '-Cond:-' + f'{ii}' +'_Fig2_BoxPlots' + input_parameter['plot_option_save'], dpi = input_parameter['dpi'])
 
-        
-        plt.show()
+        plt.show(block=False)  # non-blocking so the pipeline continues (esp. from a terminal)
+        plt.pause(0.1)
     
     return 
 
@@ -191,7 +183,8 @@ def plot_stacked_diff_histo(comb_data, input_parameter):
     
     
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)  # non-blocking so the pipeline continues (esp. from a terminal)
+    plt.pause(0.1)
     
     # Save figure as PNG
     temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
@@ -204,19 +197,9 @@ def plot_stacked_diff_histo(comb_data, input_parameter):
 # Assuming Para1 is a dictionary-like object
 def plot_compare_conditions(comb_data=None, input_parameter=None):
 
-    print('\nRun plot_combined_data_sptPALM.py')
+    print('\nRun plot_compare_conditions')
 
-    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/input_parameter.pkl'
-    # with open(filename, 'rb') as f:
-    #     input_parameter = pickle.load(f)
-        
-    # # TEMPORARY For bugfixing - Replace the following line with your file path if needed
-    # filename = '/Users/hohlbein/Documents/WORK-DATA-local/2024-TypeIII/output_python/sptData_combined_movies.pkl'
-    # with open(filename, 'rb') as f:
-    #     comb_data = pickle.load(f)
-    
-    fig, ax = plt.subplots(2, 2, figsize=(14, 10)) # 
+    fig, ax = plt.subplots(2, 2, figsize=(14, 10)) #
     dot_size = 5
     
     # A) Avg. diffusion coefficient per cell per condition
@@ -298,7 +281,8 @@ def plot_compare_conditions(comb_data=None, input_parameter=None):
     temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
     plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig2_BoxPlots' + input_parameter['plot_option_save'], dpi = input_parameter['dpi'])
 
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.1)
    
     return input_parameter, comb_data    
  
