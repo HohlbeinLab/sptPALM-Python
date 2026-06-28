@@ -6,7 +6,9 @@ original author). Last updated: 2026-06-27.
 
 Progress: MSD bug fix done; **Step 1 done** (§3.1); faster startup done (§2.2b);
 terminal/macOS runtime fixes done (§2.3); **Step 2 done** (§3.2, incl. gap
-correction 3.2a). Next: Step 3 (§3.3, untangle the `para` god-dict).
+correction 3.2a); **Step 3 done as "cleanup + documentation"** (§3.3). Next:
+Step 4 (§3.4, sub-track diagnostic) when wanted; deferred: sim_input pkl->JSON,
+the structural god-dict rewrite.
 
 ## 1. Goals
 
@@ -167,15 +169,29 @@ Plus sub-task 3.2a `d99a1d6` (gap correction).
   gap. NOTE: OLD vs FAST still differ as estimators (first-N vs all-steps); this
   sub-task is only about the gap correction, not making the two numerically equal.
 
-### 3.3 Untangle the `para` god-dict + documentation
+### 3.3 Maintainability — done as "cleanup + documentation" (2026-06-28)
 
-- Separate *settings* (and file references) from *data* (raw DataFrames, results).
-  Functions should declare what they consume and return, rather than mutating one
-  shared dict.
-- Add docstrings/comments aimed at external users; consistent naming; remove
-  commented-out debug path blocks scattered through several files.
-- Fix `row_index` inconsistency in `set_parameters_sptPALM_GUI.py` (it is
-  incremented but several rows use hardcoded literal row numbers).
+Scope chosen by Johannes: cleanup + documentation, **not** the structural god-dict
+rewrite (high risk / hard to validate without full GUI runs — deferred). Commits:
+`e08c55e` (cleanup), `3057640` (user tidy-ups), docs commit (this).
+
+- DONE: removed the commented-out "TEMP! SPECIFIC FILE / WORK-DATA-local"
+  debug-load blocks from analyse_movies, combine_analysed_data, MC_diffusion,
+  plot_combined_data, simulation_main.
+- DONE: deleted unused scratch `temp.py` and orphan duplicate
+  `plot_compare_conditions.py` (the live copy lives inside plot_combined_data).
+- DONE: `set_parameters_sptPALM_GUI` file-frame entries use the running
+  `row_index` instead of hardcoded grid rows (which had gaps); dropped dead
+  commented widgets.
+- DONE: added `docs/DATA_CONTRACT.md` — what `input_parameter` / `para` / `data` /
+  `comb_data` hold, and what each function reads/writes. Serves as the practical
+  substitute for the structural rewrite.
+- DEFERRED (high risk, low reward for working code): separating settings from
+  data and changing function signatures so they declare inputs/outputs. The
+  god-dict pattern remains; `DATA_CONTRACT.md` documents it instead.
+- STILL OPEN minor: the intentional dataset presets in `set_parameters_sptPALM.py`
+  are kept; `plot_compare_conditions` (inline in plot_combined_data) still has a
+  hardcoded personal path if ever re-enabled.
 
 ### 3.4 Sub-track / moving-average diffusion (new, optional feature)
 
