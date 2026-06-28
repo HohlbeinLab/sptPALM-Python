@@ -69,6 +69,19 @@ def load_parameters(filepath):
     return para
 
 
+def apply_caption_fontsize(para):
+    """Make all matplotlib figure titles/suptitles use para['fontsize'].
+
+    Call once at a plotting entry point: matplotlib rcParams persist for the
+    session, so every figure created afterwards inherits the configured (smaller)
+    caption size without having to set fontsize on each individual title.
+    """
+    import matplotlib.pyplot as plt
+    fs = para.get('fontsize', 10)
+    plt.rcParams['axes.titlesize'] = fs     # subplot titles (ax.set_title)
+    plt.rcParams['figure.titlesize'] = fs   # figure suptitles (fig.suptitle)
+
+
 def yes_no_input(prompt, default="yes"):
     # Define default options based on the default value
     if default == "yes":

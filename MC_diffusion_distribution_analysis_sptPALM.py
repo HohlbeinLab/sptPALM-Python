@@ -25,6 +25,7 @@ from initiate_simulation import initiate_simulation
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast
 from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
 from fit_data_with_MCDDA_sptPALM import fit_data_with_MCDDA_sptPALM
+from helper_functions import apply_caption_fontsize
 
  # Assuming Para1 is a dictionary-like object
 def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=None, sim_input=None):
@@ -97,6 +98,9 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
    
     print(f"  Running MCDDA on tracks assigned for condition: {comb_data['condition_names'][sim_input['species_to_select']]}\n")
     
+    # Apply the configured caption (title) font size to all figures produced below
+    apply_caption_fontsize(input_parameter)
+
     # Use tracks from anaDDA style of plotting tracks
     # tracks: x[µm), y[µm]], frame, track_id, frametime
     tracks = comb_data['anaDDA_tracks'][sim_input['species_to_select']]

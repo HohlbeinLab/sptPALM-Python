@@ -19,6 +19,7 @@ import pandas as pd
 import pickle
 from set_parameters_sptPALM import set_parameters_sptPALM
 from set_parameters_sptPALM_GUI import set_parameters_sptPALM_GUI
+from helper_functions import apply_caption_fontsize
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.simpledialog import askstring
@@ -58,7 +59,10 @@ def plot_combined_data_sptPALM(comb_data=None, input_parameter=None):
                 comb_data = pickle.load(f)
         else:
             raise ValueError("No file selected!")
-    
+
+    # Apply the configured caption (title) font size to all figures produced below
+    apply_caption_fontsize(input_parameter)
+
     # Figure A: plot stack plot with diffusion coefficients)
     if input_parameter['use_segmentations']:
         plot_diff_tracklength_combined(comb_data,input_parameter)

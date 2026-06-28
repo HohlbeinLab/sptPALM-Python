@@ -25,7 +25,7 @@ from single_cell_analysis_sptPALM import single_cell_analysis_sptPALM
 from plot_single_cell_analysis_sptPALM import plot_single_cell_analysis_sptPALM
 from diff_coeffs_from_tracks_fast import diff_coeffs_from_tracks_fast, diff_coeffs_per_track
 from plot_diff_histograms_tracklength_resolved import plot_diff_histograms_tracklength_resolved
-from helper_functions import yes_no_input
+from helper_functions import yes_no_input, apply_caption_fontsize
 
 def analyse_movies_sptPALM(input_parameter = None):
     """
@@ -90,6 +90,9 @@ def analyse_movies_sptPALM(input_parameter = None):
     print('  Show input_parameter')
     for key, value in input_parameter.items():
         print(f"    .{key}: {value}")
+
+    # Apply the configured caption (title) font size to all figures produced below
+    apply_caption_fontsize(input_parameter)
 
     """ 2. sptPALM data analysis (looping over each single movie) """
     data = {}
