@@ -100,13 +100,13 @@ def MC_diffusion_distribution_analysis_sptPALM(comb_data=None, input_parameter=N
     # Use tracks from anaDDA style of plotting tracks
     # tracks: x[µm), y[µm]], frame, track_id, frametime
     tracks = comb_data['anaDDA_tracks'][sim_input['species_to_select']]
-    
-    # Generate average diffusion coefficients for each track
-    sorted_tracks = tracks.sort_values(by=['track_id', 'frame'])
 
+    # Generate average diffusion coefficients for each track.
+    # (diff_coeffs_from_tracks_fast sorts by ['track_id','frame'] internally, so no
+    # pre-sort is needed here.)
     # D: tracks + #_loc, MSD, D_coeff
     # D_track_length_matrix: Bins, steps[2-3]
-    [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(sorted_tracks, sim_input);
+    [D, D_track_length_matrix] = diff_coeffs_from_tracks_fast(tracks, sim_input);
     
     # Plot experimental data
     plot_diff_histograms_tracklength_resolved(D_track_length_matrix, sim_input, D)
