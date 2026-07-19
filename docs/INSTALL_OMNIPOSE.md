@@ -9,8 +9,11 @@ use to run `sptPALM_main.py`. The pipeline launches it as a subprocess (see
 [`OmniposeFromMain.py`](../OmniposeFromMain.py)).
 
 > **Status:** verified against Omnipose **1.1.4** (Jan 2026) and the official
-> install docs on 2026-07-19. If you install and something differs, please update
-> this file — see [Keeping this future-proof](#keeping-this-future-proof).
+> install docs on 2026-07-19. The Quick-install path below was confirmed working
+> on macOS via the standard `conda create` (no Apple-Silicon environment file
+> needed) — the `omnipose` GUI launched successfully. If you install and something
+> differs, please update this file — see
+> [Keeping this future-proof](#keeping-this-future-proof).
 
 ---
 
