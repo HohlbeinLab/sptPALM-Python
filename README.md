@@ -69,6 +69,8 @@ Macro_CellSegmentation.ijm is used to segment cells on 'MyBrightfield.tif'. Curr
 ## 5. Omnipose
 
 ### 5.1 Installation and set-up
+> **For a step-by-step install guide (recommended), see [docs/INSTALL_OMNIPOSE.md](docs/INSTALL_OMNIPOSE.md).**
+
 To install Omnipose, follow the official documentation.
 - Omnipose Installation Guide [[link]](https://omnipose.readthedocs.io/installation.html)  
 - Omnipose GitHub Repository [[link]](https://github.com/kevinjohncutler/omnipose)
