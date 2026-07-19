@@ -18,7 +18,13 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 import os
 import numpy as np
+
+# Importing OmniposeForCommand pulls in torch + omnipose, which is slow on first
+# launch (tens of seconds) and shows a spinning cursor. Announce it so the calling
+# terminal isn't mistaken for a hang.
+print("Loading Omnipose libraries (torch, omnipose) — this can take a while on first launch...", flush=True)
 from OmniposeForCommand import run_segmentation_pipeline
+print("Omnipose libraries loaded. Opening the segmentation GUI...", flush=True)
 
 import argparse
 import json
@@ -28,7 +34,7 @@ import json
 MODEL_OPTIONS = [
     "bact_phase_omni",
     "bact_fluor_omni", 
-    "cyto2_omni",     
+    "cyto2_omni", 
     "worm_omni",
 ]
 
@@ -122,16 +128,20 @@ def run_pipeline():
     invert = invert_var.get()
     save_setting_text = save_setting_text_var.get()
 
-    message_var.set("Running segmentation...")
+    message_var.set("Running segmentation... (window will be unresponsive until done)")
     message_label.config(fg="black")
+    # Force the GUI to repaint the status message BEFORE the blocking call below.
+    # run_segmentation_pipeline() runs on this (main) thread, so the window cannot
+    # process events while it works and macOS shows a spinning beachball. Painting
+    # first makes clear it is busy, not hung.
+    root.update_idletasks()
 
     run_segmentation_pipeline(
         basedir=files_to_segment, model_name=model_name, chans=chans, mask_threshold=mask_threshold,
         flow_threshold=flow_threshold, omni=omni, diameter=diameter, invert=invert, 
         min_size=min_size,
         boundary_thickness=boundary_thickness, area_thresh=area_thresh, cutoff=cutoff, 
-        save_setting_text=save_setting_text, post_processing=post_processing, output_folder=output_dir,
-    )
+        save_setting_text=save_setting_text, post_processing=post_processing, output_folder=output_dir)
 
 
     message_var.set("Segmentation completed successfully.")
@@ -143,9 +153,10 @@ def run_pipeline():
 
 # Main window
 root = tk.Tk()
-root.title("Segmentation Pipeline GUI")
-root.geometry("630x600")
-root.config(bg="#f0f0f0")  # Set background color
+root.title("Omnipose Segmentation (sptPALM)")
+# No fixed geometry and no hardcoded fonts/colours: the window auto-sizes to its
+# contents and uses the system default font, matching the Set Parameters GUI.
+root.resizable(True, True)
 
 # Variables
 #basedir_var = tk.StringVar()
@@ -167,102 +178,95 @@ post_processing_var = tk.BooleanVar(value=False)
 
 # Message Frame
 message_var = tk.StringVar()
-message_label = tk.Label(root, textvariable=message_var, font=("Arial", 12), bg="#f0f0f0")
+message_label = tk.Label(root, textvariable=message_var)
 message_label.pack(pady=0
                    )
 
 # Main Frame
-main_frame = tk.Frame(root, bg="#f0f0f0")
+main_frame = tk.Frame(root)
 main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=18)
 
 # Base Directory Frame
 
 # Model Frame
-model_frame = tk.Frame(main_frame, bg="#f0f0f0")
+model_frame = tk.Frame(main_frame)
 model_frame.grid(row=2, column=0, sticky="w", pady=8)
-tk.Label(model_frame, text="Model", font=("Arial", 11), bg="#f0f0f0").grid(row=0, column=0, sticky="w", padx=5)
-ttk.Combobox(model_frame, textvariable=model_var, values=MODEL_OPTIONS, width=47, font=("Arial", 10)).grid(row=0, column=1, padx=5)
+tk.Label(model_frame, text="Model").grid(row=0, column=0, sticky="w", padx=5)
+ttk.Combobox(model_frame, textvariable=model_var, values=MODEL_OPTIONS, width=47).grid(row=0, column=1, padx=5)
 
 # Channel Frame
-channel_frame = tk.Frame(main_frame, bg="#f0f0f0")
+channel_frame = tk.Frame(main_frame)
 channel_frame.grid(row=3, column=0, sticky="w", pady=8)
-tk.Label(channel_frame, text="Channel 1", font=("Arial", 11), bg="#f0f0f0").grid(row=0, column=0, sticky="w", padx=4)
-tk.Entry(channel_frame, textvariable=chan1_var, font=("Arial", 10), width=10).grid(row=0, column=1, padx=5)
-tk.Label(channel_frame, text="Channel 2", font=("Arial", 11), bg="#f0f0f0").grid(row=0, column=2, sticky="w", padx=4)
-tk.Entry(channel_frame, textvariable=chan2_var, font=("Arial", 10), width=10).grid(row=0, column=3, padx=5)
+tk.Label(channel_frame, text="Channel 1").grid(row=0, column=0, sticky="w", padx=4)
+tk.Entry(channel_frame, textvariable=chan1_var, width=10).grid(row=0, column=1, padx=5)
+tk.Label(channel_frame, text="Channel 2").grid(row=0, column=2, sticky="w", padx=4)
+tk.Entry(channel_frame, textvariable=chan2_var, width=10).grid(row=0, column=3, padx=5)
 channel_frame.grid_columnconfigure(0, weight=1)
 channel_frame.grid_columnconfigure(1, weight=1)
 channel_frame.grid_columnconfigure(2, weight=1)
 channel_frame.grid_columnconfigure(3, weight=1)
-tk.Label(channel_frame, 
-         text="Select Channel 1:0, Channel 2:0 for gray-scale images.\n"
+tk.Label(channel_frame,
+         text="Select Channel 1 = 0, Channel 2 = 0 for gray-scale images.\n"
               "Use Channel 1 for the cytoplasm channel: 1,2,3 for red, green, blue.\n"
-              "Use Channel 2 for the nuclear channel: 1,2,3 for red, green, blue.",
-         font=("Arial", 9), bg="#f0f0f0", fg="#555", wraplength=400, justify="left").grid(
-    row=1, column=0, columnspan=4, sticky="w", padx=5, pady=1
+              "Use Channel 2 for the nuclear channel: 1,2,3 for red, green, blue.", justify="left").grid(
+    row=1, column=0, columnspan=4, sticky="w", padx=(28, 5), pady=1
 )
              
 # Parameter Frame
-param_frame = tk.Frame(main_frame, bg="#f0f0f0")
+param_frame = tk.Frame(main_frame)
 param_frame.grid(row=4, column=0, sticky="w", pady=3)
 
 # Mask Threshold frame
-tk.Label(param_frame, text="Mask Threshold", font=("Arial", 11), bg="#f0f0f0").grid(row=0, column=0, sticky="w", padx=5)
-tk.Entry(param_frame, textvariable=mask_thresh_var, font=("Arial", 10), width=10).grid(row=0, column=1, padx=5)
+tk.Label(param_frame, text="Mask Threshold").grid(row=0, column=0, sticky="w", padx=5)
+tk.Entry(param_frame, textvariable=mask_thresh_var, width=10).grid(row=0, column=1, padx=5)
 tk.Label(param_frame, text="Erode or dilate masks with respectively higher or lower values between -5 and 5.\n"
-         "Decrease this threshold if you are getting too few masks or if masks do not cover the entire cell.",
-         font=("Arial", 9), bg="#f0f0f0", fg="#555", justify="left").grid(row=1, column=0, columnspan=4, sticky="w", padx=5, pady=3)
+         "Decrease this threshold if you are getting too few masks or if masks do not cover the entire cell.", justify="left").grid(row=1, column=0, columnspan=4, sticky="w", padx=(28, 5), pady=3)
 
 # Flow Threshold Frame
-tk.Label(param_frame, text="Flow Threshold", font=("Arial", 11), bg="#f0f0f0").grid(row=2, column=0, sticky="w", padx=5)
-tk.Entry(param_frame, textvariable=flow_thresh_var, font=("Arial", 10), width=10).grid(row=2, column=1, padx=5)
+tk.Label(param_frame, text="Flow Threshold").grid(row=2, column=0, sticky="w", padx=5)
+tk.Entry(param_frame, textvariable=flow_thresh_var, width=10).grid(row=2, column=1, padx=5)
 tk.Label(param_frame, 
          text="Only needed if there are spurious masks to clean up; slows down output.\n"
-         "Increase in case of too many masks. Decrease in case of too many spurious masks.",
-         font=("Arial", 9), bg="#f0f0f0", fg="#555", justify="left").grid(row=3, column=0, columnspan=3, sticky="w", padx=5, pady=3)
+         "Increase in case of too many masks. Decrease in case of too many spurious masks.", justify="left").grid(row=3, column=0, columnspan=3, sticky="w", padx=(28, 5), pady=3)
 
 # Diameter Frame
-tk.Label(param_frame, text="Diameter", font=("Arial", 11), bg="#f0f0f0").grid(row=4, column=0, sticky="w", padx=5)
-tk.Entry(param_frame, textvariable=diameter_var, font=("Arial", 10), width=10).grid(row=4, column=1, padx=5)
-tk.Label(param_frame, text="Select 0 for automatic determination or put in cell diameter in pixels.",
-         font=("Arial", 9), bg="#f0f0f0", fg="#555").grid(row=5, column=0, columnspan=3, sticky="w", padx=5, pady=3)
+tk.Label(param_frame, text="Diameter").grid(row=4, column=0, sticky="w", padx=5)
+tk.Entry(param_frame, textvariable=diameter_var, width=10).grid(row=4, column=1, padx=5)
+tk.Label(param_frame, text="Select 0 for automatic determination or put in cell diameter in pixels.").grid(row=5, column=0, columnspan=3, sticky="w", padx=(28, 5), pady=3)
 
 # Min Size Frame
 
 # Options Frame
-options_frame = tk.Frame(main_frame, bg="#f0f0f0")
+options_frame = tk.Frame(main_frame)
 options_frame.grid(row=5, column=0, sticky="w", pady=3)
 
 # left side
-left_options_frame = tk.Frame(options_frame, bg="#f0f0f0")
+left_options_frame = tk.Frame(options_frame)
 left_options_frame.grid(row=0, column=0, sticky="nw")
 
-tk.Checkbutton(left_options_frame, text="Omnipose mask reconstruction (advised)", variable=omni_var, 
-               font=("Arial", 10), bg="#f0f0f0").grid(row=0, column=0, sticky="w", padx=5)
-tk.Checkbutton(left_options_frame, text="Invert Image", variable=invert_var, font=("Arial", 10), 
-               bg="#f0f0f0").grid(row=1, column=0, sticky="w", padx=5)
-tk.Checkbutton(left_options_frame, text="Save settings in a txt file", variable=save_setting_text_var, 
-               font=("Arial", 10), bg="#f0f0f0").grid(row=2, column=0, sticky="w", padx=5)
+tk.Checkbutton(left_options_frame, text="Omnipose mask reconstruction (advised)", variable=omni_var).grid(row=0, column=0, sticky="w", padx=5)
+tk.Checkbutton(left_options_frame, text="Invert Image", variable=invert_var).grid(row=1, column=0, sticky="w", padx=5)
+tk.Checkbutton(left_options_frame, text="Save settings in a txt file", variable=save_setting_text_var).grid(row=2, column=0, sticky="w", padx=5)
 # Run button
-tk.Button(left_options_frame, text="Run Segmentation", command=run_pipeline, font=("Arial", 12), 
-          bg="#4CAF50", fg="white", width=20).grid(row=3, column=0, pady=10, padx=5)
+# NOTE: macOS renders tk.Button with the native grey background and ignores bg,
+# so fg="white" made the label invisible (white on grey). Use black text.
+tk.Button(left_options_frame, text="Run Segmentation", command=run_pipeline,
+          fg="black", width=20).grid(row=3, column=0, pady=10, padx=5)
 
 # Post-processing Frame
-right_params_frame = tk.Frame(options_frame, bg="#f0f0f0", highlightbackground="black", highlightthickness=1)
+right_params_frame = tk.Frame(options_frame, highlightbackground="black", highlightthickness=1)
 right_params_frame.grid(row=0, column=1, sticky="nw", padx=10)
-tk.Checkbutton(right_params_frame, text="Post-processing", variable=post_processing_var, font=("Arial", 10),
-         bg="#f0f0f0").grid(row=0, column=0, columnspan=2, sticky="w", pady=3)
+tk.Checkbutton(right_params_frame, text="Post-processing", variable=post_processing_var).grid(row=0, column=0, columnspan=2, sticky="w", pady=3)
 
-tk.Label(right_params_frame, text="Boundary Thickness: edge width.\nArea: remove boundary masks smaller than this.\nCutoff (0-1): remove masks with ≥ X% edge pixels.\nTo remove all boundary masks: area: np.inf, cutoff: 0.",
-         fg="#555", bg="#f0f0f0", justify="left").grid(row=1, column=0, columnspan=2, sticky="w", pady=0)
+tk.Label(right_params_frame, text="Boundary Thickness: edge width.\nArea: remove boundary masks smaller than this.\nCutoff (0-1): remove masks with ≥ X% edge pixels.\nTo remove all boundary masks: area: np.inf, cutoff: 0.", justify="left").grid(row=1, column=0, columnspan=2, sticky="w", pady=0)
 
-tk.Label(right_params_frame, text="Boundary Thickness", font=("Arial", 10), bg="#f0f0f0").grid(row=2, column=0, sticky="w", pady=2)
+tk.Label(right_params_frame, text="Boundary Thickness").grid(row=2, column=0, sticky="w", pady=2)
 tk.Entry(right_params_frame, textvariable=boundary_thickness_var, width=10).grid(row=2, column=1, pady=2)
 
-tk.Label(right_params_frame, text="Area Threshold", font=("Arial", 10), bg="#f0f0f0").grid(row=3, column=0, sticky="w", pady=2)
+tk.Label(right_params_frame, text="Area Threshold").grid(row=3, column=0, sticky="w", pady=2)
 tk.Entry(right_params_frame, textvariable=area_thresh_var, width=10).grid(row=3, column=1, pady=2)
 
-tk.Label(right_params_frame, text="Cutoff", font=("Arial", 10), bg="#f0f0f0").grid(row=4, column=0, sticky="w", pady=10)
+tk.Label(right_params_frame, text="Cutoff").grid(row=4, column=0, sticky="w", pady=10)
 tk.Entry(right_params_frame, textvariable=cutoff_var, width=10).grid(row=4, column=1, pady=10)
 
 # Start the GUI loop
