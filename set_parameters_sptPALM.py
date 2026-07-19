@@ -35,6 +35,9 @@ def set_parameters_sptPALM():
         'use_segmentations': bool(True), # Account for segmentations = False, default: True
         'cellarea_pixels_min': int(50),  # Filter cells for minum area (area is given in number of pixels), default: 50
         'cellarea_pixels_max': int(500), # Filter cells for area (area is given in number of pixels), default: 500
+        'used_segmentation_method': 'Watershed', # Used segmentation method, either 'Watershed' or 'Cellpose/Omnipose'
+        'applied_segmentation': bool(False), # False, starts up Omnipose GUI for segmentation, True: assumes masks and CSV file are present: 
+        'z_projection': bool(False), # Default: False, True for z-projection
 
         # Tracking and diffusion analysis
         'frametime': float(0.01), # Frametime in seconds, default: 0.01

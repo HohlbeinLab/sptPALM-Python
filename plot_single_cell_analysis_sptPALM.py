@@ -52,7 +52,10 @@ def plot_tracks_in_cells(para):
   
     # Show processed brightfield image
     ax.imshow(bf_dict['proc_brightfield_image'], cmap='gray')
-    ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)', fontsize=para['fontsize'])
+    if para['used_segmentation_method'] == 'Watershed':
+        ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)', fontsize=para['fontsize'])
+    elif para['used_segmentation_method'] == 'Cellpose/Omnipose':
+        ax.set_title('Processed brightfield image (from Cellpose/Omnipose)', fontsize=para['fontsize'])
     ax.set_xlabel('Pixels')
     ax.set_ylabel('Pixels')
     ax.set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal

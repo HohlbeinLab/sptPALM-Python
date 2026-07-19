@@ -81,6 +81,9 @@ def sptPALM_main():
                 print('  Show input_parameter:') # Display analysis parameters
                 for key, value in input_parameter.items():
                     print(f"    .{key}: {value}")
+                if input_parameter['use_segmentations'] == True:
+                    from OmniposeFromMain import start_omnipose
+                    start_omnipose(input_parameter) # go to start up Omnipose file
                 print("\n...'input_parameter' in memory, return to selection menu...")
             case 2:  # analyse_movies_sptPALM,py
                 from analyse_movies_sptPALM import analyse_movies_sptPALM
