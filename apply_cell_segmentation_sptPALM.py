@@ -20,29 +20,18 @@ from plot_cells_locs_sptPALM import plot_cells_locs_sptPALM
 def apply_cell_segmentation_sptPALM(para):
     print('Run apply_cell_segmentation_sptPALM.py')
     
-    # the following definition will it make easier to wrap other segmentation input
-    # general structue: colum_names={'name_internally','name_from_extern'}
-    segm_table_column_names = {'Label':'Label',
-                    'volume':'volume'
-                    } 
-    
-    # Define filenames to load existing data (requires correct settings in ImageJ/Fiji: 'Macro_CellSegmentation.imj')
-    para['fn_proc_brightfield_segm'] = para['fn_proc_brightfield'][:-4] + '_segm.tif'
-    para['fn_proc_brightfield_segm_table'] = para['fn_proc_brightfield_segm'][:-4] + '_table.csv'
-
     # Load processed brightfield image with cells, filename: '*_procBrightfield.tif'
     print(f"  Load_proc_brightfield: {para['fn_proc_brightfield']}")
     bf_dict = {} # brightfield_dictionary
     bf_dict['proc_brightfield_image'] = imread(para['data_dir'] + para['fn_proc_brightfield'])
-
-    # Load segmented image with cells, filename '*_procBrightfield_segm.tif'
-    print(f"  Load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
-    bf_dict['proc_brightfield_segm_image'] = imread(para['data_dir'] + para['fn_proc_brightfield_segm'])
     
-    # Load table with information on the segmentations, filename '*_procBrightfield_segm_table.csv'
-    print(f"  Load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
-    bf_dict['proc_brightfield_segm_table'] = pd.read_csv(para['data_dir'] + para['fn_proc_brightfield_segm_table'])
-         
+    # Check the cell segmentation method for correct processing of input-files
+    if para['used_segmentation_method'] == 'Watershed':
+    # para, bf_dict and segm table column names for mapping csv headers to dataframe
+        para, bf_dict, segm_table_column_names = watershed_parameters(para, bf_dict)
+    elif para['used_segmentation_method'] == 'Cellpose/Omnipose':
+        para, bf_dict, segm_table_column_names = cellpose_parameters(para, bf_dict)
+        
     # Import '*_analysis.csv'
     temp_path = os.path.join(para['data_dir'], para['default_output_dir'])
     csv_data = pd.read_csv(temp_path + para['fn_locs'][:-4] + para['fn_csv_handle'])
@@ -126,3 +115,52 @@ def apply_cell_segmentation_sptPALM(para):
     
     return para
 
+def watershed_parameters(para, bf_dict):
+    """Definition for selecting the correct files and method of mapping .csv file
+    in case watershed was used for segmentation.
+    """
+    
+    # general structure: colum_names={'name_internally','name_from_extern'}
+    segm_table_column_names = {'Label':'Label',
+                    'volume':'volume'
+                    } 
+    
+    # Define filenames to load existing data (requires correct settings in ImageJ/Fiji: 'Macro_CellSegmentation.imj')
+    para['fn_proc_brightfield_segm'] = para['fn_proc_brightfield'][:-4] + '_segm.tif'
+    para['fn_proc_brightfield_segm_table'] = para['fn_proc_brightfield_segm'][:-4] + '_table.csv'
+
+    # Load segmented image with cells, filename '*_procBrightfield_segm.tif'
+    print(f"  Load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
+    bf_dict['proc_brightfield_segm_image'] = imread(para['data_dir'] + para['fn_proc_brightfield_segm'])
+    
+    # Load table with information on the segmentations, filename '*_procBrightfield_segm_table.csv'
+    print(f"  Load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
+    bf_dict['proc_brightfield_segm_table'] = pd.read_csv(para['data_dir'] + para['fn_proc_brightfield_segm_table'])
+    
+    return para, bf_dict, segm_table_column_names
+
+def cellpose_parameters(para, bf_dict):
+    """Definition for selecting the correct files and method of mapping .csv file
+    in case watershed was used for segmentation.
+    """
+    # general structure: colum_names={'name_internally','name_from_extern'}
+    segm_table_column_names = {'Label':'Label',
+                    'volume':'Area' 
+                    # for checking area currently called volume for looping, 
+                    # need to remove later as max_size not really needed or keep it like this the way it is
+                    # called area in the csv_file
+                    } 
+    
+    # Define filenames to load existing data
+    para['fn_proc_brightfield_segm'] = para['fn_proc_brightfield'][:-4] + '_cp_masks.tif'
+    para['fn_proc_brightfield_segm_table'] = para['fn_proc_brightfield_segm'][:-4] + '_table.csv'
+
+    # Load segmented image with cells, filename '*_cp_masks.tif'
+    print(f"  Load_proc_brightfield_segm: {para['fn_proc_brightfield_segm']}")
+    bf_dict['proc_brightfield_segm_image'] = imread(para['data_dir'] + para['fn_proc_brightfield_segm'])
+    
+    # Load table with information on the segmentations, filename '*_cp_masks_table.csv'
+    print(f"  Load_proc_brightfield_segm_table: {para['fn_proc_brightfield_segm_table']}")
+    bf_dict['proc_brightfield_segm_table'] = pd.read_csv(para['data_dir'] + para['fn_proc_brightfield_segm_table'])
+    
+    return para, bf_dict, segm_table_column_names

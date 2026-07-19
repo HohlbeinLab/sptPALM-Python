@@ -17,6 +17,8 @@ import numpy as np
 from skimage.io import imread
 import pandas as pd
 
+from helper_functions import randomize_label_image
+
 
 def plot_single_cell_analysis_sptPALM(para):
     print('\nRun plot_single_cell_analysis_sptPALM.py')
@@ -52,7 +54,10 @@ def plot_tracks_in_cells(para):
   
     # Show processed brightfield image
     ax.imshow(bf_dict['proc_brightfield_image'], cmap='gray')
-    ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)', fontsize=para['fontsize'])
+    if para['used_segmentation_method'] == 'Watershed':
+        ax.set_title('Processed brightfield image (from MacroCellSegmentation.ijm)', fontsize=para['fontsize'])
+    elif para['used_segmentation_method'] == 'Cellpose/Omnipose':
+        ax.set_title('Processed brightfield image (from Cellpose/Omnipose)', fontsize=para['fontsize'])
     ax.set_xlabel('Pixels')
     ax.set_ylabel('Pixels')
     ax.set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
@@ -111,8 +116,11 @@ def plot_tracks_histograms(para):
     fig.suptitle('Segmentations images and localisations + various histogram for valid cells',
                  fontsize=para['fontsize'])
 
+    # Shuffle label->colour so neighbouring cells are distinguishable (see helper).
+    segm_disp = randomize_label_image(para['bf_dict']['proc_brightfield_segm_image'])
+
     # Show segmented brightfield image with all localisations
-    ax[0, 0].imshow(para['bf_dict']['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
+    ax[0, 0].imshow(segm_disp, cmap = para['cmap_applied'])
     ax[0, 0].scatter(para['bf_dict']['loc_pixel_table'].loc[:, 'x'], para['bf_dict']['loc_pixel_table'].loc[:, 'y'], circle_spot_size,
                       'black', label='Localisations')
     ax[0, 0].set_title(f"Segmented image containing {len(para['bf_dict']['loc_pixel_table'])} localisations",
@@ -122,7 +130,7 @@ def plot_tracks_histograms(para):
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
     # Show segmented brightfield image with all localisations
-    ax[0, 1].imshow(para['bf_dict']['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
+    ax[0, 1].imshow(segm_disp, cmap = para['cmap_applied'])
     ax[0, 1].scatter(para['bf_dict']['loc_pixel_table_filt'].loc[:, 'x'], para['bf_dict']['loc_pixel_table_filt'].loc[:, 'y'], circle_spot_size,
                       'magenta', label='Localisations')
     ax[0, 1].set_title(f"{len(para['bf_dict']['loc_pixel_table_filt'])} localisations in tracks "

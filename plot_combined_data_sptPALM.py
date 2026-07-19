@@ -107,7 +107,8 @@ def plot_diff_tracklength_combined(comb_data, input_parameter):
         
         # Save figure as PNG/SVG/PDF
         temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
-        plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '-Cond:-' + f'{ii}' +'_Fig2_BoxPlots' + input_parameter['plot_option_save'], dpi = input_parameter['dpi'])
+        
+        plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '-Cond-' + f'{ii}' +'_Fig2_BoxPlots' + input_parameter['plot_option_save'], dpi = input_parameter['dpi'])
 
         plt.show(block=False)  # non-blocking so the pipeline continues (esp. from a terminal)
         plt.pause(0.1)
@@ -188,7 +189,7 @@ def plot_stacked_diff_histo(comb_data, input_parameter):
     
     # Save figure as PNG
     temp_path = os.path.join(input_parameter['data_dir'], input_parameter['default_output_dir'])
-    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig01_Diffs.' + input_parameter['plot_option_save'],
+    plt.savefig(temp_path + input_parameter['fn_combined_movies'][:-4] + '_Fig01_Diffs' + input_parameter['plot_option_save'],
                 dpi = input_parameter['dpi'])
 
 

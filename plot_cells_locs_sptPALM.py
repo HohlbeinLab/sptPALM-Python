@@ -15,23 +15,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+from helper_functions import randomize_label_image
+
 def plot_cells_locs_sptPALM(para, bf_dict):
-  
+
     print('  Run plot_locs_cells_sptPALM.py')
     # Plot images initially segmented elsewhere
-    fig, ax = plt.subplots(2, 3, figsize=(14, 8)) # 
+    fig, ax = plt.subplots(2, 3, figsize=(14, 8)) #
     fig.suptitle('Brightfield images, segmentations, and localisations + Histogram of localisation intensities')
     circle_spot_size = 1
 
+    # Shuffle label->colour so neighbouring cells are distinguishable (see helper).
+    segm_disp = randomize_label_image(bf_dict['proc_brightfield_segm_image'])
+
     # Show processed brightfield image
     ax[0, 0].imshow(bf_dict['proc_brightfield_image'], cmap='gray')
-    ax[0, 0].set_title('Proc. brightfield image (MacroCellSegmentation.ijm)')
+    if para['used_segmentation_method'] == 'Watershed':
+        ax[0, 0].set_title('Processed brightfield image (from MacroCellSegmentation.ijm)')
+    elif para['used_segmentation_method'] == 'Cellpose/Omnipose':
+        ax[0, 0].set_title('Processed brightfield image')
     ax[0, 0].set_xlabel('Pixels')
     ax[0, 0].set_ylabel('Pixels')
     ax[0, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
     # Show segmented brightfield image
-    ax[0, 1].imshow(bf_dict['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
+    ax[0, 1].imshow(segm_disp, cmap = para['cmap_applied'])
     ax[0, 1].set_title(f"Proc. brightfield segm. image with {len(bf_dict['proc_brightfield_segm_table'])} cells")
     ax[0, 1].set_xlabel('Pixels')
     ax[0, 1].set_ylabel('Pixels')
@@ -45,7 +53,7 @@ def plot_cells_locs_sptPALM(para, bf_dict):
     ax[0, 2].set_ylabel('Number of localisations')
 
     # Show segmented brightfield image with all localisations
-    ax[1, 0].imshow(bf_dict['proc_brightfield_segm_image'], cmap = para['cmap_applied'])
+    ax[1, 0].imshow(segm_disp, cmap = para['cmap_applied'])
     ax[1, 0].scatter(bf_dict['loc_pixel_table'].loc[:, 'x'], bf_dict['loc_pixel_table'].loc[:, 'y'], circle_spot_size,
                      'black', label='Localisations')
     ax[1, 0].set_title(f"Segmented image with {len(bf_dict['loc_pixel_table'])} localisations")
@@ -54,7 +62,7 @@ def plot_cells_locs_sptPALM(para, bf_dict):
     ax[1, 0].set_aspect('equal', adjustable='box')  # Set aspect ratio to be equal
 
     # Show segmented brightfield image with localisations in valid cells
-    ax[1, 1].imshow(bf_dict['proc_brightfield_segm_image'], cmap = para['cmap_applied']) 
+    ax[1, 1].imshow(segm_disp, cmap = para['cmap_applied'])
     ax[1, 1].scatter(bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] == -1, 'x'], 
                      bf_dict['loc_pixel_table'].loc[bf_dict['loc_pixel_table'].loc[:, 'cell_id'] == -1, 'y'],
                      circle_spot_size, 'black', label='Outside valid cells')

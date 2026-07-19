@@ -120,8 +120,49 @@ def string_input_with_default(prompt, default):
     # If the user presses Enter without typing, use the default value
     if not user_input:
         return default
-    
+
     return user_input
+
+
+def randomize_label_image(label_img, seed=0):
+    """Return a copy of an integer label image with non-zero labels shuffled.
+
+    The segmentation images are integer label maps (cell 1, 2, 3, ... N).
+    Segmentation tools (e.g. skimage.measure.label used for the Omnipose masks)
+    number cells in raster order, so physically adjacent cells often get
+    consecutive labels. Shown through a continuous colormap, consecutive labels
+    map to near-identical colours, making neighbouring cells hard to tell apart.
+
+    Shuffling which label value each cell receives (background 0 preserved)
+    decorrelates colour from position, so neighbours get distinct colours. The
+    permutation is deterministic for a given seed, so a cell keeps the same colour
+    across every panel and figure.
+
+    Parameters
+    ----------
+    label_img : np.ndarray
+        Integer label image (0 = background).
+    seed : int, optional
+        Seed for the deterministic shuffle. The default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Copy of label_img with non-zero labels permuted. The set of values is
+        unchanged (so display normalisation is unaffected); only their spatial
+        assignment differs.
+    """
+    labels = np.unique(label_img)
+    labels = labels[labels != 0]
+    if labels.size == 0:
+        return label_img.copy()
+    rng = np.random.default_rng(seed)
+    shuffled = labels.copy()
+    rng.shuffle(shuffled)
+    # Vectorised remap: lookup table indexed by original label value (0 -> 0).
+    lut = np.zeros(int(label_img.max()) + 1, dtype=label_img.dtype)
+    lut[labels] = shuffled
+    return lut[label_img]
 
 #Version if the default should already show in the commandline
 

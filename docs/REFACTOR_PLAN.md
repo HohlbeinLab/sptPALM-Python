@@ -6,9 +6,9 @@ original author). Last updated: 2026-06-27.
 
 Progress: MSD bug fix done; **Step 1 done** (§3.1); faster startup done (§2.2b);
 terminal/macOS runtime fixes done (§2.3); **Step 2 done** (§3.2, incl. gap
-correction 3.2a); **Step 3 done as "cleanup + documentation"** (§3.3). Next:
-Step 4 (§3.4, sub-track diagnostic) when wanted; deferred: sim_input pkl->JSON,
-the structural god-dict rewrite.
+correction 3.2a); **Step 3 done as "cleanup + documentation"** (§3.3). Remaining,
+renumbered: Step 4 = god-dict structural refactor (§3.4); Step 5 = sub-track
+diagnostic (§3.5); Step 6 = unified GUI (§3.6). Also deferred: sim_input pkl->JSON.
 
 ## 1. Goals
 
@@ -186,14 +186,31 @@ rewrite (high risk / hard to validate without full GUI runs — deferred). Commi
 - DONE: added `docs/DATA_CONTRACT.md` — what `input_parameter` / `para` / `data` /
   `comb_data` hold, and what each function reads/writes. Serves as the practical
   substitute for the structural rewrite.
-- DEFERRED (high risk, low reward for working code): separating settings from
-  data and changing function signatures so they declare inputs/outputs. The
-  god-dict pattern remains; `DATA_CONTRACT.md` documents it instead.
+- DEFERRED to its own step: separating settings from data and changing function
+  signatures so they declare inputs/outputs — now **Step 4 (§3.4)**. For now the
+  god-dict pattern remains and `DATA_CONTRACT.md` documents it.
 - STILL OPEN minor: the intentional dataset presets in `set_parameters_sptPALM.py`
   are kept; `plot_compare_conditions` (inline in plot_combined_data) still has a
   hardcoded personal path if ever re-enabled.
 
-### 3.4 Sub-track / moving-average diffusion (new, optional feature)
+### 3.4 Untangle the `para` god-dict (structural refactor)
+
+Promoted from a deferred note to a planned step. High risk / high reward: the
+single `para` / `input_parameter` dictionary currently carries both settings and
+results and is mutated in place across ~12 files (see `DATA_CONTRACT.md`).
+
+- Goal: separate **settings** (paths, parameters) from **data/results** (raw
+  DataFrames, computed outputs); have functions declare what they consume and
+  return rather than mutating one shared dict.
+- Approach: incremental — refactor one function boundary at a time, validating
+  each against current output before moving on (the `DATA_CONTRACT.md` tables are
+  the reference for who reads/writes what).
+- Caveats: needs full GUI-pipeline runs (case 2 → 3 → 4 → 5) on a display to
+  validate, so collaboration with Johannes on testing is required. Reversible but
+  higher churn than previous steps. Consider doing only after external feedback on
+  the current PR has settled.
+
+### 3.5 Sub-track / moving-average diffusion (new, optional feature)
 
 For very long tracks (organic fluorophores, many localisations), split a single
 track into consecutive sub-tracks and report diffusion coefficients along the
@@ -224,6 +241,25 @@ changes. Basis: Uphoff lab, *J. Phys. Chem. B* 2024,
   within it (smaller window = finer state resolution but noisier D). A fully
   rigorous treatment of state switching would be a hidden-Markov approach
   (e.g. vbSPT) — out of scope here.
+
+### 3.6 Unified GUI for the pipeline (longer-term)
+
+Replace / supplement the interactive numbered prompt in `sptPALM_main.py` with a
+single GUI that drives the whole pipeline (set parameters → analyse → combine →
+plot → MCDDA) and shows output + figures inline.
+
+- Prior start: `sptPALM_main_GUI.py` already exists (tkinter) — buttons per menu
+  option, stdout redirected to a Text widget, figures embedded via
+  `FigureCanvasTkAgg`. Marked "not yet fully functional"; has signature mismatches
+  with the current functions (e.g. expects `plot_combined_data_sptPALM` to return a
+  figure; MCDDA call signature changed). **Keep as a reference / starting point.**
+- Open design question (from early discussion): stay with tkinter, or move to a
+  **browser-based GUI** (e.g. Gradio/Panel)? A browser GUI would sidestep the
+  tkinter+macOS fragility seen in §2.3 and run anywhere, at the cost of a real
+  implementation effort. Given the tool is meant to be script-like (set once, run),
+  this is a convenience layer, not the core.
+- Depends on / benefits from Step 4 (a clean settings/data split makes wiring a GUI
+  much easier than around the current god-dict).
 
 ## 4. Cross-cutting design principles
 
